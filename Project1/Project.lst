@@ -1,14 +1,14 @@
-Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/09/19 11:07:58
-Program 1		(addtwo.asm			     Page 1 - 1
+Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/09/19 16:40:17
+Program 1		(Project1.asm			     Page 1 - 1
 
 
-				TITLE Program 1		(addtwo.asm)
+				TITLE Program 1		(Project1.asm)
 
 				; Author: Bryce Hahn
 				; Course/Project ID: CS 271 Project 1
 				; Date: 1/9/2019
 				; Description: Get the input for two numbers from the user,
-				; add them up, and tell if the second number is larger than the first number.
+				; add them up, divide, subtract and multiply, and tell if the second number is larger than the first number.
 
 				INCLUDE Irvine32.inc
 			      C ; Include file for Irvine32.lib             (Irvine32.inc)
@@ -30,10 +30,15 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/09/19 11:07:58
 			      C 
 
  00000000			.data								; var declaration
- 00000000 00000002		num1			DWORD	2			; The first number the user will enter
+ 00000000 0000000A		num1			DWORD	10			; The first number the user will enter
  00000004 00000007		num2			DWORD	7			; The second number the user will enter
- 00000008 01			keep_going		BYTE	1			; Continue running the program until the user quits
- 00000009 57 65 6C 63 6F	intro_1			BYTE	"Welcome to Add 'Em Up! In this program you will give two integers and I will add them up! (and subtract, divide, multiply)", 0
+ 00000008 00000000		sum				DWORD	?			; the sum of the inputs
+ 0000000C 00000000		dif				DWORD	?			; the difference of the inputs
+ 00000010 00000000		prod			DWORD	?			; the product of the inputs
+ 00000014 00000000		quotient		DWORD	?			; the quotient of the inputs
+ 00000018 00000000		remain			DWORD	?			; the remainder of the quotient
+ 0000001C 00000000		keep_going		DWORD	?			; Continue running the program until the user quits
+ 00000020 57 65 6C 63 6F	intro_1			BYTE	"Welcome to Add 'Em Up! In this program you will give two integers and I will add them up! (and subtract, divide, multiply)", 0
 	   6D 65 20 74 6F
 	   20 41 64 64 20
 	   27 45 6D 20 55
@@ -58,7 +63,7 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/09/19 11:07:58
 	   65 2C 20 6D 75
 	   6C 74 69 70 6C
 	   79 29 00
- 00000084 44 6F 6E 27 74	intro_2			BYTE	"Don't forget that I only want the second number to be lower than the first.", 0
+ 0000009B 44 6F 6E 27 74	intro_2			BYTE	"Don't forget that I only want the second number to be lower than the first.", 0
 	   20 66 6F 72 67
 	   65 74 20 74 68
 	   61 74 20 49 20
@@ -74,7 +79,7 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/09/19 11:07:58
 	   74 68 65 20 66
 	   69 72 73 74 2E
 	   00
- 000000D0 50 6C 65 61 73	prompt_1		BYTE	"Please provide your first integer: ", 0
+ 000000E7 50 6C 65 61 73	prompt_1		BYTE	"Please provide your first integer: ", 0
 	   65 20 70 72 6F
 	   76 69 64 65 20
 	   79 6F 75 72 20
@@ -82,7 +87,7 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/09/19 11:07:58
 	   20 69 6E 74 65
 	   67 65 72 3A 20
 	   00
- 000000F4 50 6C 65 61 73	prompt_2		BYTE	"Please provide your second integer: ", 0
+ 0000010B 50 6C 65 61 73	prompt_2		BYTE	"Please provide your second integer: ", 0
 	   65 20 70 72 6F
 	   76 69 64 65 20
 	   79 6F 75 72 20
@@ -90,7 +95,23 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/09/19 11:07:58
 	   64 20 69 6E 74
 	   65 67 65 72 3A
 	   20 00
- 00000119 49 27 6D 20 73	input_too_big	BYTE	"I'm sorry, the second integer was bigger than the first! Try another.", 0
+ 00000130 54 68 65 20 73	failed_1		BYTE	"The second integer was bigger than the first.", 0
+	   65 63 6F 6E 64
+	   20 69 6E 74 65
+	   67 65 72 20 77
+	   61 73 20 62 69
+	   67 67 65 72 20
+	   74 68 61 6E 20
+	   74 68 65 20 66
+	   69 72 73 74 2E
+	   00
+ 0000015E 50 6C 65 61 73	failed_prompt_1 BYTE	"Please enter a new integer: ", 0
+	   65 20 65 6E 74
+	   65 72 20 61 20
+	   6E 65 77 20 69
+	   6E 74 65 67 65
+	   72 3A 20 00
+ 0000017B 49 27 6D 20 73	input_too_big	BYTE	"I'm sorry, the second integer was bigger than the first! Try another.", 0
 	   6F 72 72 79 2C
 	   20 74 68 65 20
 	   73 65 63 6F 6E
@@ -104,76 +125,236 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/09/19 11:07:58
 	   21 20 54 72 79
 	   20 61 6E 6F 74
 	   68 65 72 2E 00
- 0000015F 54 68 65 20 73	result_1		BYTE	"The sum of your integers is ", 0
+ 000001C1 54 68 65 20 73	result_1		BYTE	"The sum of ", 0
 	   75 6D 20 6F 66
-	   20 79 6F 75 72
-	   20 69 6E 74 65
-	   67 65 72 73 20
-	   69 73 20 00
- 0000017C 44 6F 20 79 6F	prompt_3		BYTE	"Do you wish to add some more? ", 0
+	   20 00
+ 000001CD 54 68 65 20 64	result_2		BYTE	"The difference of ", 0
+	   69 66 66 65 72
+	   65 6E 63 65 20
+	   6F 66 20 00
+ 000001E0 54 68 65 20 70	result_3		BYTE	"The product of ", 0
+	   72 6F 64 75 63
+	   74 20 6F 66 20
+	   00
+ 000001F0 54 68 65 20 71	result_4		BYTE	"The quotient of ", 0
+	   75 6F 74 69 65
+	   6E 74 20 6F 66
+	   20 00
+ 00000201 54 68 65 20 66	result_5		BYTE	"The floating-point quotient of ", 0
+	   6C 6F 61 74 69
+	   6E 67 2D 70 6F
+	   69 6E 74 20 71
+	   75 6F 74 69 65
+	   6E 74 20 6F 66
+	   20 00
+ 00000221 44 6F 20 79 6F	prompt_3		BYTE	"Do you wish to add some more? (Press 1 to start over) ", 0
 	   75 20 77 69 73
 	   68 20 74 6F 20
 	   61 64 64 20 73
 	   6F 6D 65 20 6D
 	   6F 72 65 3F 20
-	   00
- 0000019B 54 68 61 6E 6B	finish			BYTE	"Thanks for addin up! Goodbye.", 0
+	   28 50 72 65 73
+	   73 20 31 20 74
+	   6F 20 73 74 61
+	   72 74 20 6F 76
+	   65 72 29 20 00
+ 00000258 54 68 61 6E 6B	finish			BYTE	"Thanks for addin up! Goodbye.", 0
 	   73 20 66 6F 72
 	   20 61 64 64 69
 	   6E 20 75 70 21
 	   20 47 6F 6F 64
 	   62 79 65 2E 00
-
+ 00000276 3D 00			result_string	BYTE	"=", 0
+ 00000278 2B 00			sum_string		BYTE	"+", 0
+ 0000027A 2D 00			dif_string		BYTE	"-", 0
+ 0000027C 2A 00			prod_string		BYTE	"*", 0
+ 0000027E 2F 00			quotient_string BYTE	"/", 0
+ 00000280 20 72 65 6D 61	remain_string	BYTE	" remainder ", 0
+	   69 6E 64 65 72
+	   20 00
 
 
  00000000			.code				; end of data segment
  00000000			main PROC
 					; Introduce user to the program, and what they need to do/instructions
 						;intro 1
- 00000000  BA 00000009 R			mov		edx, OFFSET intro_1
+ 00000000  BA 00000020 R			mov		edx, OFFSET intro_1
  00000005  E8 00000000 E			call	WriteString
  0000000A  E8 00000000 E			call	CrLf
 						; intro 2
- 0000000F  BA 00000084 R			mov		edx, OFFSET intro_2
+ 0000000F  BA 0000009B R			mov		edx, OFFSET intro_2
  00000014  E8 00000000 E			call	WriteString
  00000019  E8 00000000 E			call	CrLf
-					; get user inputs for 2 random integers
- 0000001E  BA 000000D0 R			mov		edx, OFFSET prompt_1
+
+ 0000001E			Inputs:					; get user inputs for 2 random integers
+ 0000001E  BA 000000E7 R			mov		edx, OFFSET prompt_1
  00000023  E8 00000000 E			call	WriteString
-						;get the int
- 00000028  A1 00000000 R			mov		eax, num1
- 0000002D  B9 00000004				mov		ecx, 4
- 00000032  E8 00000000 E			call	ReadInt
+						; get the input
+ 00000028  E8 00000000 E			call	ReadInt
+ 0000002D  A3 00000000 R			mov		num1, eax
+
+ 00000032  BA 0000010B R			mov		edx, OFFSET prompt_2
+ 00000037  E8 00000000 E			call	WriteString
+						; get the input
+ 0000003C  E8 00000000 E			call	ReadInt
+ 00000041  A3 00000004 R			mov		num2, eax
 
 					; check to see if the second integer is bigger than the first one
+ 00000046  A1 00000004 R			mov		eax, num2
+ 0000004B  3B 05 00000000 R			cmp		eax, num1
+ 00000051  7F 02				jg		FailedInput
+ 00000053  7E 32				jle		Calculations
 
-
-					; calculate the sum of the two numbers
-
-					; print result
- 00000037  BA 0000015F R			mov		edx, OFFSET result_1
- 0000003C  E8 00000000 E			call	WriteString
- 00000041  A1 00000000 R			mov		eax, num1
- 00000046  E8 00000000 E			call	WriteDec
- 0000004B  E8 00000000 E			call	CrLf
-
-					; ask if the user wishes to run aagain.
-
-
-					; exit the program
- 00000050  BA 0000019B R			mov		edx, OFFSET finish
- 00000055  E8 00000000 E			call	CrLf
+ 00000055			FailedInput:			; let the user know the input was UNACEPTABLE
+ 00000055  BA 00000130 R			mov		edx, OFFSET failed_1
  0000005A  E8 00000000 E			call	WriteString
  0000005F  E8 00000000 E			call	CrLf
+ 00000064  BA 0000015E R			mov		edx, OFFSET failed_prompt_1
+ 00000069  E8 00000000 E			call	WriteString
+ 0000006E  E8 00000000 E			call	ReadInt
+ 00000073  A3 00000004 R			mov		num2, eax
+
+						;once again check
+ 00000078  A1 00000004 R			mov		eax, num2
+ 0000007D  3B 05 00000000 R			cmp		eax, num1
+ 00000083  7F D0				jg		FailedInput
+ 00000085  7E 00				jle		Calculations
+
+
+ 00000087			Calculations:			; calculate all the different forms
+					; calculate the sum of the two numbers
+ 00000087  A1 00000000 R			mov		eax, num1
+ 0000008C  03 05 00000004 R			add		eax, num2
+ 00000092  A3 00000008 R			mov		sum, eax
+						
+					; calculate the difference of the two numbers
+ 00000097  A1 00000000 R			mov		eax, num1
+ 0000009C  8B 1D 00000004 R			mov		ebx, num2
+ 000000A2  2B C3				sub		eax, ebx
+ 000000A4  A3 0000000C R			mov		dif, eax
+
+					; calculate the product of the two numbers
+ 000000A9  A1 00000000 R			mov		eax, num1
+ 000000AE  8B 1D 00000004 R			mov		ebx, num2
+ 000000B4  F7 E3				mul		ebx
+ 000000B6  A3 00000010 R			mov		prod, eax
+
+					; calculate the quotient of the two numbers
+ 000000BB  BA 00000000				mov		edx, 0
+ 000000C0  A1 00000000 R			mov		eax, num1
+ 000000C5  99					cdq
+ 000000C6  8B 1D 00000004 R			mov		ebx, num2
+ 000000CC  99					cdq
+ 000000CD  F7 F3				div		ebx
+
+ 000000CF  A3 00000014 R			mov		quotient, eax
+ 000000D4  89 15 00000018 R			mov		remain, edx
+
+					; calculate the floating point quotient of the two numbers
+
+
+
+
+
+					; print result
+ 000000DA  BA 000001C1 R			mov		edx, OFFSET result_1
+ 000000DF  E8 00000000 E			call	WriteString					; "The sum of "
+ 000000E4  A1 00000000 R			mov		eax, num1
+ 000000E9  E8 00000000 E			call	WriteDec					; num1
+ 000000EE  BA 00000278 R			mov		edx, OFFSET sum_string
+ 000000F3  E8 00000000 E			call	WriteString					; "+"
+ 000000F8  A1 00000004 R			mov		eax, num2
+ 000000FD  E8 00000000 E			call	WriteDec					; num2
+ 00000102  BA 00000276 R			mov		edx, OFFSET result_string
+ 00000107  E8 00000000 E			call	WriteString					; "="
+ 0000010C  A1 00000008 R			mov		eax, sum
+ 00000111  E8 00000000 E			call	WriteDec					; res
+ 00000116  E8 00000000 E			call	CrLf
+
+ 0000011B  BA 000001CD R			mov		edx, OFFSET result_2
+ 00000120  E8 00000000 E			call	WriteString					; "The difference of "
+ 00000125  A1 00000000 R			mov		eax, num1
+ 0000012A  E8 00000000 E			call	WriteDec					; num1
+ 0000012F  BA 0000027A R			mov		edx, OFFSET dif_string
+ 00000134  E8 00000000 E			call	WriteString					; "-"
+ 00000139  A1 00000004 R			mov		eax, num2
+ 0000013E  E8 00000000 E			call	WriteDec					; num2
+ 00000143  BA 00000276 R			mov		edx, OFFSET result_string
+ 00000148  E8 00000000 E			call	WriteString					; "="
+ 0000014D  A1 0000000C R			mov		eax, dif
+ 00000152  E8 00000000 E			call	WriteDec					; res
+ 00000157  E8 00000000 E			call	CrLf
+
+ 0000015C  BA 000001E0 R			mov		edx, OFFSET result_3
+ 00000161  E8 00000000 E			call	WriteString					; "The product of "
+ 00000166  A1 00000000 R			mov		eax, num1
+ 0000016B  E8 00000000 E			call	WriteDec					; num1
+ 00000170  BA 0000027C R			mov		edx, OFFSET prod_string
+ 00000175  E8 00000000 E			call	WriteString					; "*"
+ 0000017A  A1 00000004 R			mov		eax, num2
+ 0000017F  E8 00000000 E			call	WriteDec					; num2
+ 00000184  BA 00000276 R			mov		edx, OFFSET result_string
+ 00000189  E8 00000000 E			call	WriteString					; "="
+ 0000018E  A1 00000010 R			mov		eax, prod
+ 00000193  E8 00000000 E			call	WriteDec					; res
+ 00000198  E8 00000000 E			call	CrLf
+
+ 0000019D  BA 000001F0 R			mov		edx, OFFSET result_4
+ 000001A2  E8 00000000 E			call	WriteString					; "The quotient of "
+ 000001A7  A1 00000000 R			mov		eax, num1
+ 000001AC  E8 00000000 E			call	WriteDec					; num1
+ 000001B1  BA 0000027E R			mov		edx, OFFSET quotient_string
+ 000001B6  E8 00000000 E			call	WriteString					; "/"
+ 000001BB  A1 00000004 R			mov		eax, num2
+ 000001C0  E8 00000000 E			call	WriteDec					; num2
+ 000001C5  BA 00000276 R			mov		edx, OFFSET result_string
+ 000001CA  E8 00000000 E			call	WriteString					; "="
+ 000001CF  A1 00000014 R			mov		eax, quotient
+ 000001D4  E8 00000000 E			call	WriteDec					; quotient
+ 000001D9  BA 00000280 R			mov		edx, OFFSET remain_string
+ 000001DE  E8 00000000 E			call	WriteString					; " remainder "
+ 000001E3  A1 00000018 R			mov		eax, remain
+ 000001E8  E8 00000000 E			call	WriteDec					; remainder
+ 000001ED  E8 00000000 E			call	CrLf
+
+
+ 000001F2  BA 00000201 R			mov		edx, OFFSET result_5
+ 000001F7  E8 00000000 E			call	WriteString					; "The floating-point quotient of "
+ 000001FC  A1 00000000 R			mov		eax, num1
+ 00000201  E8 00000000 E			call	WriteDec					; num1
+ 00000206  BA 0000027E R			mov		edx, OFFSET quotient_string
+ 0000020B  E8 00000000 E			call	WriteString					; "/"
+ 00000210  A1 00000004 R			mov		eax, num2
+ 00000215  E8 00000000 E			call	WriteDec					; num2
+ 0000021A  BA 00000276 R			mov		edx, OFFSET result_string
+ 0000021F  E8 00000000 E			call	WriteString					; "="
+
+ 00000224  E8 00000000 E			call	CrLf
+
+ 00000229			RunAgain:					; ask if the user wishes to run aagain.
+ 00000229  BA 00000221 R			mov		edx, OFFSET prompt_3
+ 0000022E  E8 00000000 E			call	WriteString
+						; get user input for a y or n
+ 00000233  E8 00000000 E			call	ReadInt
+ 00000238  A3 0000001C R			mov		keep_going, eax
+
+ 0000023D  83 F8 01				cmp		eax, 1
+ 00000240  0F 84 FFFFFDD8			je		Inputs		; Jumps to int inputs if wanted, else end program
+
+					; exit the program
+ 00000246  BA 00000258 R			mov		edx, OFFSET finish
+ 0000024B  E8 00000000 E			call	CrLf
+ 00000250  E8 00000000 E			call	WriteString
+ 00000255  E8 00000000 E			call	CrLf
 					exit			; close program, return to OS
- 00000064  6A 00	   *	    push   +000000000h
- 00000066  E8 00000000 E   *	    call   ExitProcess
- 0000006B			main ENDP
+ 0000025A  6A 00	   *	    push   +000000000h
+ 0000025C  E8 00000000 E   *	    call   ExitProcess
+ 00000261			main ENDP
 
 
 				END main
-Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/09/19 11:07:58
-Program 1		(addtwo.asm			     Symbols 2 - 1
+Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/09/19 16:40:17
+Program 1		(Project1.asm			     Symbols 2 - 1
 
 
 
@@ -266,8 +447,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 000001B9 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 0000006B Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 0000028C Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000261 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -374,7 +555,11 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 0000006B Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000261 Public STDCALL
+  Inputs . . . . . . . . . . . .	L Near	 0000001E _TEXT	
+  FailedInput  . . . . . . . . .	L Near	 00000055 _TEXT	
+  Calculations . . . . . . . . .	L Near	 00000087 _TEXT	
+  RunAgain . . . . . . . . . . .	L Near	 00000229 _TEXT	
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -597,14 +782,18 @@ black  . . . . . . . . . . . . .	Number	 00000000h
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
+dif_string . . . . . . . . . . .	Byte	 0000027A _DATA	
+dif  . . . . . . . . . . . . . .	DWord	 0000000C _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
-finish . . . . . . . . . . . . .	Byte	 0000019B _DATA	
+failed_1 . . . . . . . . . . . .	Byte	 00000130 _DATA	
+failed_prompt_1  . . . . . . . .	Byte	 0000015E _DATA	
+finish . . . . . . . . . . . . .	Byte	 00000258 _DATA	
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
-input_too_big  . . . . . . . . .	Byte	 00000119 _DATA	
-intro_1  . . . . . . . . . . . .	Byte	 00000009 _DATA	
-intro_2  . . . . . . . . . . . .	Byte	 00000084 _DATA	
-keep_going . . . . . . . . . . .	Byte	 00000008 _DATA	
+input_too_big  . . . . . . . . .	Byte	 0000017B _DATA	
+intro_1  . . . . . . . . . . . .	Byte	 00000020 _DATA	
+intro_2  . . . . . . . . . . . .	Byte	 0000009B _DATA	
+keep_going . . . . . . . . . . .	DWord	 0000001C _DATA	
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
 lightCyan  . . . . . . . . . . .	Number	 0000000Bh   
 lightGray  . . . . . . . . . . .	Number	 00000007h   
@@ -614,11 +803,24 @@ lightRed . . . . . . . . . . . .	Number	 0000000Ch
 magenta  . . . . . . . . . . . .	Number	 00000005h   
 num1 . . . . . . . . . . . . . .	DWord	 00000000 _DATA	
 num2 . . . . . . . . . . . . . .	DWord	 00000004 _DATA	
-prompt_1 . . . . . . . . . . . .	Byte	 000000D0 _DATA	
-prompt_2 . . . . . . . . . . . .	Byte	 000000F4 _DATA	
-prompt_3 . . . . . . . . . . . .	Byte	 0000017C _DATA	
+prod_string  . . . . . . . . . .	Byte	 0000027C _DATA	
+prod . . . . . . . . . . . . . .	DWord	 00000010 _DATA	
+prompt_1 . . . . . . . . . . . .	Byte	 000000E7 _DATA	
+prompt_2 . . . . . . . . . . . .	Byte	 0000010B _DATA	
+prompt_3 . . . . . . . . . . . .	Byte	 00000221 _DATA	
+quotient_string  . . . . . . . .	Byte	 0000027E _DATA	
+quotient . . . . . . . . . . . .	DWord	 00000014 _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
-result_1 . . . . . . . . . . . .	Byte	 0000015F _DATA	
+remain_string  . . . . . . . . .	Byte	 00000280 _DATA	
+remain . . . . . . . . . . . . .	DWord	 00000018 _DATA	
+result_1 . . . . . . . . . . . .	Byte	 000001C1 _DATA	
+result_2 . . . . . . . . . . . .	Byte	 000001CD _DATA	
+result_3 . . . . . . . . . . . .	Byte	 000001E0 _DATA	
+result_4 . . . . . . . . . . . .	Byte	 000001F0 _DATA	
+result_5 . . . . . . . . . . . .	Byte	 00000201 _DATA	
+result_string  . . . . . . . . .	Byte	 00000276 _DATA	
+sum_string . . . . . . . . . . .	Byte	 00000278 _DATA	
+sum  . . . . . . . . . . . . . .	DWord	 00000008 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   

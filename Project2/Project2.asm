@@ -24,10 +24,11 @@ intro_1			BYTE	"Welcome to the Fibonacci Calculator! I will take in a number to 
 intro_2			BYTE	"many Fibonacci terms you wish me to print.  Extra Credit: My background color ", 0	; Intro 2
 intro_3			BYTE	"and text color changes!", 0														; Intro 3
 prompt_1		BYTE	"Please input your name: ", 0														; Prompt for users name firstly
-prompt_2		BYTE	", please enter how many numbers you wish be printed (between 1 and 45): ", 0			; Prompt for fib numbers count
+prompt_2		BYTE	"Welcome, please enter how many numbers you wish be printed (between 1 and 45): ", 0		; Prompt for fib numbers count
 prompt_3		BYTE	"Do you want to run the program again? (enter 1 for yes)", 0						; Prompt the user to run again
 failed_input_1	BYTE	"The entered number was above the provided range!", 0								; Warn the user that they can't input such a RIDICULOUSLY high number
 failed_input_2	BYTE	"The entered number was bellow the provided range!", 0								; Warn the user that they can't input such a CRAZY low number
+outro_1			BYTE	"Outputting the Fibonacci Sequence:", 0												; Start the calc section with letting the user know it's printing
 finished		BYTE	"Thank you for using my program! Goodbye, ", 0										; Thank the user and say goodbye by name input
 
 
@@ -79,30 +80,38 @@ Inputs:
 		call	ReadString
 		mov		byteCount, eax
 
-		mov		edx, OFFSET userinput
-		call	WriteString
 		mov		edx, OFFSET prompt_2		; prompt the user for how many fib numbers they wish printed
 		call	CrLf
 		call	WriteString
 		call	ReadInt						; read in the user input
-		mov		num_of_fibs, eax					; move the input val to num_of_fibs
+		mov		num_of_fibs, eax			; move the input val to num_of_fibs
 
-											; check to see if the second integer is bigger than the first one
 		mov		eax, num_of_fibs			; move the num_of_fibs to int reg
-		cmp		eax, 1					; compare int reg val (num2) to num1
-		jg		FailedInput					; if greater than, jump to failedInput label
-		jle		Calculations				; if less than or equal to, jump to calculations label
+		cmp		eax, MAXFIB					; compare int reg val (num user wants to print) to the max val
+		jg		HigherInput					; if greater than, jump to higher input failure label
+		cmp		eax, MINFIB					; compare int reg val (num user wants to print) to the min val
+		jl		LowerInput					; if less than, jump to lower input failure label
+		jmp		Calculations				; else, its within min and max, so jump to calculations
 
 ;---------------------------------------------------------------;
-;	The FailedInputs label will be jumped to when the user		;
-;	inputs a faulty second integer, because it was above the	;
-;	first given integer. This will warn the user to input a		;
-;	proper lower int, then ask for a new int, and check if		;
+;	The Lower/Higher Inputs labels will be jumped to when the 	;
+;	user inputs a faulty second integer, because it was above 	;
+;	the first given integer. This will warn the user to input 	;
+;	a proper lower int, then ask for a new int, and check if	;
 ;	the new int is above num1. If successful, will jump the		;
 ;	user to the calculations label.								;
 ;---------------------------------------------------------------;
-FailedInput:
-		
+LowerInput:
+		mov		edx, OFFSET failed_input_2
+		call	WriteString
+		call	CrLf
+		jmp		Inputs
+
+HigherInput:
+		mov		edx, OFFSET failed_input_1
+		call	WriteString
+		call	CrLf
+		jmp		Inputs
 
 ;---------------------------------------------------------------;
 ;	The Calculations label will be the bulk of the process,		;
@@ -111,7 +120,9 @@ FailedInput:
 ;	output.														;
 ;---------------------------------------------------------------;
 Calculations:
-	
+		mov		edx, OFFSET outro_1
+		call	WriteString
+		call	CrLf
 
 ;---------------------------------------------------------------;
 ;	The RunAgain label will test to see if the user is			;
@@ -133,6 +144,8 @@ RunAgain:
 	; exit the program
 		mov		edx, OFFSET finished		; program is done message
 		call	CrLf						; add an extra new line for good looks
+		call	WriteString
+		mov		edx, OFFSET username
 		call	WriteString
 		call	CrLf
 	exit									; close program, return to OS

@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/11/19 10:56:29
+Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/17/19 11:46:55
 Program 2		(Project2.asm			     Page 1 - 1
 
 
@@ -91,22 +91,23 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/11/19 10:56:29
 	   75 74 20 79 6F
 	   75 72 20 6E 61
 	   6D 65 3A 20 00
- 000000F7 2C 20 70 6C 65	prompt_2		BYTE	", please enter how many numbers you wish be printed (between 1 and 45): ", 0			; Prompt for fib numbers count
-	   61 73 65 20 65
-	   6E 74 65 72 20
-	   68 6F 77 20 6D
-	   61 6E 79 20 6E
-	   75 6D 62 65 72
-	   73 20 79 6F 75
-	   20 77 69 73 68
-	   20 62 65 20 70
-	   72 69 6E 74 65
-	   64 20 28 62 65
-	   74 77 65 65 6E
-	   20 31 20 61 6E
-	   64 20 34 35 29
-	   3A 20 00
- 00000140 44 6F 20 79 6F	prompt_3		BYTE	"Do you want to run the program again? (enter 1 for yes)", 0						; Prompt the user to run again
+ 000000F7 57 65 6C 63 6F	prompt_2		BYTE	"Welcome, please enter how many numbers you wish be printed (between 1 and 45): ", 0		; Prompt for fib numbers count
+	   6D 65 2C 20 70
+	   6C 65 61 73 65
+	   20 65 6E 74 65
+	   72 20 68 6F 77
+	   20 6D 61 6E 79
+	   20 6E 75 6D 62
+	   65 72 73 20 79
+	   6F 75 20 77 69
+	   73 68 20 62 65
+	   20 70 72 69 6E
+	   74 65 64 20 28
+	   62 65 74 77 65
+	   65 6E 20 31 20
+	   61 6E 64 20 34
+	   35 29 3A 20 00
+ 00000147 44 6F 20 79 6F	prompt_3		BYTE	"Do you want to run the program again? (enter 1 for yes)", 0						; Prompt the user to run again
 	   75 20 77 61 6E
 	   74 20 74 6F 20
 	   72 75 6E 20 74
@@ -118,7 +119,7 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/11/19 10:56:29
 	   31 20 66 6F 72
 	   20 79 65 73 29
 	   00
- 00000178 54 68 65 20 65	failed_input_1	BYTE	"The entered number was above the provided range!", 0								; Warn the user that they can't input such a RIDICULOUSLY high number
+ 0000017F 54 68 65 20 65	failed_input_1	BYTE	"The entered number was above the provided range!", 0								; Warn the user that they can't input such a RIDICULOUSLY high number
 	   6E 74 65 72 65
 	   64 20 6E 75 6D
 	   62 65 72 20 77
@@ -128,7 +129,7 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/11/19 10:56:29
 	   6F 76 69 64 65
 	   64 20 72 61 6E
 	   67 65 21 00
- 000001A9 54 68 65 20 65	failed_input_2	BYTE	"The entered number was bellow the provided range!", 0								; Warn the user that they can't input such a CRAZY low number
+ 000001B0 54 68 65 20 65	failed_input_2	BYTE	"The entered number was bellow the provided range!", 0								; Warn the user that they can't input such a CRAZY low number
 	   6E 74 65 72 65
 	   64 20 6E 75 6D
 	   62 65 72 20 77
@@ -138,7 +139,14 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/11/19 10:56:29
 	   72 6F 76 69 64
 	   65 64 20 72 61
 	   6E 67 65 21 00
- 000001DB 54 68 61 6E 6B	finished		BYTE	"Thank you for using my program! Goodbye, ", 0										; Thank the user and say goodbye by name input
+ 000001E2 4F 75 74 70 75	outro_1			BYTE	"Outputting the Fibonacci Sequence:", 0												; Start the calc section with letting the user know it's printing
+	   74 74 69 6E 67
+	   20 74 68 65 20
+	   46 69 62 6F 6E
+	   61 63 63 69 20
+	   53 65 71 75 65
+	   6E 63 65 3A 00
+ 00000205 54 68 61 6E 6B	finished		BYTE	"Thank you for using my program! Goodbye, ", 0										; Thank the user and say goodbye by name input
 	   20 79 6F 75 20
 	   66 6F 72 20 75
 	   73 69 6E 67 20
@@ -147,18 +155,26 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/11/19 10:56:29
 	   21 20 47 6F 6F
 	   64 62 79 65 2C
 	   20 00
+ 0000022F 20 20 20 20 20	SPACING			BYTE	"     ", 0																			; Pre-allocated variable to properize the spacings of the outputs
+	   00
 
 
  = 0000002D			MAXFIB			=		45																					; The maximum amount of fib numbers that will be alloud to be calculated
  = 00000001			MINFIB			=		1																					; The minimum amount of fib numbers that will be alloud to be calculated (and that can be...)
- 00000205  00000015 [		userinput		BYTE 21 DUP(0)																				; Byte array for the username input
+ 00000235  00000015 [		userinput		BYTE 21 DUP(0)																				; Byte array for the username input
 	    00
 	   ]
 
- 0000021A 00000000		byteCount		DWORD	?
- 0000021E 00000000		username		DWORD	?																					; User inputed name
- 00000222 00000000		num_of_fibs		DWORD	?																					; User inputed number to be calculated
- 00000226 00000000		keep_going		DWORD	?																					; User inputed responce to run again
+ 0000024A 00000003		backgroundColor DWORD   cyan																				; color value for background color
+ 0000024E 00000010		textColor		DWORD   16																					; color value for text color
+ 00000252 00000000		byteCount		DWORD	?																					; used for holding information about user inputting a string
+ 00000256 00000000		username		DWORD	?																					; User inputed name
+ 0000025A 00000000		num_of_fibs		DWORD	?																					; User inputed number to be calculated
+ 0000025E 00000000		num_on_line		DWORD	?																					; Keep tabs on how many numbers have been printed on a single line
+ 00000262 00000000		current_fib		DWORD	?																					; Keep tabs on the current calculated fib number in the loop
+ 00000266 00000000		last_fib		DWORD	?																					; Keep tabs on the last fib number to calc the up next one
+ 0000026A 00000000		tmp_fib			DWORD	?																					; for swapping current and last fib numbers
+ 0000026E 00000000		keep_going		DWORD	?																					; User inputed responce to run again
 
 				;------------------------;
 				;    Code Declaration    ;
@@ -174,15 +190,17 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/11/19 10:56:29
 				;	will implement this into further projects.					;
 				;---------------------------------------------------------------;
  00000000			main PROC
- 00000000  BA 0000002A R			mov		edx, OFFSET intro_1			; print the program introduction (Called only once when the program starts since the user doesn't need to see this after they restart)
- 00000005  E8 00000000 E			call	WriteString
- 0000000A  E8 00000000 E			call	CrLf						; new line
- 0000000F  BA 00000077 R			mov		edx, OFFSET intro_2			; print the program introduction part 2
- 00000014  E8 00000000 E			call	WriteString
- 00000019  E8 00000000 E			call	CrLf						; new line
- 0000001E  BA 000000C6 R			mov		edx, OFFSET intro_3			; print the extra credit section of the intro
- 00000023  E8 00000000 E			call	WriteString
- 00000028  E8 00000000 E			call	CrLf						; new line
+ 00000000  B8 00000017				mov		eax, lightGray + (blue * 16); color varaibles consist of: black, white, brown, yellow, blue, green, cyan, red, magenta, gray, lightBlue, lightGreen, lightCyan, lightRed, lightMagenta, and lightGray.
+ 00000005  E8 00000000 E			call	setTextColor				; EXTRA CREDIT: change background and foreground colors
+ 0000000A  BA 0000002A R			mov		edx, OFFSET intro_1			; print the program introduction (Called only once when the program starts since the user doesn't need to see this after they restart)
+ 0000000F  E8 00000000 E			call	WriteString
+ 00000014  E8 00000000 E			call	CrLf						; new line
+ 00000019  BA 00000077 R			mov		edx, OFFSET intro_2			; print the program introduction part 2
+ 0000001E  E8 00000000 E			call	WriteString
+ 00000023  E8 00000000 E			call	CrLf						; new line
+ 00000028  BA 000000C6 R			mov		edx, OFFSET intro_3			; print the extra credit section of the intro
+ 0000002D  E8 00000000 E			call	WriteString
+ 00000032  E8 00000000 E			call	CrLf						; new line
 
 				;---------------------------------------------------------------;
 				;	The Inputs label will be the start of the program,			;
@@ -191,38 +209,51 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/11/19 10:56:29
 				;	back into when the user states they wish to restart the		;
 				;	program.													;
 				;---------------------------------------------------------------;
- 0000002D			Inputs:	
- 0000002D  BA 000000DE R			mov		edx, OFFSET prompt_1		; prompt the user for their name
- 00000032  E8 00000000 E			call	WriteString
- 00000037  BA 00000205 R			mov		edx, OFFSET userinput
- 0000003C  B9 00000015				mov		ecx, SIZEOF	userinput
- 00000041  E8 00000000 E			call	ReadString
- 00000046  A3 0000021A R			mov		byteCount, eax
+ 00000037			Inputs:	
+ 00000037  BA 000000DE R			mov		edx, OFFSET prompt_1		; prompt the user for their name
+ 0000003C  E8 00000000 E			call	WriteString
+ 00000041  BA 00000235 R			mov		edx, OFFSET userinput
+ 00000046  B9 00000015				mov		ecx, SIZEOF	userinput
+ 0000004B  E8 00000000 E			call	ReadString
+ 00000050  A3 00000252 R			mov		byteCount, eax
 
- 0000004B  BA 00000205 R			mov		edx, OFFSET userinput
- 00000050  E8 00000000 E			call	WriteString
  00000055  BA 000000F7 R			mov		edx, OFFSET prompt_2		; prompt the user for how many fib numbers they wish printed
  0000005A  E8 00000000 E			call	CrLf
  0000005F  E8 00000000 E			call	WriteString
  00000064  E8 00000000 E			call	ReadInt						; read in the user input
- 00000069  A3 00000222 R			mov		num_of_fibs, eax					; move the input val to num_of_fibs
+ 00000069  A3 0000025A R			mov		num_of_fibs, eax			; move the input val to num_of_fibs
 
-															; check to see if the second integer is bigger than the first one
- 0000006E  A1 00000222 R			mov		eax, num_of_fibs			; move the num_of_fibs to int reg
- 00000073  83 F8 01				cmp		eax, 1					; compare int reg val (num2) to num1
- 00000076  7F 02				jg		FailedInput					; if greater than, jump to failedInput label
- 00000078  7E 00				jle		Calculations				; if less than or equal to, jump to calculations label
+ 0000006E  A1 0000025A R			mov		eax, num_of_fibs			; move the num_of_fibs to int reg
+ 00000073  83 F8 2D				cmp		eax, MAXFIB					; compare int reg val (num user wants to print) to the max val
+ 00000076  7F 30				jg		HigherInput					; if greater than, jump to higher input failure label
+ 00000078  83 F8 01				cmp		eax, MINFIB					; compare int reg val (num user wants to print) to the min val
+ 0000007B  7C 1A				jl		LowerInput					; if less than, jump to lower input failure label
+ 0000007D  0F 84 000000BD			je		Case1						; if the user is equal to the min, aka 1, go to case 1
+ 00000083  83 F8 02				cmp		eax, 2						; if the user entered 2
+ 00000086  0F 84 000000CF			je		Case2						; jump to special case 2
+ 0000008C  83 F8 03				cmp		eax, 3						; if the user entered 3
+ 0000008F  0F 84 000000F5			je		Case3						; jump to special case 3
+ 00000095  EB 25				jmp		Calculations				; else, its within min and max, so jump to calculations
 
 				;---------------------------------------------------------------;
-				;	The FailedInputs label will be jumped to when the user		;
-				;	inputs a faulty second integer, because it was above the	;
-				;	first given integer. This will warn the user to input a		;
-				;	proper lower int, then ask for a new int, and check if		;
+				;	The Lower/Higher Inputs labels will be jumped to when the 	;
+				;	user inputs a faulty second integer, because it was above 	;
+				;	the first given integer. This will warn the user to input 	;
+				;	a proper lower int, then ask for a new int, and check if	;
 				;	the new int is above num1. If successful, will jump the		;
 				;	user to the calculations label.								;
 				;---------------------------------------------------------------;
- 0000007A			FailedInput:
-						
+ 00000097			LowerInput:
+ 00000097  BA 000001B0 R			mov		edx, OFFSET failed_input_2
+ 0000009C  E8 00000000 E			call	WriteString
+ 000000A1  E8 00000000 E			call	CrLf
+ 000000A6  EB 8F				jmp		Inputs
+
+ 000000A8			HigherInput:
+ 000000A8  BA 0000017F R			mov		edx, OFFSET failed_input_1
+ 000000AD  E8 00000000 E			call	WriteString
+ 000000B2  E8 00000000 E			call	CrLf
+ 000000B7  E9 FFFFFF7B				jmp		Inputs
 
 				;---------------------------------------------------------------;
 				;	The Calculations label will be the bulk of the process,		;
@@ -230,8 +261,97 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/11/19 10:56:29
 				;	output them (very smoothly with proper symbols) to the		;
 				;	output.														;
 				;---------------------------------------------------------------;
- 0000007A			Calculations:
-					
+ 000000BC			Calculations:
+ 000000BC  BA 000001E2 R			mov		edx, OFFSET outro_1
+ 000000C1  E8 00000000 E			call	WriteString					; output to the user we are printing the numbers now..
+ 000000C6  E8 00000000 E			call	CrLf
+						
+ 000000CB  B9 00000000				mov		ecx, 0						; set ecx to 0 so we can increase to num_of_fibs
+ 000000D0  C7 05 00000262 R			mov		current_fib, 1				; always start off the sequence at 1
+	   00000001
+ 000000DA  C7 05 0000025E R			mov		num_on_line, 0				; always start off the sequence at 0 on the line
+	   00000000
+ 000000E4  C7 05 00000266 R			mov		last_fib, 0					; start the last fib number off with 0 (0 + 1) = 1
+	   00000000
+ 000000EE					fib_loop:
+ 000000EE  A1 00000266 R				mov		eax, last_fib
+ 000000F3  03 05 00000262 R				add		eax, current_fib
+ 000000F9  E8 00000000 E				call	WriteDec
+
+ 000000FE  A3 0000026A R				mov		tmp_fib, eax			; (next itteration eax value will be the current_fib) move the eax value into temp_fib holder
+ 00000103  A1 00000262 R				mov		eax, current_fib		; (next itteration this will be last_fib) move current fib to a int register
+ 00000108  A3 00000266 R				mov		last_fib, eax			; FINAL: place the current itterations fib value into the next itterations last fib value
+ 0000010D  A1 0000026A R				mov		eax, tmp_fib			; put tmp back in eax
+ 00000112  A3 00000262 R				mov		current_fib, eax		; FINAL: place the current itterations print value into the next itterations current fib value
+							
+ 00000117  BA 0000022F R				mov		edx, OFFSET spacing		; move the spacing into string register
+ 0000011C  E8 00000000 E				call	WriteString				; add spacing
+ 00000121  83 05 0000025E R				add		num_on_line, 1			; add 1 to how many numbers of the sequence are printed on a line
+	   01
+
+
+ 00000128  83 3D 0000025E R				cmp		num_on_line, 5			; compare 5 to num_on_line
+	   05
+							;je		reset_line				; if there are 5 on a line, reset to a new line
+
+							
+
+
+ 0000012F  83 C1 01					add		ecx, 1					; set our temp holder val to +1 so we can get one iteration closer to the fib num
+ 00000132  3B 0D 0000025A R				cmp		ecx, num_of_fibs		; if ecx >= num_of_fibs
+ 00000138  0F 8D 00000099				jge		RunAgain				; jump out of calculations and ask to run again?
+ 0000013E  7C AE					jl		fib_loop
+							
+
+				;---------------------------------------------------------------;
+				;	The Case1 label will only be called if the user enteres		;
+				;	1 as their number of fibonacci sequencings to print.		;
+				;---------------------------------------------------------------;
+ 00000140			Case1:
+ 00000140  C7 05 00000262 R		mov		current_fib, 1					; start the sequence off as 1
+	   00000001
+ 0000014A  A1 00000262 R		mov		eax, current_fib				; move the current_fib to a print register
+ 0000014F  E8 00000000 E		call	WriteDec						; print out
+ 00000154  E8 00000000 E		call	CrLf							; sequence is done so new line
+ 00000159  EB 7C			jmp		RunAgain						; jump to the end of the program, ask if they wanna start over
+
+				;---------------------------------------------------------------;
+				;	The Case2 label will only be called if the user enteres		;
+				;	2 as their number of fibonacci sequencings to print.		;
+				;---------------------------------------------------------------;
+ 0000015B			Case2:
+ 0000015B  C7 05 00000262 R		mov		current_fib, 1					; start the sequence off as 1
+	   00000001
+ 00000165  A1 00000262 R		mov		eax, current_fib				; move the current_fib to a print register
+ 0000016A  E8 00000000 E		call	WriteDec						; print
+ 0000016F  BA 0000022F R		mov		edx, OFFSET spacing				; set the spacing dword to a string register
+ 00000174  E8 00000000 E		call	WriteString						; print out to organize outputs
+ 00000179  A1 00000262 R		mov		eax, current_fib				; back to integers, next up is 1 (cause 0 + 1 = 1)
+ 0000017E  E8 00000000 E		call	WriteDec						; print
+ 00000183  E8 00000000 E		call	CrLf							; sequence is done so new line
+ 00000188  EB 4D			jmp		RunAgain						; jump to the end of the program, ask if they wanna start over
+
+				;---------------------------------------------------------------;
+				;	The Case3 label will only be called if the user enteres		;
+				;	3 as their number of fibonacci sequencings to print.		;
+				;---------------------------------------------------------------;
+ 0000018A			Case3:
+ 0000018A  C7 05 00000262 R		mov		current_fib, 1					; start the sequence off as 1
+	   00000001
+ 00000194  A1 00000262 R		mov		eax, current_fib				; move the current_fib to a print register
+ 00000199  E8 00000000 E		call	WriteDec						; print
+ 0000019E  BA 0000022F R		mov		edx, OFFSET spacing				; set the spacing dword to a string register
+ 000001A3  E8 00000000 E		call	WriteString						; print out to organize outputs
+ 000001A8  A1 00000262 R		mov		eax, current_fib				; back to integers, next up is 1 (cause 0 + 1 = 1)
+ 000001AD  E8 00000000 E		call	WriteDec						; print
+ 000001B2  BA 0000022F R		mov		edx, OFFSET spacing				; set the spacing dword to a string register
+ 000001B7  E8 00000000 E		call	WriteString						; print spacing
+ 000001BC  C7 05 00000262 R		mov		current_fib, 2					; back to integers, next up is 2 (cause 1 + 1 = 2)
+	   00000002
+ 000001C6  A1 00000262 R		mov		eax, current_fib				; move ints to integer register
+ 000001CB  E8 00000000 E		call	WriteDec						; print
+ 000001D0  E8 00000000 E		call	CrLf							; sequence is done, new line
+ 000001D5  EB 00			jmp		RunAgain						; jump to end of program, ask if they wanna start over
 
 				;---------------------------------------------------------------;
 				;	The RunAgain label will test to see if the user is			;
@@ -241,28 +361,30 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/11/19 10:56:29
 				;	integers. If anything else is answered, the program will	;
 				;	exit to the OS.												;
 				;---------------------------------------------------------------;
- 0000007A			RunAgain:
- 0000007A  BA 00000140 R			mov		edx, OFFSET prompt_3		; run again prompt
- 0000007F  E8 00000000 E			call	WriteString
- 00000084  E8 00000000 E			call	ReadInt						; read in the user input for an answer
- 00000089  A3 00000226 R			mov		keep_going, eax				; move the user input to a readable register
+ 000001D7			RunAgain:
+ 000001D7  BA 00000147 R			mov		edx, OFFSET prompt_3		; run again prompt
+ 000001DC  E8 00000000 E			call	WriteString
+ 000001E1  E8 00000000 E			call	ReadInt						; read in the user input for an answer
+ 000001E6  A3 0000026E R			mov		keep_going, eax				; move the user input to a readable register
 
- 0000008E  83 F8 01				cmp		eax, 1						; compare if the user input was a '1'
- 00000091  74 9A				je		Inputs						; Jumps to int inputs if wanted, else end program
+ 000001EB  83 F8 01				cmp		eax, 1						; compare if the user input was a '1'
+ 000001EE  0F 84 FFFFFE43			je		Inputs						; Jumps to int inputs if wanted, else end program
 
 					; exit the program
- 00000093  BA 000001DB R			mov		edx, OFFSET finished		; program is done message
- 00000098  E8 00000000 E			call	CrLf						; add an extra new line for good looks
- 0000009D  E8 00000000 E			call	WriteString
- 000000A2  E8 00000000 E			call	CrLf
+ 000001F4  BA 00000205 R			mov		edx, OFFSET finished		; program is done message
+ 000001F9  E8 00000000 E			call	CrLf						; add an extra new line for good looks
+ 000001FE  E8 00000000 E			call	WriteString
+ 00000203  BA 00000256 R			mov		edx, OFFSET username
+ 00000208  E8 00000000 E			call	WriteString
+ 0000020D  E8 00000000 E			call	CrLf
 					exit									; close program, return to OS
- 000000A7  6A 00	   *	    push   +000000000h
- 000000A9  E8 00000000 E   *	    call   ExitProcess
- 000000AE			main ENDP									; the main PROC is finished, this symbolyses that we are done with the proc
+ 00000212  6A 00	   *	    push   +000000000h
+ 00000214  E8 00000000 E   *	    call   ExitProcess
+ 00000219			main ENDP									; the main PROC is finished, this symbolyses that we are done with the proc
 
 
 				END main									; the symbolyses that the main program is finished
-Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/11/19 10:56:29
+Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/17/19 11:46:55
 Program 2		(Project2.asm			     Symbols 2 - 1
 
 
@@ -356,8 +478,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 0000022A Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 000000AE Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000272 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000219 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -464,11 +586,16 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 000000AE Public STDCALL
-  Inputs . . . . . . . . . . . .	L Near	 0000002D _TEXT	
-  FailedInput  . . . . . . . . .	L Near	 0000007A _TEXT	
-  Calculations . . . . . . . . .	L Near	 0000007A _TEXT	
-  RunAgain . . . . . . . . . . .	L Near	 0000007A _TEXT	
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000219 Public STDCALL
+  Inputs . . . . . . . . . . . .	L Near	 00000037 _TEXT	
+  LowerInput . . . . . . . . . .	L Near	 00000097 _TEXT	
+  HigherInput  . . . . . . . . .	L Near	 000000A8 _TEXT	
+  Calculations . . . . . . . . .	L Near	 000000BC _TEXT	
+  fib_loop . . . . . . . . . . .	L Near	 000000EE _TEXT	
+  Case1  . . . . . . . . . . . .	L Near	 00000140 _TEXT	
+  Case2  . . . . . . . . . . . .	L Near	 0000015B _TEXT	
+  Case3  . . . . . . . . . . . .	L Near	 0000018A _TEXT	
+  RunAgain . . . . . . . . . . .	L Near	 000001D7 _TEXT	
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -601,6 +728,7 @@ ReadConsole  . . . . . . . . . .	Text   	 ReadConsoleA
 SCROLLLOCK_ON  . . . . . . . . .	Number	 00000040h   
 SHIFT_MASK . . . . . . . . . . .	Number	 00000010h   
 SHIFT_PRESSED  . . . . . . . . .	Number	 00000010h   
+SPACING  . . . . . . . . . . . .	Byte	 0000022F _DATA	
 STD_ERROR_HANDLE . . . . . . . .	Number	 -0000000Ch   
 STD_INPUT_HANDLE . . . . . . . .	Number	 -0000000Ah   
 STD_OUTPUT_HANDLE  . . . . . . .	Number	 -0000000Bh   
@@ -689,21 +817,24 @@ VK_UP  . . . . . . . . . . . . .	Number	 00000026h
 WINDOW_BUFFER_SIZE_EVENT . . . .	Number	 00000004h   
 WriteConsoleOutputCharacter  . .	Text   	 WriteConsoleOutputCharacterA
 WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
+backgroundColor  . . . . . . . .	DWord	 0000024A _DATA	
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
-byteCount  . . . . . . . . . . .	DWord	 0000021A _DATA	
+byteCount  . . . . . . . . . . .	DWord	 00000252 _DATA	
+current_fib  . . . . . . . . . .	DWord	 00000262 _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
-failed_input_1 . . . . . . . . .	Byte	 00000178 _DATA	
-failed_input_2 . . . . . . . . .	Byte	 000001A9 _DATA	
-finished . . . . . . . . . . . .	Byte	 000001DB _DATA	
+failed_input_1 . . . . . . . . .	Byte	 0000017F _DATA	
+failed_input_2 . . . . . . . . .	Byte	 000001B0 _DATA	
+finished . . . . . . . . . . . .	Byte	 00000205 _DATA	
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
 intro_1  . . . . . . . . . . . .	Byte	 0000002A _DATA	
 intro_2  . . . . . . . . . . . .	Byte	 00000077 _DATA	
 intro_3  . . . . . . . . . . . .	Byte	 000000C6 _DATA	
-keep_going . . . . . . . . . . .	DWord	 00000226 _DATA	
+keep_going . . . . . . . . . . .	DWord	 0000026E _DATA	
+last_fib . . . . . . . . . . . .	DWord	 00000266 _DATA	
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
 lightCyan  . . . . . . . . . . .	Number	 0000000Bh   
 lightGray  . . . . . . . . . . .	Number	 00000007h   
@@ -711,14 +842,18 @@ lightGreen . . . . . . . . . . .	Number	 0000000Ah
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
-num_of_fibs  . . . . . . . . . .	DWord	 00000222 _DATA	
+num_of_fibs  . . . . . . . . . .	DWord	 0000025A _DATA	
+num_on_line  . . . . . . . . . .	DWord	 0000025E _DATA	
+outro_1  . . . . . . . . . . . .	Byte	 000001E2 _DATA	
 project  . . . . . . . . . . . .	Byte	 00000000 _DATA	
 prompt_1 . . . . . . . . . . . .	Byte	 000000DE _DATA	
 prompt_2 . . . . . . . . . . . .	Byte	 000000F7 _DATA	
-prompt_3 . . . . . . . . . . . .	Byte	 00000140 _DATA	
+prompt_3 . . . . . . . . . . . .	Byte	 00000147 _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
-userinput  . . . . . . . . . . .	Byte	 00000205 _DATA	
-username . . . . . . . . . . . .	DWord	 0000021E _DATA	
+textColor  . . . . . . . . . . .	DWord	 0000024E _DATA	
+tmp_fib  . . . . . . . . . . . .	DWord	 0000026A _DATA	
+userinput  . . . . . . . . . . .	Byte	 00000235 _DATA	
+username . . . . . . . . . . . .	DWord	 00000256 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   

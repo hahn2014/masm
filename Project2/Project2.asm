@@ -9,8 +9,10 @@ TITLE Program 2		(Project2.asm)
 ;		to be printed. The prompt the user to enter a range these
 ;		numbers will be calculated between [0-51] for example.	I
 ;		will then process the inputs and ensure they are proper
-;		parameters. Print the numbers out, 5 per line with 5 spaces
-;		between each number.
+;		parameters. Print the numbers out, 5 per line with proper
+;		spacing to form left aligned collumns (EC) I also do 
+;		something incredible, I.E. changing the background and
+;		foreground colors (MORE EC PLZ)
 
 INCLUDE Irvine32.inc
 
@@ -23,29 +25,30 @@ project			BYTE	"-	 Fibonacci Numbers   --   Bryce Hahn  -", 0
 intro_1			BYTE	"Welcome to the Fibonacci Calculator! I will take in a number to signify how ", 0	; Intro 1 
 intro_2			BYTE	"many Fibonacci terms you wish me to print.  Extra Credit: My background color ", 0	; Intro 2
 intro_3			BYTE	"and text color changes!", 0														; Intro 3
+intro_4			BYTE	"Welcome, ", 0
 prompt_1		BYTE	"Please input your name: ", 0														; Prompt for users name firstly
-prompt_2		BYTE	"Welcome, please enter how many numbers you wish be printed (between 1 and 45): ", 0		; Prompt for fib numbers count
+prompt_2		BYTE	"Please enter how many numbers you wish be printed (between 1 and 46): ", 0			; Prompt for fib numbers count
 prompt_3		BYTE	"Do you want to run the program again? (enter 1 for yes)", 0						; Prompt the user to run again
 failed_input_1	BYTE	"The entered number was above the provided range!", 0								; Warn the user that they can't input such a RIDICULOUSLY high number
 failed_input_2	BYTE	"The entered number was bellow the provided range!", 0								; Warn the user that they can't input such a CRAZY low number
 outro_1			BYTE	"Outputting the Fibonacci Sequence:", 0												; Start the calc section with letting the user know it's printing
 finished		BYTE	"Thank you for using my program! Goodbye, ", 0										; Thank the user and say goodbye by name input
-SPACING			BYTE	"     ", 0																			; Pre-allocated variable to properize the spacings of the outputs
+spacer			BYTE	" ", 0																				; Pre-allocated variable to properize the spacings of the outputs
+large_spacer	BYTE	"         ", 0
 
-
-MAXFIB			=		45																					; The maximum amount of fib numbers that will be alloud to be calculated
+MAXFIB			=		46																					; The maximum amount of fib numbers that will be alloud to be calculated
 MINFIB			=		1																					; The minimum amount of fib numbers that will be alloud to be calculated (and that can be...)
-userinput		BYTE 21 DUP(0)																				; Byte array for the username input
+userinput		BYTE	21 DUP(0)																			; Byte array for the username input
 
-backgroundColor DWORD   cyan																				; color value for background color
-textColor		DWORD   16																					; color value for text color
 byteCount		DWORD	?																					; used for holding information about user inputting a string
 username		DWORD	?																					; User inputed name
 num_of_fibs		DWORD	?																					; User inputed number to be calculated
 num_on_line		DWORD	?																					; Keep tabs on how many numbers have been printed on a single line
-current_fib		DWORD	?																					; Keep tabs on the current calculated fib number in the loop
-last_fib		DWORD	?																					; Keep tabs on the last fib number to calc the up next one
-tmp_fib			DWORD	?																					; for swapping current and last fib numbers
+current			DWORD	?																					; Keep tabs on the current calculated fib number in the loop
+last			DWORD	?																					; Keep tabs on the last fib number to calc the up next one
+tmp				DWORD	?																					; for swapping current and last fib numbers
+loop_count		DWORD	?																					; var to keep track of loop iteration count
+mult			DWORD	10																					; multiplier to see how many spaces to add
 keep_going		DWORD	?																					; User inputed responce to run again
 
 ;------------------------;
@@ -88,6 +91,11 @@ Inputs:
 		mov		ecx, SIZEOF	userinput
 		call	ReadString
 		mov		byteCount, eax
+
+		mov		edx, OFFSET intro_4
+		call	WriteString
+		mov		edx, OFFSET userinput
+		call	WriteString
 
 		mov		edx, OFFSET prompt_2		; prompt the user for how many fib numbers they wish printed
 		call	CrLf
@@ -137,37 +145,59 @@ Calculations:
 		mov		edx, OFFSET outro_1
 		call	WriteString					; output to the user we are printing the numbers now..
 		call	CrLf
-		
-		mov		ecx, 0						; set ecx to 0 so we can increase to num_of_fibs
-		mov		current_fib, 1				; always start off the sequence at 1
-		mov		num_on_line, 0				; always start off the sequence at 0 on the line
-		mov		last_fib, 0					; start the last fib number off with 0 (0 + 1) = 1
+		mov		eax, 1
+		call	WriteDec
+		mov		edx, OFFSET large_spacer
+		call	WriteString
+
+
+		mov		ecx, num_of_fibs			; set ecx to num_of_fibs for looping
+		mov		current, 1					; always start off the sequence at 1
+		mov		num_on_line, 1				; always start off the sequence at 1 on the line
+		mov		last, 0						; start the last fib number off with 0 (0 + 1) = 1
+		mov		loop_count, 1				; always start off the sequence at 1 (cause 1 is already printed)
 		fib_loop:
-			mov		eax, last_fib
-			add		eax, current_fib
+			mov		eax, last
+			add		eax, current
 			call	WriteDec
 
-			mov		tmp_fib, eax			; (next itteration eax value will be the current_fib) move the eax value into temp_fib holder
-			mov		eax, current_fib		; (next itteration this will be last_fib) move current fib to a int register
-			mov		last_fib, eax			; FINAL: place the current itterations fib value into the next itterations last fib value
-			mov		eax, tmp_fib			; put tmp back in eax
-			mov		current_fib, eax		; FINAL: place the current itterations print value into the next itterations current fib value
+			mov		tmp, eax				; next itteration eax value will be the current
+			mov		eax, current			; next itteration this will be last
+			mov		last, eax				; FINAL: place the current itterations fib value into the next itterations last fib value
+			mov		eax, tmp				; put tmp back in eax
+			mov		current, eax			; FINAL: place the current itterations print value into the next itterations current fib value
 			
-			mov		edx, OFFSET spacing		; move the spacing into string register
-			call	WriteString				; add spacing
+			; EXTRA CREDIT: space out the 5 numbers into left aligned columns
+			mov		ecx, 11
+			mov		eax, 1
+			space:
+				;mul		mult
+				cmp		ebx, eax
+				;jge		skip
+				mov		edx, OFFSET spacer	; move the spacing into string register
+				call	WriteString			; add spacing
+				;skip:
+					loop	space			; couldn't get this to work due to the jump byte limitation :(
+
 			add		num_on_line, 1			; add 1 to how many numbers of the sequence are printed on a line
-
-
 			cmp		num_on_line, 5			; compare 5 to num_on_line
-			;je		reset_line				; if there are 5 on a line, reset to a new line
+			je		reset_line				; if there are 5 on a line, reset to a new line
+			jl		finishingUP				; if not 5, finish up the loop
 
-			
+			reset_line:
+				mov		num_on_line, 0
+				call	CrLf
+				jmp		finishingUP
 
+			finishingUP:
+				add		loop_count, 1		; set our temp holder val to +1 so we can get one iteration closer to the fib num
+				mov		eax, loop_count
+				cmp		eax, num_of_fibs	; if eax >= num_of_fibs
+				jge		RunAgain			; jump out of calculations and ask to run again?
+				jl		endOfLoop
 
-			add		ecx, 1					; set our temp holder val to +1 so we can get one iteration closer to the fib num
-			cmp		ecx, num_of_fibs		; if ecx >= num_of_fibs
-			jge		RunAgain				; jump out of calculations and ask to run again?
-			jl		fib_loop
+			endOfLoop:
+				loop	fib_loop
 			
 
 ;---------------------------------------------------------------;
@@ -175,8 +205,8 @@ Calculations:
 ;	1 as their number of fibonacci sequencings to print.		;
 ;---------------------------------------------------------------;
 Case1:
-	mov		current_fib, 1					; start the sequence off as 1
-	mov		eax, current_fib				; move the current_fib to a print register
+	mov		current, 1					; start the sequence off as 1
+	mov		eax, current				; move the current to a print register
 	call	WriteDec						; print out
 	call	CrLf							; sequence is done so new line
 	jmp		RunAgain						; jump to the end of the program, ask if they wanna start over
@@ -186,12 +216,12 @@ Case1:
 ;	2 as their number of fibonacci sequencings to print.		;
 ;---------------------------------------------------------------;
 Case2:
-	mov		current_fib, 1					; start the sequence off as 1
-	mov		eax, current_fib				; move the current_fib to a print register
+	mov		current, 1					; start the sequence off as 1
+	mov		eax, current				; move the current to a print register
 	call	WriteDec						; print
-	mov		edx, OFFSET spacing				; set the spacing dword to a string register
+	mov		edx, OFFSET large_spacer		; set the spacing dword to a string register
 	call	WriteString						; print out to organize outputs
-	mov		eax, current_fib				; back to integers, next up is 1 (cause 0 + 1 = 1)
+	mov		eax, current				; back to integers, next up is 1 (cause 0 + 1 = 1)
 	call	WriteDec						; print
 	call	CrLf							; sequence is done so new line
 	jmp		RunAgain						; jump to the end of the program, ask if they wanna start over
@@ -201,17 +231,17 @@ Case2:
 ;	3 as their number of fibonacci sequencings to print.		;
 ;---------------------------------------------------------------;
 Case3:
-	mov		current_fib, 1					; start the sequence off as 1
-	mov		eax, current_fib				; move the current_fib to a print register
+	mov		current, 1					; start the sequence off as 1
+	mov		eax, current				; move the current to a print register
 	call	WriteDec						; print
-	mov		edx, OFFSET spacing				; set the spacing dword to a string register
+	mov		edx, OFFSET large_spacer		; set the spacing dword to a string register
 	call	WriteString						; print out to organize outputs
-	mov		eax, current_fib				; back to integers, next up is 1 (cause 0 + 1 = 1)
+	mov		eax, current				; back to integers, next up is 1 (cause 0 + 1 = 1)
 	call	WriteDec						; print
-	mov		edx, OFFSET spacing				; set the spacing dword to a string register
+	mov		edx, OFFSET large_spacer		; set the spacing dword to a string register
 	call	WriteString						; print spacing
-	mov		current_fib, 2					; back to integers, next up is 2 (cause 1 + 1 = 2)
-	mov		eax, current_fib				; move ints to integer register
+	mov		current, 2					; back to integers, next up is 2 (cause 1 + 1 = 2)
+	mov		eax, current				; move ints to integer register
 	call	WriteDec						; print
 	call	CrLf							; sequence is done, new line
 	jmp		RunAgain						; jump to end of program, ask if they wanna start over
@@ -225,6 +255,7 @@ Case3:
 ;	exit to the OS.												;
 ;---------------------------------------------------------------;
 RunAgain:
+		call	CrLf
 		mov		edx, OFFSET prompt_3		; run again prompt
 		call	WriteString
 		call	ReadInt						; read in the user input for an answer
@@ -237,7 +268,7 @@ RunAgain:
 		mov		edx, OFFSET finished		; program is done message
 		call	CrLf						; add an extra new line for good looks
 		call	WriteString
-		mov		edx, OFFSET username
+		mov		edx, OFFSET userinput
 		call	WriteString
 		call	CrLf
 	exit									; close program, return to OS

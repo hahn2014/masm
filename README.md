@@ -6,7 +6,7 @@ Microsoft Assembly Projects
 2.  Project 2
   -  Develop a program to print out the Fibonacci sequence with a user inputed number of prints. Change the color of the background screen and text color
 3.  Project 3
-  -  Unknown
+  -  Develop a program that takes in negative numbers between -100 and -1 until a positive number is inputted. Then calculate the sum of the negative numbers, how many negatives were inputted, and the average of the numbers.
 4.  Project 4
   -  Unknown
 5.  Project 5

@@ -42,6 +42,7 @@ outro_fail		BYTE	"Look here ya little smartass, I said input negative numbers...
 finished		BYTE	"Thank you for using my program! Goodbye, ", 0										; Thank the user and say goodbye by name input
 line_num_in		BYTE	"[", 0
 line_num_fin	BYTE	"] -  ", 0
+dot_string		BYTE	".", 0
 
 MAXNUM			=		-1																					; The maximum range of negative numbers
 MINNUM			=		-100																				; The minimum range we want to calculate
@@ -179,13 +180,21 @@ Calculations:
 ;	to find the average and floating point average.				;
 ;---------------------------------------------------------------;
 FinalCalculations:
-		mov		edx, 0						; set the value or remainder reg to 0
-		mov		eax, negative_sum			; move num1 to int reg 1
+		mov		eax, 0						; reset eax value
+		mov		eax, negative_sum			; set eax register to sum
 		cdq									; convert DoubleWord to QuadWord
-		mov		ebx, negative_count			; move num2 to int reg 2
-		cdq									; convert DoubleWord to QuadWord
-		;div		ebx							; reg 1 / reg 2
-		mov		negative_avg, eax			; get the division
+		mov		ebx, negative_count			; set ebx register to count
+		idiv	ebx							; Doing integer division
+		mov		negative_avg, eax			; move the eax register value to average
+
+
+		fld		negative_sum				; load num1 as a floating point into stack 0
+		fidiv	negative_count				; floating point divide num1 by num2
+		fimul	fpnt_thousanth				; multiply by 1000 to get 4 digits that will be used when spliting for decimal and whole int
+		frndint								; round the number to a whole int so we can move to our var
+		fist	fpnt_by1000					; store calculated int into 4 digit int var
+		fst		fpnt_quotient				; store calculated floating point from stack
+
 
 ;---------------------------------------------------------------;
 ;	The Output label will be the final call in the program		;
@@ -217,10 +226,27 @@ Output:
 		call	WriteInt
 		call	CrLf
 
-		mov		edx, OFFSET outro_5
-		call	WriteString
-		;mov		eax, negative_FPavg
-		;call	WriteInt
+		mov		edx, OFFSET outro_5			; EC: Negative average floating point value
+		call	WriteString					; "The floating-point quotient"
+		mov		edx, 0						; prep the remainder
+		mov		eax, fpnt_by1000			; load the 4 digit int to int reg
+		cdq									; convert doubleword to quadword
+		mov		ebx, 1000					; prep 1000 into the reg to divide eax, this will give us not only the remainder but the whole number
+		cdq									; convert doubleword into quadword
+		idiv	ebx							; divide eax by 1000 to get the rounded whole number
+		mov		fpnt_whole, eax				; store the new number into the whole var
+		mov		fpnt_remainder, ebx			; store the calculated remainder into the var
+		mov		eax, fpnt_whole				; set the whole number to the reg
+		call	WriteDec					; write the whole number before the decimal
+		mov		edx, OFFSET dot_string		; "."
+		call	WriteString					; print it out
+		mov		eax, fpnt_whole				; move the whole num to int reg
+		mul		fpnt_thousanth				; multiply by 1000
+		mov		fpnt_hold, eax				; move int reg val to temporary var
+		mov		eax, fpnt_by1000			; move the 1000th to int reg
+		sub		eax, fpnt_hold				; subtract the first digit (timed by 1000) to get a 4 digit to 3 (being the remainder left over)
+		mov		fpnt_decimal, eax			; move this new calulated val from the int reg to the decimal var
+		call	WriteDec					; write it out
 		call	CrLf
 
 		jmp		RunAgain					; output is done, ask to run again

@@ -30,7 +30,7 @@ fpnt_by1000		DWORD	0																					; the result from first division by 100
 fpnt_remainder	DWORD	?																					; the remainder
 fpnt_hold		DWORD	?																					; a temporary value while calculating the remainder
 keep_going		DWORD	?																					; Continue running the program until the user quits
-project			BYTE	"-	Bryce Hahn	 -- 	Project 1	-", 0										; Prints my name and project number as per checked by grading guideline
+project			BYTE	"-	Bryce Hahn	 -- 	Project 1	-", 0											; Prints my name and project number as per checked by grading guideline
 intro_1			BYTE	"Welcome to Add 'Em Up! In this program you will give me two integers,", 0			; the folowing 3 are the declaration of the intro descriptions
 intro_2			BYTE	"and I will calculate them up! (add, subtract, multiply, and divide)", 0
 intro_3			BYTE	"Extra Credit: I will ensure the second integer is lower than the first!", 0
@@ -42,7 +42,7 @@ result_1		BYTE	"The sum of ", 0																	; the start of the sum result
 result_2		BYTE	"The difference of ", 0																; the start of the difference result
 result_3		BYTE	"The product of ", 0																; the start of the product result
 result_4		BYTE	"The quotient of ", 0																; the start of the quotient result
-result_5		BYTE	"Extra Credit: The floating-point quotient of ", 0												; extra credit: the start of the floating point quotient result
+result_5		BYTE	"Extra Credit: The floating-point quotient of ", 0									; extra credit: the start of the floating point quotient result
 prompt_3		BYTE	"Do you wish to add some more? (Press 1 to start over) ", 0							; extra credit: prompt the user to start over
 finish			BYTE	"Thanks for addin up! Goodbye.", 0													; goodbye message
 result_string	BYTE	"=", 0																				; all the folowing are for a clean calculation output
@@ -68,7 +68,7 @@ dot_string		BYTE	".", 0
 ;	will implement this into further projects.					;
 ;---------------------------------------------------------------;
 main PROC
-		mov	edx, OFFSET project			; print the program title and my name
+		mov	edx, OFFSET project				; print the program title and my name
 		call	WriteString
 		call	CrLf
 		mov		edx, OFFSET intro_1			; print the program introduction (Called only once when the program starts since the user doesn't need to see this after they restart)

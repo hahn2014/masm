@@ -172,7 +172,7 @@ Calculations:
 		add		eax, negative_cur			; add the current to the sum
 		mov		negative_sum, eax			; place the updated sum back into the variable
 
-		jmp Inputs
+		jmp		Inputs
 
 ;---------------------------------------------------------------;
 ;	The FinalCalculations label will be called when a positive	;
@@ -187,9 +187,8 @@ FinalCalculations:
 		idiv	ebx							; Doing integer division
 		mov		negative_avg, eax			; move the eax register value to average
 
-
 		fld		negative_sum				; load num1 as a floating point into stack 0
-		fidiv	negative_count				; floating point divide num1 by num2
+		fdiv	negative_count				; floating point divide num1 by num2
 		fimul	fpnt_thousanth				; multiply by 1000 to get 4 digits that will be used when spliting for decimal and whole int
 		frndint								; round the number to a whole int so we can move to our var
 		fist	fpnt_by1000					; store calculated int into 4 digit int var
@@ -230,14 +229,13 @@ Output:
 		call	WriteString					; "The floating-point quotient"
 		mov		edx, 0						; prep the remainder
 		mov		eax, fpnt_by1000			; load the 4 digit int to int reg
-		cdq									; convert doubleword to quadword
-		mov		ebx, 1000					; prep 1000 into the reg to divide eax, this will give us not only the remainder but the whole number
-		cdq									; convert doubleword into quadword
-		idiv	ebx							; divide eax by 1000 to get the rounded whole number
+		mov		ecx, 1000					; prep 1000 into the reg to divide eax, this will give us not only the remainder but the whole number
+		xor		edx, edx
+		div		ecx							; divide eax by 1000 to get the rounded whole number
 		mov		fpnt_whole, eax				; store the new number into the whole var
-		mov		fpnt_remainder, ebx			; store the calculated remainder into the var
+		mov		fpnt_remainder, ecx			; store the calculated remainder into the var
 		mov		eax, fpnt_whole				; set the whole number to the reg
-		call	WriteDec					; write the whole number before the decimal
+		call	WriteInt					; write the whole number before the decimal
 		mov		edx, OFFSET dot_string		; "."
 		call	WriteString					; print it out
 		mov		eax, fpnt_whole				; move the whole num to int reg

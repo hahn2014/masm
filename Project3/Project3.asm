@@ -38,7 +38,7 @@ outro_2			BYTE	"The negative input count: ", 0
 outro_3			BYTE	"The negative sum: ", 0
 outro_4			BYTE	"The negative average: ", 0
 outro_5			BYTE	"EC: The negative floating point average: ", 0
-outro_fail		BYTE	"Look here ya little smartass, I said input negative numbers... You put in 0 -.-", 0; Give a message for putting no negative numbers
+outro_fail		BYTE	"Look here ya little shit, I said input negative numbers... You put in 0 -.-", 0	; Give a message for putting no negative numbers
 finished		BYTE	"Thank you for using my program! Goodbye, ", 0										; Thank the user and say goodbye by name input
 line_num_in		BYTE	"[", 0
 line_num_fin	BYTE	"] -  ", 0
@@ -51,7 +51,7 @@ userinput		BYTE	21 DUP(0)																			; Byte array for the username input
 byteCount		DWORD	?																					; used for holding information about user inputting a string
 keep_going		DWORD	?																					; User inputed responce to run again
 negative_cur	DWORD	0																					; The most recent negative input
-negative_sum	DWORD	0																					; The total sum of all the inputed negatives
+negative_sum	DWORD	?																					; The total sum of all the inputed negatives
 negative_count	DWORD	0																					; The total count of all negative numbers
 negative_avg	DWORD	?																					; Only updated after all the inputs are done, average whole number
 fpnt_quotient	REAL4	?																					; extra credit: the floating point quotient
@@ -93,9 +93,9 @@ main PROC
 		mov		edx, OFFSET EC_intro_1		; print the extra credit section of the intro
 		call	WriteString
 		call	CrLf						; new line
-		mov		edx, OFFSET EC_intro_2		; print the extra credit section of the intro
-		call	WriteString
-		call	CrLf						; new line
+		;mov	edx, OFFSET EC_intro_2		; print the extra credit section of the intro
+		;call	WriteString
+		;call	CrLf						; new line
 		mov		edx, OFFSET EC_intro_3		; print the extra credit section of the intro
 		call	WriteString
 		call	CrLf						; new line
@@ -128,10 +128,10 @@ Inputs:
 
 		mov		edx, OFFSET prompt_3		; prompt the user for negative numbers
 		call	WriteString
+		xor		eax, eax					; reset eax
 		call	ReadInt						; read in the user input
 		mov		negative_cur, eax			; move the input val to negative_cur
 
-		mov		eax, negative_cur			; move the num_of_fibs to int reg
 		cmp		eax, MAXNUM					; compare int reg val (num user wants to print) to the max val
 		jg		HigherInput					; if greater than, jump to higher input failure label
 		cmp		eax, MINNUM					; compare int reg val (num user wants to print) to the min val
@@ -157,6 +157,9 @@ HigherInput:
 		mov		edx, OFFSET failed_input_1
 		call	WriteString
 		call	CrLf
+		mov		eax, negative_count			;
+		cmp		eax, 0						; check to see if they didn't input a single negative number
+		je		NoNegatives					; jump and give them a nice message :)
 		jmp		FinalCalculations
 
 ;---------------------------------------------------------------;
@@ -172,7 +175,7 @@ Calculations:
 		add		eax, negative_cur			; add the current to the sum
 		mov		negative_sum, eax			; place the updated sum back into the variable
 
-		jmp		Inputs
+		jmp Inputs
 
 ;---------------------------------------------------------------;
 ;	The FinalCalculations label will be called when a positive	;
@@ -187,13 +190,14 @@ FinalCalculations:
 		idiv	ebx							; Doing integer division
 		mov		negative_avg, eax			; move the eax register value to average
 
+
+		ffree	st[0]						; frees up the allocated mem
 		fld		negative_sum				; load num1 as a floating point into stack 0
-		fdiv	negative_count				; floating point divide num1 by num2
+		fidiv	negative_count				; floating point divide num1 by num2
+		fist	fpnt_quotient				; store calculated floating point from stack
 		fimul	fpnt_thousanth				; multiply by 1000 to get 4 digits that will be used when spliting for decimal and whole int
 		frndint								; round the number to a whole int so we can move to our var
-		fist	fpnt_by1000					; store calculated int into 4 digit int var
-		fst		fpnt_quotient				; store calculated floating point from stack
-
+		fst		fpnt_by1000					; store calculated int into 4 digit int var
 
 ;---------------------------------------------------------------;
 ;	The Output label will be the final call in the program		;
@@ -229,13 +233,14 @@ Output:
 		call	WriteString					; "The floating-point quotient"
 		mov		edx, 0						; prep the remainder
 		mov		eax, fpnt_by1000			; load the 4 digit int to int reg
-		mov		ecx, 1000					; prep 1000 into the reg to divide eax, this will give us not only the remainder but the whole number
-		xor		edx, edx
-		div		ecx							; divide eax by 1000 to get the rounded whole number
+		cdq									; convert doubleword to quadword
+		mov		ebx, 1000					; prep 1000 into the reg to divide eax, this will give us not only the remainder but the whole number
+		cdq									; convert doubleword into quadword
+		idiv	ebx							; divide eax by 1000 to get the rounded whole number
 		mov		fpnt_whole, eax				; store the new number into the whole var
-		mov		fpnt_remainder, ecx			; store the calculated remainder into the var
+		mov		fpnt_remainder, ebx			; store the calculated remainder into the var
 		mov		eax, fpnt_whole				; set the whole number to the reg
-		call	WriteInt					; write the whole number before the decimal
+		call	WriteDec					; write the whole number before the decimal
 		mov		edx, OFFSET dot_string		; "."
 		call	WriteString					; print it out
 		mov		eax, fpnt_whole				; move the whole num to int reg

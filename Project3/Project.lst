@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.16.27026.1	    01/26/19 15:43:19
+Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/27/19 18:28:14
 Program 3		(Project3.asm			     Page 1 - 1
 
 
@@ -217,23 +217,23 @@ Microsoft (R) Macro Assembler Version 14.16.27026.1	    01/26/19 15:43:19
 	   74 20 61 76 65
 	   72 61 67 65 3A
 	   20 00
- 0000034F 4C 6F 6F 6B 20	outro_fail		BYTE	"Look here ya little smartass, I said input negative numbers... You put in 0 -.-", 0; Give a message for putting no negative numbers
+ 0000034F 4C 6F 6F 6B 20	outro_fail		BYTE	"Look here ya little shit, I said input negative numbers... You put in 0 -.-", 0	; Give a message for putting no negative numbers
 	   68 65 72 65 20
 	   79 61 20 6C 69
 	   74 74 6C 65 20
-	   73 6D 61 72 74
-	   61 73 73 2C 20
-	   49 20 73 61 69
-	   64 20 69 6E 70
-	   75 74 20 6E 65
-	   67 61 74 69 76
-	   65 20 6E 75 6D
-	   62 65 72 73 2E
-	   2E 2E 20 59 6F
-	   75 20 70 75 74
-	   20 69 6E 20 30
-	   20 2D 2E 2D 00
- 0000039F 54 68 61 6E 6B	finished		BYTE	"Thank you for using my program! Goodbye, ", 0										; Thank the user and say goodbye by name input
+	   73 68 69 74 2C
+	   20 49 20 73 61
+	   69 64 20 69 6E
+	   70 75 74 20 6E
+	   65 67 61 74 69
+	   76 65 20 6E 75
+	   6D 62 65 72 73
+	   2E 2E 2E 20 59
+	   6F 75 20 70 75
+	   74 20 69 6E 20
+	   30 20 2D 2E 2D
+	   00
+ 0000039B 54 68 61 6E 6B	finished		BYTE	"Thank you for using my program! Goodbye, ", 0										; Thank the user and say goodbye by name input
 	   20 79 6F 75 20
 	   66 6F 72 20 75
 	   73 69 6E 67 20
@@ -242,30 +242,30 @@ Microsoft (R) Macro Assembler Version 14.16.27026.1	    01/26/19 15:43:19
 	   21 20 47 6F 6F
 	   64 62 79 65 2C
 	   20 00
- 000003C9 5B 00			line_num_in		BYTE	"[", 0
- 000003CB 5D 20 2D 20 20	line_num_fin	BYTE	"] -  ", 0
+ 000003C5 5B 00			line_num_in		BYTE	"[", 0
+ 000003C7 5D 20 2D 20 20	line_num_fin	BYTE	"] -  ", 0
 	   00
- 000003D1 2E 00			dot_string		BYTE	".", 0
+ 000003CD 2E 00			dot_string		BYTE	".", 0
 
  =-00000001			MAXNUM			=		-1																					; The maximum range of negative numbers
  =-00000064			MINNUM			=		-100																				; The minimum range we want to calculate
- 000003D3  00000015 [		userinput		BYTE	21 DUP(0)																			; Byte array for the username input
+ 000003CF  00000015 [		userinput		BYTE	21 DUP(0)																			; Byte array for the username input
 	    00
 	   ]
 
- 000003E8 00000000		byteCount		DWORD	?																					; used for holding information about user inputting a string
- 000003EC 00000000		keep_going		DWORD	?																					; User inputed responce to run again
- 000003F0 00000000		negative_cur	DWORD	0																					; The most recent negative input
- 000003F4 00000000		negative_sum	DWORD	0																					; The total sum of all the inputed negatives
- 000003F8 00000000		negative_count	DWORD	0																					; The total count of all negative numbers
- 000003FC 00000000		negative_avg	DWORD	?																					; Only updated after all the inputs are done, average whole number
- 00000400 00000000		fpnt_quotient	REAL4	?																					; extra credit: the floating point quotient
- 00000404 000003E8		fpnt_thousanth	DWORD	1000																				; extra credit: decimal to the thousanth
- 00000408 00000000		fpnt_whole		DWORD	?																					; extra credit: the whole number before the decimal
- 0000040C 00000000		fpnt_decimal	DWORD	?																					; extra credit: the decimal representation
- 00000410 00000000		fpnt_by1000		DWORD	0																					; the result from first division by 1000 as a 4 digit int
- 00000414 00000000		fpnt_remainder	DWORD	?																					; the remainder
- 00000418 00000000		fpnt_hold		DWORD	?
+ 000003E4 00000000		byteCount		DWORD	?																					; used for holding information about user inputting a string
+ 000003E8 00000000		keep_going		DWORD	?																					; User inputed responce to run again
+ 000003EC 00000000		negative_cur	DWORD	0																					; The most recent negative input
+ 000003F0 00000000		negative_sum	DWORD	?																					; The total sum of all the inputed negatives
+ 000003F4 00000000		negative_count	DWORD	0																					; The total count of all negative numbers
+ 000003F8 00000000		negative_avg	DWORD	?																					; Only updated after all the inputs are done, average whole number
+ 000003FC 00000000		fpnt_quotient	REAL4	?																					; extra credit: the floating point quotient
+ 00000400 000003E8		fpnt_thousanth	DWORD	1000																				; extra credit: decimal to the thousanth
+ 00000404 00000000		fpnt_whole		DWORD	?																					; extra credit: the whole number before the decimal
+ 00000408 00000000		fpnt_decimal	DWORD	?																					; extra credit: the decimal representation
+ 0000040C 00000000		fpnt_by1000		DWORD	0																					; the result from first division by 1000 as a 4 digit int
+ 00000410 00000000		fpnt_remainder	DWORD	?																					; the remainder
+ 00000414 00000000		fpnt_hold		DWORD	?
 
 				;------------------------;
 				;    Code Declaration    ;
@@ -298,51 +298,51 @@ Microsoft (R) Macro Assembler Version 14.16.27026.1	    01/26/19 15:43:19
  00000046  BA 00000127 R			mov		edx, OFFSET EC_intro_1		; print the extra credit section of the intro
  0000004B  E8 00000000 E			call	WriteString
  00000050  E8 00000000 E			call	CrLf						; new line
- 00000055  BA 00000160 R			mov		edx, OFFSET EC_intro_2		; print the extra credit section of the intro
+						;mov		edx, OFFSET EC_intro_2		; print the extra credit section of the intro
+						;call	WriteString
+						;call	CrLf						; new line
+ 00000055  BA 00000191 R			mov		edx, OFFSET EC_intro_3		; print the extra credit section of the intro
  0000005A  E8 00000000 E			call	WriteString
  0000005F  E8 00000000 E			call	CrLf						; new line
- 00000064  BA 00000191 R			mov		edx, OFFSET EC_intro_3		; print the extra credit section of the intro
- 00000069  E8 00000000 E			call	WriteString
- 0000006E  E8 00000000 E			call	CrLf						; new line
 
- 00000073  BA 000001C2 R			mov		edx, OFFSET prompt_1		; prompt the user for their name
- 00000078  E8 00000000 E			call	WriteString
- 0000007D  BA 000003D3 R			mov		edx, OFFSET userinput
- 00000082  B9 00000015				mov		ecx, SIZEOF	userinput
- 00000087  E8 00000000 E			call	ReadString
- 0000008C  A3 000003E8 R			mov		byteCount, eax
- 00000091  BA 000001DB R			mov		edx, OFFSET prompt_2
- 00000096  E8 00000000 E			call	WriteString
- 0000009B  BA 000003D3 R			mov		edx, OFFSET userinput
- 000000A0  E8 00000000 E			call	WriteString
- 000000A5  E8 00000000 E			call	CrLf
+ 00000064  BA 000001C2 R			mov		edx, OFFSET prompt_1		; prompt the user for their name
+ 00000069  E8 00000000 E			call	WriteString
+ 0000006E  BA 000003CF R			mov		edx, OFFSET userinput
+ 00000073  B9 00000015				mov		ecx, SIZEOF	userinput
+ 00000078  E8 00000000 E			call	ReadString
+ 0000007D  A3 000003E4 R			mov		byteCount, eax
+ 00000082  BA 000001DB R			mov		edx, OFFSET prompt_2
+ 00000087  E8 00000000 E			call	WriteString
+ 0000008C  BA 000003CF R			mov		edx, OFFSET userinput
+ 00000091  E8 00000000 E			call	WriteString
+ 00000096  E8 00000000 E			call	CrLf
 
 				;---------------------------------------------------------------;
 				;	The Inputs label will be the start of the program,			;
 				;	where we will prompt the user to input their - integers		;
 				;	into our datastreams until a positive number is inputed		;
 				;---------------------------------------------------------------;
- 000000AA			Inputs:	
- 000000AA  BA 000003C9 R			mov		edx, OFFSET line_num_in		; EC: Write the line number
- 000000AF  E8 00000000 E			call	WriteString					; formating
- 000000B4  A1 000003F8 R			mov		eax, negative_count			; take the current number of inputed negatives
- 000000B9  40					inc		eax							; increase by 1 cause thats what were looking for
- 000000BA  E8 00000000 E			call	WriteDec					; write this number between brackets
- 000000BF  BA 000003CB R			mov		edx, OFFSET line_num_fin	; formating
- 000000C4  E8 00000000 E			call	WriteString
+ 0000009B			Inputs:	
+ 0000009B  BA 000003C5 R			mov		edx, OFFSET line_num_in		; EC: Write the line number
+ 000000A0  E8 00000000 E			call	WriteString					; formating
+ 000000A5  A1 000003F4 R			mov		eax, negative_count			; take the current number of inputed negatives
+ 000000AA  40					inc		eax							; increase by 1 cause thats what were looking for
+ 000000AB  E8 00000000 E			call	WriteDec					; write this number between brackets
+ 000000B0  BA 000003C7 R			mov		edx, OFFSET line_num_fin	; formating
+ 000000B5  E8 00000000 E			call	WriteString
 
- 000000C9  BA 000001E5 R			mov		edx, OFFSET prompt_3		; prompt the user for negative numbers
- 000000CE  E8 00000000 E			call	WriteString
- 000000D3  E8 00000000 E			call	ReadInt						; read in the user input
- 000000D8  A3 000003F0 R			mov		negative_cur, eax			; move the input val to negative_cur
+ 000000BA  BA 000001E5 R			mov		edx, OFFSET prompt_3		; prompt the user for negative numbers
+ 000000BF  E8 00000000 E			call	WriteString
+ 000000C4  33 C0				xor		eax, eax					; reset eax
+ 000000C6  E8 00000000 E			call	ReadInt						; read in the user input
+ 000000CB  A3 000003EC R			mov		negative_cur, eax			; move the input val to negative_cur
 
- 000000DD  A1 000003F0 R			mov		eax, negative_cur			; move the num_of_fibs to int reg
- 000000E2  83 F8 FF				cmp		eax, MAXNUM					; compare int reg val (num user wants to print) to the max val
- 000000E5  7F 18				jg		HigherInput					; if greater than, jump to higher input failure label
- 000000E7  83 F8 9C				cmp		eax, MINNUM					; compare int reg val (num user wants to print) to the min val
- 000000EA  7C 02				jl		LowerInput					; if less than, jump to lower input failure label
+ 000000D0  83 F8 FF				cmp		eax, MAXNUM					; compare int reg val (num user wants to print) to the max val
+ 000000D3  7F 18				jg		HigherInput					; if greater than, jump to higher input failure label
+ 000000D5  83 F8 9C				cmp		eax, MINNUM					; compare int reg val (num user wants to print) to the min val
+ 000000D8  7C 02				jl		LowerInput					; if less than, jump to lower input failure label
 						
- 000000EC  EB 22				jmp		Calculations				; else, its within min and max, so jump to calculations
+ 000000DA  EB 30				jmp		Calculations				; else, its within min and max, so jump to calculations
 
 				;---------------------------------------------------------------;
 				;	The Lower/Higher Inputs labels will be jumped to when the 	;
@@ -352,17 +352,20 @@ Microsoft (R) Macro Assembler Version 14.16.27026.1	    01/26/19 15:43:19
 				;	the new int is above num1. If successful, will jump the		;
 				;	user to the calculations label.								;
 				;---------------------------------------------------------------;
- 000000EE			LowerInput:
- 000000EE  BA 00000283 R			mov		edx, OFFSET failed_input_2
- 000000F3  E8 00000000 E			call	WriteString
- 000000F8  E8 00000000 E			call	CrLf
- 000000FD  EB AB				jmp		Inputs
+ 000000DC			LowerInput:
+ 000000DC  BA 00000283 R			mov		edx, OFFSET failed_input_2
+ 000000E1  E8 00000000 E			call	WriteString
+ 000000E6  E8 00000000 E			call	CrLf
+ 000000EB  EB AE				jmp		Inputs
 
- 000000FF			HigherInput:
- 000000FF  BA 00000249 R			mov		edx, OFFSET failed_input_1
- 00000104  E8 00000000 E			call	WriteString
- 00000109  E8 00000000 E			call	CrLf
- 0000010E  EB 18				jmp		FinalCalculations
+ 000000ED			HigherInput:
+ 000000ED  BA 00000249 R			mov		edx, OFFSET failed_input_1
+ 000000F2  E8 00000000 E			call	WriteString
+ 000000F7  E8 00000000 E			call	CrLf
+ 000000FC  A1 000003F4 R			mov		eax, negative_count			;
+ 00000101  83 F8 00				cmp		eax, 0						; check to see if they didn't input a single negative number
+ 00000104  0F 84 00000127			je		NoNegatives					; jump and give them a nice message :)
+ 0000010A  EB 1B				jmp		FinalCalculations
 
 				;---------------------------------------------------------------;
 				;	The Calculations label will be the bulk of the process,		;
@@ -370,96 +373,98 @@ Microsoft (R) Macro Assembler Version 14.16.27026.1	    01/26/19 15:43:19
 				;	output them (very smoothly with proper symbols) to the		;
 				;	output.														;
 				;---------------------------------------------------------------;
- 00000110			Calculations:
- 00000110  FF 05 000003F8 R			inc		negative_count				; increase the negative numbers count
+ 0000010C			Calculations:
+ 0000010C  FF 05 000003F4 R			inc		negative_count				; increase the negative numbers count
 
- 00000116  A1 000003F4 R			mov		eax, negative_sum			; move the sum to a register
- 0000011B  03 05 000003F0 R			add		eax, negative_cur			; add the current to the sum
- 00000121  A3 000003F4 R			mov		negative_sum, eax			; place the updated sum back into the variable
+ 00000112  A1 000003F0 R			mov		eax, negative_sum			; move the sum to a register
+ 00000117  03 05 000003EC R			add		eax, negative_cur			; add the current to the sum
+ 0000011D  A3 000003F0 R			mov		negative_sum, eax			; place the updated sum back into the variable
 
- 00000126  EB 82				jmp		Inputs
+ 00000122  E9 FFFFFF74				jmp Inputs
 
 				;---------------------------------------------------------------;
 				;	The FinalCalculations label will be called when a positive	;
 				;	integer was inputed, so we will do the last remaining calcs	;
 				;	to find the average and floating point average.				;
 				;---------------------------------------------------------------;
- 00000128			FinalCalculations:
- 00000128  B8 00000000				mov		eax, 0						; reset eax value
- 0000012D  A1 000003F4 R			mov		eax, negative_sum			; set eax register to sum
- 00000132  99					cdq									; convert DoubleWord to QuadWord
- 00000133  8B 1D 000003F8 R			mov		ebx, negative_count			; set ebx register to count
- 00000139  F7 FB				idiv	ebx							; Doing integer division
- 0000013B  A3 000003FC R			mov		negative_avg, eax			; move the eax register value to average
+ 00000127			FinalCalculations:
+ 00000127  B8 00000000				mov		eax, 0						; reset eax value
+ 0000012C  A1 000003F0 R			mov		eax, negative_sum			; set eax register to sum
+ 00000131  99					cdq									; convert DoubleWord to QuadWord
+ 00000132  8B 1D 000003F4 R			mov		ebx, negative_count			; set ebx register to count
+ 00000138  F7 FB				idiv	ebx							; Doing integer division
+ 0000013A  A3 000003F8 R			mov		negative_avg, eax			; move the eax register value to average
 
- 00000140  D9 05 000003F4 R			fld		negative_sum				; load num1 as a floating point into stack 0
- 00000146  D8 35 000003F8 R			fdiv	negative_count				; floating point divide num1 by num2
- 0000014C  DA 0D 00000404 R			fimul	fpnt_thousanth				; multiply by 1000 to get 4 digits that will be used when spliting for decimal and whole int
- 00000152  D9 FC				frndint								; round the number to a whole int so we can move to our var
- 00000154  DB 15 00000410 R			fist	fpnt_by1000					; store calculated int into 4 digit int var
- 0000015A  D9 15 00000400 R			fst		fpnt_quotient				; store calculated floating point from stack
 
+ 0000013F  DD C0				ffree	st[0]						; frees up the allocated mem
+ 00000141  D9 05 000003F0 R			fld		negative_sum				; load num1 as a floating point into stack 0
+ 00000147  DA 35 000003F4 R			fidiv	negative_count				; floating point divide num1 by num2
+ 0000014D  DB 15 000003FC R			fist	fpnt_quotient				; store calculated floating point from stack
+ 00000153  DA 0D 00000400 R			fimul	fpnt_thousanth				; multiply by 1000 to get 4 digits that will be used when spliting for decimal and whole int
+ 00000159  D9 FC				frndint								; round the number to a whole int so we can move to our var
+ 0000015B  D9 15 0000040C R			fst		fpnt_by1000					; store calculated int into 4 digit int var
 
 				;---------------------------------------------------------------;
 				;	The Output label will be the final call in the program		;
 				;	where it will simply print the results of the expirement	;
 				;---------------------------------------------------------------;
- 00000160			Output:
- 00000160  BA 000002B5 R			mov		edx, OFFSET outro_1			; intro output
- 00000165  E8 00000000 E			call	WriteString
- 0000016A  E8 00000000 E			call	CrLf
- 0000016F  E8 00000000 E			call	CrLf
+ 00000161			Output:
+ 00000161  BA 000002B5 R			mov		edx, OFFSET outro_1			; intro output
+ 00000166  E8 00000000 E			call	WriteString
+ 0000016B  E8 00000000 E			call	CrLf
+ 00000170  E8 00000000 E			call	CrLf
 
- 00000174  BA 000002E0 R			mov		edx, OFFSET outro_2			; negative count
- 00000179  E8 00000000 E			call	WriteString
- 0000017E  A1 000003F8 R			mov		eax, negative_count
- 00000183  83 F8 00				cmp		eax, 0						; check to see if they didn't input a single negative number
- 00000186  0F 84 000000A4			je		NoNegatives					; jump and give them a nice message :)
- 0000018C  E8 00000000 E			call	WriteDec					; they had at least 1 negative, so continue
- 00000191  E8 00000000 E			call	CrLf
+ 00000175  BA 000002E0 R			mov		edx, OFFSET outro_2			; negative count
+ 0000017A  E8 00000000 E			call	WriteString
+ 0000017F  A1 000003F4 R			mov		eax, negative_count
+ 00000184  83 F8 00				cmp		eax, 0						; check to see if they didn't input a single negative number
+ 00000187  0F 84 000000A4			je		NoNegatives					; jump and give them a nice message :)
+ 0000018D  E8 00000000 E			call	WriteDec					; they had at least 1 negative, so continue
+ 00000192  E8 00000000 E			call	CrLf
 
- 00000196  BA 000002FB R			mov		edx, OFFSET outro_3			; negative sum
- 0000019B  E8 00000000 E			call	WriteString
- 000001A0  A1 000003F4 R			mov		eax, negative_sum			;
- 000001A5  E8 00000000 E			call	WriteInt					;
- 000001AA  E8 00000000 E			call	CrLf
+ 00000197  BA 000002FB R			mov		edx, OFFSET outro_3			; negative sum
+ 0000019C  E8 00000000 E			call	WriteString
+ 000001A1  A1 000003F0 R			mov		eax, negative_sum			;
+ 000001A6  E8 00000000 E			call	WriteInt					;
+ 000001AB  E8 00000000 E			call	CrLf
 
- 000001AF  BA 0000030E R			mov		edx, OFFSET outro_4			; negative average
- 000001B4  E8 00000000 E			call	WriteString
- 000001B9  A1 000003FC R			mov		eax, negative_avg
- 000001BE  E8 00000000 E			call	WriteInt
- 000001C3  E8 00000000 E			call	CrLf
+ 000001B0  BA 0000030E R			mov		edx, OFFSET outro_4			; negative average
+ 000001B5  E8 00000000 E			call	WriteString
+ 000001BA  A1 000003F8 R			mov		eax, negative_avg
+ 000001BF  E8 00000000 E			call	WriteInt
+ 000001C4  E8 00000000 E			call	CrLf
 
- 000001C8  BA 00000325 R			mov		edx, OFFSET outro_5			; EC: Negative average floating point value
- 000001CD  E8 00000000 E			call	WriteString					; "The floating-point quotient"
- 000001D2  BA 00000000				mov		edx, 0						; prep the remainder
- 000001D7  A1 00000410 R			mov		eax, fpnt_by1000			; load the 4 digit int to int reg
- 000001DC  B9 000003E8				mov		ecx, 1000					; prep 1000 into the reg to divide eax, this will give us not only the remainder but the whole number
- 000001E1  33 D2				xor		edx, edx
- 000001E3  F7 F1				div		ecx							; divide eax by 1000 to get the rounded whole number
- 000001E5  A3 00000408 R			mov		fpnt_whole, eax				; store the new number into the whole var
- 000001EA  89 0D 00000414 R			mov		fpnt_remainder, ecx			; store the calculated remainder into the var
- 000001F0  A1 00000408 R			mov		eax, fpnt_whole				; set the whole number to the reg
- 000001F5  E8 00000000 E			call	WriteInt					; write the whole number before the decimal
- 000001FA  BA 000003D1 R			mov		edx, OFFSET dot_string		; "."
- 000001FF  E8 00000000 E			call	WriteString					; print it out
- 00000204  A1 00000408 R			mov		eax, fpnt_whole				; move the whole num to int reg
- 00000209  F7 25 00000404 R			mul		fpnt_thousanth				; multiply by 1000
- 0000020F  A3 00000418 R			mov		fpnt_hold, eax				; move int reg val to temporary var
- 00000214  A1 00000410 R			mov		eax, fpnt_by1000			; move the 1000th to int reg
- 00000219  2B 05 00000418 R			sub		eax, fpnt_hold				; subtract the first digit (timed by 1000) to get a 4 digit to 3 (being the remainder left over)
- 0000021F  A3 0000040C R			mov		fpnt_decimal, eax			; move this new calulated val from the int reg to the decimal var
- 00000224  E8 00000000 E			call	WriteDec					; write it out
- 00000229  E8 00000000 E			call	CrLf
+ 000001C9  BA 00000325 R			mov		edx, OFFSET outro_5			; EC: Negative average floating point value
+ 000001CE  E8 00000000 E			call	WriteString					; "The floating-point quotient"
+ 000001D3  BA 00000000				mov		edx, 0						; prep the remainder
+ 000001D8  A1 0000040C R			mov		eax, fpnt_by1000			; load the 4 digit int to int reg
+ 000001DD  99					cdq									; convert doubleword to quadword
+ 000001DE  BB 000003E8				mov		ebx, 1000					; prep 1000 into the reg to divide eax, this will give us not only the remainder but the whole number
+ 000001E3  99					cdq									; convert doubleword into quadword
+ 000001E4  F7 FB				idiv	ebx							; divide eax by 1000 to get the rounded whole number
+ 000001E6  A3 00000404 R			mov		fpnt_whole, eax				; store the new number into the whole var
+ 000001EB  89 1D 00000410 R			mov		fpnt_remainder, ebx			; store the calculated remainder into the var
+ 000001F1  A1 00000404 R			mov		eax, fpnt_whole				; set the whole number to the reg
+ 000001F6  E8 00000000 E			call	WriteDec					; write the whole number before the decimal
+ 000001FB  BA 000003CD R			mov		edx, OFFSET dot_string		; "."
+ 00000200  E8 00000000 E			call	WriteString					; print it out
+ 00000205  A1 00000404 R			mov		eax, fpnt_whole				; move the whole num to int reg
+ 0000020A  F7 25 00000400 R			mul		fpnt_thousanth				; multiply by 1000
+ 00000210  A3 00000414 R			mov		fpnt_hold, eax				; move int reg val to temporary var
+ 00000215  A1 0000040C R			mov		eax, fpnt_by1000			; move the 1000th to int reg
+ 0000021A  2B 05 00000414 R			sub		eax, fpnt_hold				; subtract the first digit (timed by 1000) to get a 4 digit to 3 (being the remainder left over)
+ 00000220  A3 00000408 R			mov		fpnt_decimal, eax			; move this new calulated val from the int reg to the decimal var
+ 00000225  E8 00000000 E			call	WriteDec					; write it out
+ 0000022A  E8 00000000 E			call	CrLf
 
- 0000022E  EB 16				jmp		RunAgain					; output is done, ask to run again
+ 0000022F  EB 16				jmp		RunAgain					; output is done, ask to run again
 
- 00000230			NoNegatives:
- 00000230  E8 00000000 E			call	CrLf
- 00000235  BA 0000034F R			mov		edx, OFFSET outro_fail
- 0000023A  E8 00000000 E			call	WriteString
- 0000023F  E8 00000000 E			call	CrLf
- 00000244  EB 00				jmp		RunAgain
+ 00000231			NoNegatives:
+ 00000231  E8 00000000 E			call	CrLf
+ 00000236  BA 0000034F R			mov		edx, OFFSET outro_fail
+ 0000023B  E8 00000000 E			call	WriteString
+ 00000240  E8 00000000 E			call	CrLf
+ 00000245  EB 00				jmp		RunAgain
 
 				;---------------------------------------------------------------;
 				;	The RunAgain label will test to see if the user is			;
@@ -469,30 +474,30 @@ Microsoft (R) Macro Assembler Version 14.16.27026.1	    01/26/19 15:43:19
 				;	integers. If anything else is answered, the program will	;
 				;	exit to the OS.												;
 				;---------------------------------------------------------------;
- 00000246			RunAgain:
- 00000246  BA 00000211 R			mov		edx, OFFSET prompt_4		; run again prompt
- 0000024B  E8 00000000 E			call	WriteString
- 00000250  E8 00000000 E			call	ReadInt						; read in the user input for an answer
- 00000255  A3 000003EC R			mov		keep_going, eax				; move the user input to a readable register
+ 00000247			RunAgain:
+ 00000247  BA 00000211 R			mov		edx, OFFSET prompt_4		; run again prompt
+ 0000024C  E8 00000000 E			call	WriteString
+ 00000251  E8 00000000 E			call	ReadInt						; read in the user input for an answer
+ 00000256  A3 000003E8 R			mov		keep_going, eax				; move the user input to a readable register
 
- 0000025A  83 F8 01				cmp		eax, 1						; compare if the user input was a '1'
- 0000025D  0F 84 FFFFFE47			je		Inputs						; Jumps to int inputs if wanted, else end program
+ 0000025B  83 F8 01				cmp		eax, 1						; compare if the user input was a '1'
+ 0000025E  0F 84 FFFFFE37			je		Inputs						; Jumps to int inputs if wanted, else end program
 
 					; exit the program
- 00000263  BA 0000039F R			mov		edx, OFFSET finished		; program is done message
- 00000268  E8 00000000 E			call	CrLf						; add an extra new line for good looks
- 0000026D  E8 00000000 E			call	WriteString
- 00000272  BA 000003D3 R			mov		edx, OFFSET userinput
- 00000277  E8 00000000 E			call	WriteString
- 0000027C  E8 00000000 E			call	CrLf
+ 00000264  BA 0000039B R			mov		edx, OFFSET finished		; program is done message
+ 00000269  E8 00000000 E			call	CrLf						; add an extra new line for good looks
+ 0000026E  E8 00000000 E			call	WriteString
+ 00000273  BA 000003CF R			mov		edx, OFFSET userinput
+ 00000278  E8 00000000 E			call	WriteString
+ 0000027D  E8 00000000 E			call	CrLf
 					exit									; close program, return to OS
- 00000281  6A 00	   *	    push   +000000000h
- 00000283  E8 00000000 E   *	    call   ExitProcess
- 00000288			main ENDP									; the main PROC is finished, this symbolyses that we are done with the proc
+ 00000282  6A 00	   *	    push   +000000000h
+ 00000284  E8 00000000 E   *	    call   ExitProcess
+ 00000289			main ENDP									; the main PROC is finished, this symbolyses that we are done with the proc
 
 
 				END main									; the symbolyses that the main program is finished
-Microsoft (R) Macro Assembler Version 14.16.27026.1	    01/26/19 15:43:19
+Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/27/19 18:28:14
 Program 3		(Project3.asm			     Symbols 2 - 1
 
 
@@ -586,8 +591,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 0000041C Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000288 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000418 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000289 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -694,15 +699,15 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000288 Public STDCALL
-  Inputs . . . . . . . . . . . .	L Near	 000000AA _TEXT	
-  LowerInput . . . . . . . . . .	L Near	 000000EE _TEXT	
-  HigherInput  . . . . . . . . .	L Near	 000000FF _TEXT	
-  Calculations . . . . . . . . .	L Near	 00000110 _TEXT	
-  FinalCalculations  . . . . . .	L Near	 00000128 _TEXT	
-  Output . . . . . . . . . . . .	L Near	 00000160 _TEXT	
-  NoNegatives  . . . . . . . . .	L Near	 00000230 _TEXT	
-  RunAgain . . . . . . . . . . .	L Near	 00000246 _TEXT	
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000289 Public STDCALL
+  Inputs . . . . . . . . . . . .	L Near	 0000009B _TEXT	
+  LowerInput . . . . . . . . . .	L Near	 000000DC _TEXT	
+  HigherInput  . . . . . . . . .	L Near	 000000ED _TEXT	
+  Calculations . . . . . . . . .	L Near	 0000010C _TEXT	
+  FinalCalculations  . . . . . .	L Near	 00000127 _TEXT	
+  Output . . . . . . . . . . . .	L Near	 00000161 _TEXT	
+  NoNegatives  . . . . . . . . .	L Near	 00000231 _TEXT	
+  RunAgain . . . . . . . . . . .	L Near	 00000247 _TEXT	
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -929,40 +934,40 @@ WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
-byteCount  . . . . . . . . . . .	DWord	 000003E8 _DATA	
+byteCount  . . . . . . . . . . .	DWord	 000003E4 _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
-dot_string . . . . . . . . . . .	Byte	 000003D1 _DATA	
+dot_string . . . . . . . . . . .	Byte	 000003CD _DATA	
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
 failed_input_1 . . . . . . . . .	Byte	 00000249 _DATA	
 failed_input_2 . . . . . . . . .	Byte	 00000283 _DATA	
-finished . . . . . . . . . . . .	Byte	 0000039F _DATA	
-fpnt_by1000  . . . . . . . . . .	DWord	 00000410 _DATA	
-fpnt_decimal . . . . . . . . . .	DWord	 0000040C _DATA	
-fpnt_hold  . . . . . . . . . . .	DWord	 00000418 _DATA	
-fpnt_quotient  . . . . . . . . .	DWord	 00000400 _DATA	
-fpnt_remainder . . . . . . . . .	DWord	 00000414 _DATA	
-fpnt_thousanth . . . . . . . . .	DWord	 00000404 _DATA	
-fpnt_whole . . . . . . . . . . .	DWord	 00000408 _DATA	
+finished . . . . . . . . . . . .	Byte	 0000039B _DATA	
+fpnt_by1000  . . . . . . . . . .	DWord	 0000040C _DATA	
+fpnt_decimal . . . . . . . . . .	DWord	 00000408 _DATA	
+fpnt_hold  . . . . . . . . . . .	DWord	 00000414 _DATA	
+fpnt_quotient  . . . . . . . . .	DWord	 000003FC _DATA	
+fpnt_remainder . . . . . . . . .	DWord	 00000410 _DATA	
+fpnt_thousanth . . . . . . . . .	DWord	 00000400 _DATA	
+fpnt_whole . . . . . . . . . . .	DWord	 00000404 _DATA	
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
 intro_1  . . . . . . . . . . . .	Byte	 0000002C _DATA	
 intro_2  . . . . . . . . . . . .	Byte	 00000078 _DATA	
 intro_3  . . . . . . . . . . . .	Byte	 000000C5 _DATA	
 intro_4  . . . . . . . . . . . .	Byte	 00000112 _DATA	
-keep_going . . . . . . . . . . .	DWord	 000003EC _DATA	
+keep_going . . . . . . . . . . .	DWord	 000003E8 _DATA	
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
 lightCyan  . . . . . . . . . . .	Number	 0000000Bh   
 lightGray  . . . . . . . . . . .	Number	 00000007h   
 lightGreen . . . . . . . . . . .	Number	 0000000Ah   
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
-line_num_fin . . . . . . . . . .	Byte	 000003CB _DATA	
-line_num_in  . . . . . . . . . .	Byte	 000003C9 _DATA	
+line_num_fin . . . . . . . . . .	Byte	 000003C7 _DATA	
+line_num_in  . . . . . . . . . .	Byte	 000003C5 _DATA	
 magenta  . . . . . . . . . . . .	Number	 00000005h   
-negative_avg . . . . . . . . . .	DWord	 000003FC _DATA	
-negative_count . . . . . . . . .	DWord	 000003F8 _DATA	
-negative_cur . . . . . . . . . .	DWord	 000003F0 _DATA	
-negative_sum . . . . . . . . . .	DWord	 000003F4 _DATA	
+negative_avg . . . . . . . . . .	DWord	 000003F8 _DATA	
+negative_count . . . . . . . . .	DWord	 000003F4 _DATA	
+negative_cur . . . . . . . . . .	DWord	 000003EC _DATA	
+negative_sum . . . . . . . . . .	DWord	 000003F0 _DATA	
 outro_1  . . . . . . . . . . . .	Byte	 000002B5 _DATA	
 outro_2  . . . . . . . . . . . .	Byte	 000002E0 _DATA	
 outro_3  . . . . . . . . . . . .	Byte	 000002FB _DATA	
@@ -975,7 +980,7 @@ prompt_2 . . . . . . . . . . . .	Byte	 000001DB _DATA
 prompt_3 . . . . . . . . . . . .	Byte	 000001E5 _DATA	
 prompt_4 . . . . . . . . . . . .	Byte	 00000211 _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
-userinput  . . . . . . . . . . .	Byte	 000003D3 _DATA	
+userinput  . . . . . . . . . . .	Byte	 000003CF _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   

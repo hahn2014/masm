@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/24/19 10:47:48
+Microsoft (R) Macro Assembler Version 14.15.26726.0	    02/06/19 10:49:43
 Program 3		(Project3.asm			     Page 1 - 1
 
 
@@ -209,6 +209,7 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/24/19 10:47:48
  00000318 00000000		keep_going		DWORD	?																					; User inputed responce to run again
  0000031C 00000000		printCount		DWORD	?																					; user inputed number of composites to print
  00000320 00000004		compos_current	DWORD	4																					; the current composite number
+ 00000324 00000000		compos_bool		DWORD	0																					; boolean 0 or 1
 
 				;------------------------;
 				;    Code Declaration    ;
@@ -224,46 +225,53 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/24/19 10:47:48
 				;	will implement this into further projects.					;
 				;---------------------------------------------------------------;
  00000000			main PROC
- 00000000  B8 00000017				mov		eax, lightGray + (blue * 16); color varaibles consist of: black, white, brown, yellow, blue, green, cyan, red, magenta, gray, lightBlue, lightGreen, lightCyan, lightRed, lightMagenta, and lightGray.
- 00000005  E8 00000000 E			call	setTextColor				; EXTRA CREDIT: change background and foreground colors
- 0000000A  BA 0000002B R			mov		edx, OFFSET intro_1			; print the program introduction (Called only once when the program starts since the user doesn't need to see this after they restart)
- 0000000F  E8 00000000 E			call	WriteString
- 00000014  E8 00000000 E			call	CrLf						; new line
- 00000019  BA 0000007A R			mov		edx, OFFSET intro_2			; print the program introduction pt.2
- 0000001E  E8 00000000 E			call	WriteString
- 00000023  E8 00000000 E			call	CrLf						; new line
- 00000028  BA 000000C8 R			mov		edx, OFFSET intro_3			; print the program introduction pt.3
- 0000002D  E8 00000000 E			call	WriteString
- 00000032  E8 00000000 E			call	CrLf						; new line
+ 00000000  E8 00000016				call	intro
+ 00000005  E8 00000080				call	inputs
+ 0000000A  E8 000000C4				call	calculations
+ 0000000F  E8 00000169				call	restart
+					exit									; close program, return to OS
+ 00000014  6A 00	   *	    push   +000000000h
+ 00000016  E8 00000000 E   *	    call   ExitProcess
+ 0000001B			main ENDP									; the main PROC is finished, this symbolyses that we are done with the proc
 
- 00000037  BA 000001B1 R			mov		edx, OFFSET prompt_1		; prompt the user for their name
- 0000003C  E8 00000000 E			call	WriteString
- 00000041  BA 000002FF R			mov		edx, OFFSET userinput
- 00000046  B9 00000015				mov		ecx, SIZEOF	userinput
- 0000004B  E8 00000000 E			call	ReadString
- 00000050  A3 00000314 R			mov		byteCount, eax
- 00000055  BA 000001CA R			mov		edx, OFFSET prompt_2
- 0000005A  E8 00000000 E			call	WriteString
- 0000005F  BA 000002FF R			mov		edx, OFFSET userinput
- 00000064  E8 00000000 E			call	WriteString
- 00000069  E8 00000000 E			call	CrLf
+
 
 				;---------------------------------------------------------------;
-				;	The Inputs label will be the start of the program,			;
-				;	where we will prompt the user to input their - integers		;
-				;	into our datastreams until a positive number is inputed		;
+				;	The intro procedure will be called right off the bat, sort	;
+				;	of like before using procedures. This will allow to keep	;
+				;	the main function clean and organized, making debugging		;
+				;	easier! This function litterally just calls all intro		;
+				;	scripts.													;
 				;---------------------------------------------------------------;
- 0000006E			Inputs:	
- 0000006E  BA 000001D4 R			mov		edx, OFFSET prompt_3		; ask for number of composite numbers
- 00000073  E8 00000000 E			call	WriteString
- 00000078  B8 00000000				mov		eax, 0
- 0000007D  E8 00000000 E			call	ReadInt
- 00000082  A3 0000031C R			mov		printCount, eax
- 00000087  3D 00000190				cmp		eax, MAXNUM
- 0000008C  7F 18				jg		HigherInput
- 0000008E  83 F8 01				cmp		eax, MINNUM
- 00000091  7C 02				jl		LowerInput
- 00000093  EB 22				jmp		Calculations
+ 0000001B			intro PROC
+ 0000001B  B8 00000017			mov		eax, lightGray + (blue * 16)	; color varaibles consist of: black, white, brown, yellow, blue, green, cyan, red, magenta, gray, lightBlue, lightGreen, lightCyan, lightRed, lightMagenta, and lightGray.
+ 00000020  E8 00000000 E		call	setTextColor					; EXTRA CREDIT: change background and foreground colors
+ 00000025  BA 0000002B R		mov		edx, OFFSET intro_1				; print the program introduction (Called only once when the program starts since the user doesn't need to see this after they restart)
+ 0000002A  E8 00000000 E		call	WriteString
+ 0000002F  E8 00000000 E		call	CrLf							; new line
+ 00000034  BA 0000007A R		mov		edx, OFFSET intro_2				; print the program introduction pt.2
+ 00000039  E8 00000000 E		call	WriteString
+ 0000003E  E8 00000000 E		call	CrLf							; new line
+ 00000043  BA 000000C8 R		mov		edx, OFFSET intro_3				; print the program introduction pt.3
+ 00000048  E8 00000000 E		call	WriteString
+ 0000004D  E8 00000000 E		call	CrLf							; new line
+
+ 00000052  BA 000001B1 R		mov		edx, OFFSET prompt_1			; prompt the user for their name
+ 00000057  E8 00000000 E		call	WriteString
+ 0000005C  BA 000002FF R		mov		edx, OFFSET userinput
+ 00000061  B9 00000015			mov		ecx, SIZEOF	userinput
+ 00000066  E8 00000000 E		call	ReadString
+ 0000006B  A3 00000314 R		mov		byteCount, eax
+ 00000070  BA 000001CA R		mov		edx, OFFSET prompt_2
+ 00000075  E8 00000000 E		call	WriteString
+ 0000007A  BA 000002FF R		mov		edx, OFFSET userinput
+ 0000007F  E8 00000000 E		call	WriteString
+ 00000084  E8 00000000 E		call	CrLf
+
+
+ 00000089  C3				ret
+ 0000008A			intro ENDP
+
 
 				;---------------------------------------------------------------;
 				;	The Lower/Higher Inputs labels will be jumped to when the 	;
@@ -273,17 +281,32 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/24/19 10:47:48
 				;	the new int is above num1. If successful, will jump the		;
 				;	user to the calculations label.								;
 				;---------------------------------------------------------------;
- 00000095			LowerInput:
- 00000095  BA 00000275 R			mov		edx, OFFSET failed_input_2
- 0000009A  E8 00000000 E			call	WriteString
- 0000009F  E8 00000000 E			call	CrLf
- 000000A4  EB C8				jmp		Inputs
+ 0000008A			inputs PROC
+ 0000008A				StartInp:	
+ 0000008A  BA 000001D4 R			mov		edx, OFFSET prompt_3		; ask for number of composite numbers
+ 0000008F  E8 00000000 E			call	WriteString
+ 00000094  B8 00000000				mov		eax, 0
+ 00000099  E8 00000000 E			call	ReadInt
+ 0000009E  A3 0000031C R			mov		printCount, eax
+ 000000A3  3D 00000190				cmp		eax, MAXNUM
+ 000000A8  7F 17				jg		HigherInput
+ 000000AA  83 F8 01				cmp		eax, MINNUM
+ 000000AD  7C 01				jl		LowerInput
+ 000000AF  C3					ret
 
- 000000A6			HigherInput:
- 000000A6  BA 00000245 R			mov		edx, OFFSET failed_input_1
- 000000AB  E8 00000000 E			call	WriteString
- 000000B0  E8 00000000 E			call	CrLf
- 000000B5  EB B7				jmp		Inputs
+ 000000B0				LowerInput:
+ 000000B0  BA 00000275 R			mov		edx, OFFSET failed_input_2
+ 000000B5  E8 00000000 E			call	WriteString
+ 000000BA  E8 00000000 E			call	CrLf
+ 000000BF  EB C9				jmp		StartInp
+
+ 000000C1				HigherInput:
+ 000000C1  BA 00000245 R			mov		edx, OFFSET failed_input_1
+ 000000C6  E8 00000000 E			call	WriteString
+ 000000CB  E8 00000000 E			call	CrLf
+ 000000D0  EB B8				jmp		StartInp
+ 000000D2  C3				ret
+ 000000D3			inputs ENDP
 
 				;---------------------------------------------------------------;
 				;	The Calculations label will be the bulk of the process,		;
@@ -291,35 +314,91 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/24/19 10:47:48
 				;	output them (very smoothly with proper symbols) to the		;
 				;	output.														;
 				;---------------------------------------------------------------;
- 000000B7			Calculations:
- 000000B7  BA 000002A6 R			mov		edx, OFFSET outro_1
- 000000BC  E8 00000000 E			call	WriteString
- 000000C1  E8 00000000 E			call	CrLf
- 000000C6  E8 00000000 E			call	CrLf
- 000000CB  C7 05 00000320 R			mov		compos_current, 4			; always start off composites at 4
-	   00000004
-
- 000000D5  8B 0D 0000031C R			mov		ecx, printCount				; we will loop through the calculations this many times
- 000000DB  49					dec		ecx							; decrease the loop count by 1 though because we already start at 4
- 000000DC					CompositeLoop:
+ 000000D3			calculations PROC
 
 
 
+ 000000D3  BA 000002A6 R		mov		edx, OFFSET outro_1
+ 000000D8  E8 00000000 E			call	WriteString
+ 000000DD  E8 00000000 E			call	CrLf
+ 000000E2  E8 00000000 E			call	CrLf
+ 000000E7  C7 05 00000320 R			mov		compos_current, 0
+	   00000000
+
+ 000000F1  8B 0D 0000031C R			mov		ecx, printCount				; we will loop through the calculations this many times
+ 000000F7  49					dec		ecx							; decrease the loop count by 1 though because we already start at 4
+ 000000F8					CompositeLoop:
+ 000000F8  FF 05 00000320 R				inc		compos_current			; jump up one to next number
+
+							; Compare method 1
+ 000000FE  A1 00000320 R				mov		eax, compos_current		; we will loop through each number and check if they're composite
+						;	cdq
+ 00000103  BB 00000002					mov		ebx, 2
+						;	cdq
+ 00000108  F7 F3					div		ebx						; divide current composite by 2
+ 0000010A  83 F8 00					cmp		eax, 0					; if eax is 0, move on
+ 0000010D  C7 05 00000324 R				mov		compos_bool, 1			; so far so good
+	   00000001
+
+							; Compare method 2
+ 00000117  A1 00000320 R				mov		eax, compos_current
+						;	cdq
+ 0000011C  BB 00000003					mov		ebx, 3
+						;	cdq
+ 00000121  F7 F3					div		ebx
+ 00000123  83 F8 00					cmp		eax, 0
+ 00000126  C7 05 00000324 R				mov		compos_bool, 1			; so far so good
+	   00000001
+
+							;for (int i=5; i*i<=n; i=i+6) 
+								;if (n%i == 0 || n%(i+2) == 0) 
+									;return true; 
+
+
+ 00000130  BA 00000005					mov		edx, 5					; start the itteration at 5
+ 00000135						LoopCheck:
+ 00000135  F7 E2						mul		edx					; multiply edx by edx
+ 00000137  3B 15 00000320 R					cmp		edx, compos_current	; compare return val to current checking composite
+ 0000013D  7F 2E						jg		OutOfForloop
+
+ 0000013F  A1 00000320 R					mov		eax, compos_current	;
+ 00000144  F7 F2						div		edx					; divide current num by current iteration position (edx)
+ 00000146  83 F8 00						cmp		eax, 0
+ 00000149  74 11						je		SuccessJmp			; "return true"
+
+ 0000014B  A1 00000320 R					mov		eax, compos_current	;
+ 00000150  8B F2						mov		esi, edx			; open a new register to change values
+ 00000152  83 C6 02						add		esi, 2				; add 2 to the itteration value (without changing the itteration position)
+ 00000155  F7 F6						div		esi					; divide eax by esi
+ 00000157  83 F8 00						cmp		eax, 0
+ 0000015A  74 00						je		SuccessJmp			; "return true"
+
+ 0000015C							SuccessJmp:
+ 0000015C  C7 05 00000324 R						mov		compos_bool, 1	; very good here
+	   00000001
+ 00000166  EB 05							jmp		OutOfForloop
+
+ 00000168  83 C2 06						add		edx, 6				; add a 6 each itteration
+ 0000016B  EB C8						jmp		LoopCheck
+
+
+ 0000016D						OutOfForloop:
+
+ 0000016D						WriteComposite:
+ 0000016D  E8 00000000 E					call	WriteDec
+ 00000172  BA 000002FC R					mov		edx, OFFSET seperator
+ 00000177  E8 00000000 E					call	WriteString
+								;call	CrLf
+								;loop	CompositeLoop
+
+ 0000017C						SkipWite:
+
+							;loop	CompositeLoop
 
 
 
- 000000DC  A1 00000320 R				mov		eax, compos_current
- 000000E1  E8 00000000 E				call	WriteDec
- 000000E6  BA 000002FC R				mov		edx, OFFSET seperator
- 000000EB  E8 00000000 E				call	WriteString
-							;call	CrLf
-
- 000000F0  E2 EA					loop CompositeLoop
-
-
-
-
- 000000F2  EB 00				jmp		RunAgain					; output is done, ask to run again
+ 0000017C  C3				ret
+ 0000017D			calculations ENDP
 
 				;---------------------------------------------------------------;
 				;	The RunAgain label will test to see if the user is			;
@@ -329,30 +408,27 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/24/19 10:47:48
 				;	integers. If anything else is answered, the program will	;
 				;	exit to the OS.												;
 				;---------------------------------------------------------------;
- 000000F4			RunAgain:
- 000000F4  BA 0000020D R			mov		edx, OFFSET prompt_4		; run again prompt
- 000000F9  E8 00000000 E			call	WriteString
- 000000FE  E8 00000000 E			call	ReadInt						; read in the user input for an answer
- 00000103  A3 00000318 R			mov		keep_going, eax				; move the user input to a readable register
-
- 00000108  83 F8 01				cmp		eax, 1						; compare if the user input was a '1'
- 0000010B  0F 84 FFFFFF5D			je		Inputs						; Jumps to int inputs if wanted, else end program
+ 0000017D			restart PROC
+ 0000017D  BA 0000020D R		mov		edx, OFFSET prompt_4		; run again prompt
+ 00000182  E8 00000000 E		call	WriteString
+ 00000187  E8 00000000 E		call	ReadInt						; read in the user input for an answer
+ 0000018C  A3 00000318 R		mov		keep_going, eax				; move the user input to a readable register
+ 00000191  83 F8 01			cmp		eax, 1						; compare if the user input was a '1'
+ 00000194  E8 FFFFFEF1			call	inputs						; Jumps to int inputs if wanted, else end program
 
 					; exit the program
- 00000111  BA 000002D2 R			mov		edx, OFFSET finished		; program is done message
- 00000116  E8 00000000 E			call	CrLf						; add an extra new line for good looks
- 0000011B  E8 00000000 E			call	WriteString
- 00000120  BA 000002FF R			mov		edx, OFFSET userinput
- 00000125  E8 00000000 E			call	WriteString
- 0000012A  E8 00000000 E			call	CrLf
-					exit									; close program, return to OS
- 0000012F  6A 00	   *	    push   +000000000h
- 00000131  E8 00000000 E   *	    call   ExitProcess
- 00000136			main ENDP									; the main PROC is finished, this symbolyses that we are done with the proc
+ 00000199  BA 000002D2 R		mov		edx, OFFSET finished		; program is done message
+ 0000019E  E8 00000000 E		call	CrLf						; add an extra new line for good looks
+ 000001A3  E8 00000000 E		call	WriteString
+ 000001A8  BA 000002FF R		mov		edx, OFFSET userinput
+ 000001AD  E8 00000000 E		call	WriteString
+ 000001B2  E8 00000000 E		call	CrLf
 
+ 000001B7  C3				ret
+ 000001B8			restart ENDP
 
 				END main									; the symbolyses that the main program is finished
-Microsoft (R) Macro Assembler Version 14.15.26726.0	    01/24/19 10:47:48
+Microsoft (R) Macro Assembler Version 14.15.26726.0	    02/06/19 10:49:43
 Program 3		(Project3.asm			     Symbols 2 - 1
 
 
@@ -446,8 +522,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000324 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000136 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000328 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 000001B8 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -554,14 +630,21 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000136 Public STDCALL
-  Inputs . . . . . . . . . . . .	L Near	 0000006E _TEXT	
-  LowerInput . . . . . . . . . .	L Near	 00000095 _TEXT	
-  HigherInput  . . . . . . . . .	L Near	 000000A6 _TEXT	
-  Calculations . . . . . . . . .	L Near	 000000B7 _TEXT	
-  CompositeLoop  . . . . . . . .	L Near	 000000DC _TEXT	
-  RunAgain . . . . . . . . . . .	L Near	 000000F4 _TEXT	
+calculations . . . . . . . . . .	P Near	 000000D3 _TEXT	Length= 000000AA Public STDCALL
+  CompositeLoop  . . . . . . . .	L Near	 000000F8 _TEXT	
+  LoopCheck  . . . . . . . . . .	L Near	 00000135 _TEXT	
+  SuccessJmp . . . . . . . . . .	L Near	 0000015C _TEXT	
+  OutOfForloop . . . . . . . . .	L Near	 0000016D _TEXT	
+  WriteComposite . . . . . . . .	L Near	 0000016D _TEXT	
+  SkipWite . . . . . . . . . . .	L Near	 0000017C _TEXT	
+inputs . . . . . . . . . . . . .	P Near	 0000008A _TEXT	Length= 00000049 Public STDCALL
+  StartInp . . . . . . . . . . .	L Near	 0000008A _TEXT	
+  LowerInput . . . . . . . . . .	L Near	 000000B0 _TEXT	
+  HigherInput  . . . . . . . . .	L Near	 000000C1 _TEXT	
+intro  . . . . . . . . . . . . .	P Near	 0000001B _TEXT	Length= 0000006F Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 0000001B Public STDCALL
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
+restart  . . . . . . . . . . . .	P Near	 0000017D _TEXT	Length= 0000003B Public STDCALL
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 
@@ -788,6 +871,7 @@ black  . . . . . . . . . . . . .	Number	 00000000h
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
 byteCount  . . . . . . . . . . .	DWord	 00000314 _DATA	
+compos_bool  . . . . . . . . . .	DWord	 00000324 _DATA	
 compos_current . . . . . . . . .	DWord	 00000320 _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0

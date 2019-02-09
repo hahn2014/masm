@@ -1,12 +1,12 @@
-Microsoft (R) Macro Assembler Version 14.15.26726.0	    02/06/19 10:49:43
-Program 3		(Project3.asm			     Page 1 - 1
+Microsoft (R) Macro Assembler Version 14.15.26726.0	    02/09/19 11:07:33
+Program 4		(Project4.asm			     Page 1 - 1
 
 
-				TITLE Program 3		(Project3.asm)
+				TITLE Program 4		(Project4.asm)
 
 				; Author: Bryce Hahn
-				; Course/Project ID: CS 271 Project 3
-				; Date: 1/21/2019
+				; Course/Project ID: CS 271 Project 4
+				; Date: 2/09/2019
 				; Description:
 				;	This program asks users to enter the number of composite
 				;		numbers they would like to see between 1 and 400. If
@@ -198,18 +198,20 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    02/06/19 10:49:43
 	   64 62 79 65 2C
 	   20 00
  000002FC 2C 20 00		seperator		BYTE	", ", 0
+ 000002FF 2A 2A 2A 00		testFail		BYTE	"***", 0
 
  = 00000190			MAXNUM			=		400																					; The maximum range of negative numbers
  = 00000001			MINNUM			=		1																					; The minimum range we want to calculate
- 000002FF  00000015 [		userinput		BYTE	21 DUP(0)																			; Byte array for the username input
+ 00000303  00000015 [		userinput		BYTE	21 DUP(0)																			; Byte array for the username input
 	    00
 	   ]
 
- 00000314 00000000		byteCount		DWORD	?																					; used for holding information about user inputting a string
- 00000318 00000000		keep_going		DWORD	?																					; User inputed responce to run again
- 0000031C 00000000		printCount		DWORD	?																					; user inputed number of composites to print
- 00000320 00000004		compos_current	DWORD	4																					; the current composite number
- 00000324 00000000		compos_bool		DWORD	0																					; boolean 0 or 1
+ 00000318 00000000		byteCount		DWORD	?																					; used for holding information about user inputting a string
+ 0000031C 00000000		keep_going		DWORD	?																					; User inputed responce to run again
+ 00000320 00000000		printCount		DWORD	?																					; user inputed number of composites to print
+ 00000324 00000004		compos_current	DWORD	4																					; the current composite number
+ 00000328 00000000		compos_bool		DWORD	0																					; a boolean operator to keep track through the methods
+ 0000032C 00000000		compos_count	DWORD	?																					; number of calculated composites
 
 				;------------------------;
 				;    Code Declaration    ;
@@ -227,12 +229,12 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    02/06/19 10:49:43
  00000000			main PROC
  00000000  E8 00000016				call	intro
  00000005  E8 00000080				call	inputs
- 0000000A  E8 000000C4				call	calculations
- 0000000F  E8 00000169				call	restart
-					exit									; close program, return to OS
+ 0000000A  E8 000000C4				call	getComposites
+ 0000000F  E8 000001B0				call	restart
+					exit										; close program, return to OS
  00000014  6A 00	   *	    push   +000000000h
  00000016  E8 00000000 E   *	    call   ExitProcess
- 0000001B			main ENDP									; the main PROC is finished, this symbolyses that we are done with the proc
+ 0000001B			main ENDP										; the main PROC is finished, this symbolyses that we are done with the proc
 
 
 
@@ -244,27 +246,27 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    02/06/19 10:49:43
 				;	scripts.													;
 				;---------------------------------------------------------------;
  0000001B			intro PROC
- 0000001B  B8 00000017			mov		eax, lightGray + (blue * 16)	; color varaibles consist of: black, white, brown, yellow, blue, green, cyan, red, magenta, gray, lightBlue, lightGreen, lightCyan, lightRed, lightMagenta, and lightGray.
- 00000020  E8 00000000 E		call	setTextColor					; EXTRA CREDIT: change background and foreground colors
- 00000025  BA 0000002B R		mov		edx, OFFSET intro_1				; print the program introduction (Called only once when the program starts since the user doesn't need to see this after they restart)
+ 0000001B  B8 00000017			mov		eax, lightGray + (blue * 16)		; color varaibles consist of: black, white, brown, yellow, blue, green, cyan, red, magenta, gray, lightBlue, lightGreen, lightCyan, lightRed, lightMagenta, and lightGray.
+ 00000020  E8 00000000 E		call	setTextColor						; EXTRA CREDIT: change background and foreground colors
+ 00000025  BA 0000002B R		mov		edx, OFFSET intro_1					; print the program introduction (Called only once when the program starts since the user doesn't need to see this after they restart)
  0000002A  E8 00000000 E		call	WriteString
- 0000002F  E8 00000000 E		call	CrLf							; new line
- 00000034  BA 0000007A R		mov		edx, OFFSET intro_2				; print the program introduction pt.2
+ 0000002F  E8 00000000 E		call	CrLf								; new line
+ 00000034  BA 0000007A R		mov		edx, OFFSET intro_2					; print the program introduction pt.2
  00000039  E8 00000000 E		call	WriteString
- 0000003E  E8 00000000 E		call	CrLf							; new line
- 00000043  BA 000000C8 R		mov		edx, OFFSET intro_3				; print the program introduction pt.3
- 00000048  E8 00000000 E		call	WriteString
- 0000004D  E8 00000000 E		call	CrLf							; new line
+ 0000003E  E8 00000000 E		call	CrLf								; new line
+ 00000043  BA 000000C8 R		mov		edx, OFFSET intro_3					; print the program introduction pt.3
+ 00000048  E8 00000000 E		call	WriteString	
+ 0000004D  E8 00000000 E		call	CrLf								; new line
 
- 00000052  BA 000001B1 R		mov		edx, OFFSET prompt_1			; prompt the user for their name
+ 00000052  BA 000001B1 R		mov		edx, OFFSET prompt_1				; prompt the user for their name
  00000057  E8 00000000 E		call	WriteString
- 0000005C  BA 000002FF R		mov		edx, OFFSET userinput
+ 0000005C  BA 00000303 R		mov		edx, OFFSET userinput
  00000061  B9 00000015			mov		ecx, SIZEOF	userinput
  00000066  E8 00000000 E		call	ReadString
- 0000006B  A3 00000314 R		mov		byteCount, eax
+ 0000006B  A3 00000318 R		mov		byteCount, eax
  00000070  BA 000001CA R		mov		edx, OFFSET prompt_2
  00000075  E8 00000000 E		call	WriteString
- 0000007A  BA 000002FF R		mov		edx, OFFSET userinput
+ 0000007A  BA 00000303 R		mov		edx, OFFSET userinput
  0000007F  E8 00000000 E		call	WriteString
  00000084  E8 00000000 E		call	CrLf
 
@@ -283,11 +285,11 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    02/06/19 10:49:43
 				;---------------------------------------------------------------;
  0000008A			inputs PROC
  0000008A				StartInp:	
- 0000008A  BA 000001D4 R			mov		edx, OFFSET prompt_3		; ask for number of composite numbers
+ 0000008A  BA 000001D4 R			mov		edx, OFFSET prompt_3			; ask for number of composite numbers
  0000008F  E8 00000000 E			call	WriteString
  00000094  B8 00000000				mov		eax, 0
  00000099  E8 00000000 E			call	ReadInt
- 0000009E  A3 0000031C R			mov		printCount, eax
+ 0000009E  A3 00000320 R			mov		printCount, eax
  000000A3  3D 00000190				cmp		eax, MAXNUM
  000000A8  7F 17				jg		HigherInput
  000000AA  83 F8 01				cmp		eax, MINNUM
@@ -309,127 +311,147 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    02/06/19 10:49:43
  000000D3			inputs ENDP
 
 				;---------------------------------------------------------------;
-				;	The Calculations label will be the bulk of the process,		;
+				;	The getComposites procedure will be the bulk of the process,;
 				;	where we calculate the different math operations, and		;
 				;	output them (very smoothly with proper symbols) to the		;
 				;	output.														;
 				;---------------------------------------------------------------;
- 000000D3			calculations PROC
-
-
-
+ 000000D3			getComposites PROC
  000000D3  BA 000002A6 R		mov		edx, OFFSET outro_1
- 000000D8  E8 00000000 E			call	WriteString
- 000000DD  E8 00000000 E			call	CrLf
- 000000E2  E8 00000000 E			call	CrLf
- 000000E7  C7 05 00000320 R			mov		compos_current, 0
+ 000000D8  E8 00000000 E		call	WriteString
+ 000000DD  E8 00000000 E		call	CrLf
+ 000000E2  E8 00000000 E		call	CrLf
+ 000000E7  C7 05 00000324 R		mov		compos_current, 4
+	   00000004
+ 000000F1  C7 05 0000032C R		mov		compos_count, 0
 	   00000000
 
- 000000F1  8B 0D 0000031C R			mov		ecx, printCount				; we will loop through the calculations this many times
- 000000F7  49					dec		ecx							; decrease the loop count by 1 though because we already start at 4
- 000000F8					CompositeLoop:
- 000000F8  FF 05 00000320 R				inc		compos_current			; jump up one to next number
+ 000000FB  8B 0D 00000320 R		mov		ecx, printCount					; we will loop through the calculations this many times
+ 00000101  49				dec		ecx								; decrease the loop count by 1 though because we already start at 4
+ 00000102				CompositeLoop:	
+ 00000102  FF 05 00000324 R			inc		compos_current				; jump up one to next number
 
-							; Compare method 1
- 000000FE  A1 00000320 R				mov		eax, compos_current		; we will loop through each number and check if they're composite
-						;	cdq
- 00000103  BB 00000002					mov		ebx, 2
-						;	cdq
- 00000108  F7 F3					div		ebx						; divide current composite by 2
- 0000010A  83 F8 00					cmp		eax, 0					; if eax is 0, move on
- 0000010D  C7 05 00000324 R				mov		compos_bool, 1			; so far so good
+						; Compare method 1
+ 00000108  A1 00000324 R			mov		eax, compos_current			; we will loop through each number and check if they're composite
+ 0000010D  99					cdq
+ 0000010E  BB 00000002				mov		ebx, 2
+ 00000113  99					cdq
+ 00000114  F7 F3				div		ebx							; divide current composite by 2
+ 00000116  83 F8 00				cmp		eax, 0						; if eax is 0, move on
+ 00000119  C7 05 00000328 R			mov		compos_bool, 1				; so far so good
 	   00000001
 
-							; Compare method 2
- 00000117  A1 00000320 R				mov		eax, compos_current
-						;	cdq
- 0000011C  BB 00000003					mov		ebx, 3
-						;	cdq
- 00000121  F7 F3					div		ebx
- 00000123  83 F8 00					cmp		eax, 0
- 00000126  C7 05 00000324 R				mov		compos_bool, 1			; so far so good
+						; Compare method 2
+ 00000123  A1 00000324 R			mov		eax, compos_current
+ 00000128  99					cdq
+ 00000129  BB 00000003				mov		ebx, 3
+ 0000012E  99					cdq
+ 0000012F  F7 F3				div		ebx
+ 00000131  83 F8 00				cmp		eax, 0
+ 00000134  C7 05 00000328 R			mov		compos_bool, 1				; so far so good
 	   00000001
 
-							;for (int i=5; i*i<=n; i=i+6) 
-								;if (n%i == 0 || n%(i+2) == 0) 
+ 0000013E  E8 FFFFFF90				call	getComposites				; run the check method, if 
+
+ 00000143  83 3D 00000328 R			cmp		compos_bool, 1
+	   01
+ 0000014A  74 02				je		WriteComposite
+ 0000014C  EB 1A				jmp		SkipWrite
+
+ 0000014E					WriteComposite:
+ 0000014E  E8 00000000 E				call	WriteDec
+ 00000153  BA 000002FC R				mov		edx, OFFSET seperator
+ 00000158  E8 00000000 E				call	WriteString
+ 0000015D  E8 00000000 E				call	CrLf
+ 00000162  FF 05 0000032C R				inc		compos_count
+
+ 00000168					SkipWrite:
+ 00000168  BA 000002FF R				mov		edx, OFFSET testFail
+ 0000016D  E8 00000000 E				call	WriteString
+ 00000172  E8 00000000 E				call	WriteDec
+ 00000177  E2 89					loop	CompositeLoop
+
+ 00000179  C3				ret
+ 0000017A			getComposites ENDP
+
+
+				;---------------------------------------------------------------;
+				;	The isComposite procedure will be called during the			;
+				;	getComposite procedure as a means to keep the looping to	;
+				;	labels acessible. Keeping the other procedure relatively	;
+				;	clean and organized.										;
+				;---------------------------------------------------------------;
+ 0000017A			isComposite PROC
+					;this is a c++ equivelent of getting a composite number, conversion time
+					;for (int i = 5; i * i <= n; i = i + 6) 
+								;if (n % i == 0 || n % (i + 2) == 0) 
 									;return true; 
 
 
- 00000130  BA 00000005					mov		edx, 5					; start the itteration at 5
- 00000135						LoopCheck:
- 00000135  F7 E2						mul		edx					; multiply edx by edx
- 00000137  3B 15 00000320 R					cmp		edx, compos_current	; compare return val to current checking composite
- 0000013D  7F 2E						jg		OutOfForloop
+ 0000017A  B9 00000005			mov		ecx, 5					; start the itteration at 5
+ 0000017F				LoopCheck:
+ 0000017F  F7 E1				mul		ecx					; multiply edx by edx
+ 00000181  3B 0D 00000324 R			cmp		ecx, compos_current	; compare return val to current checking composite
+ 00000187  7F 30				jg		OutOfForloop
 
- 0000013F  A1 00000320 R					mov		eax, compos_current	;
- 00000144  F7 F2						div		edx					; divide current num by current iteration position (edx)
- 00000146  83 F8 00						cmp		eax, 0
- 00000149  74 11						je		SuccessJmp			; "return true"
+ 00000189  A1 00000324 R			mov		eax, compos_current
+ 0000018E  F7 F1				div		ecx					; divide current num by current iteration position (edx)
+ 00000190  83 FA 00				cmp		edx, 0
+ 00000193  74 13				je		SuccessJmp			; "return true"
 
- 0000014B  A1 00000320 R					mov		eax, compos_current	;
- 00000150  8B F2						mov		esi, edx			; open a new register to change values
- 00000152  83 C6 02						add		esi, 2				; add 2 to the itteration value (without changing the itteration position)
- 00000155  F7 F6						div		esi					; divide eax by esi
- 00000157  83 F8 00						cmp		eax, 0
- 0000015A  74 00						je		SuccessJmp			; "return true"
+ 00000195  A1 00000324 R			mov		eax, compos_current	;
+ 0000019A  8B F1				mov		esi, ecx			; open a new register to change values
+ 0000019C  83 C6 02				add		esi, 2				; add 2 to the itteration value (without changing the itteration position)
+ 0000019F  F7 F6				div		esi					; divide eax by esi
+ 000001A1  83 FA 00				cmp		edx, 0
+ 000001A4  74 02				je		SuccessJmp			; "return true"
+ 000001A6  EB 0C				jmp		FailJmp				; can't return true on this loop, but go to next loop
 
- 0000015C							SuccessJmp:
- 0000015C  C7 05 00000324 R						mov		compos_bool, 1	; very good here
+ 000001A8					SuccessJmp:
+ 000001A8  C7 05 00000328 R				mov		compos_bool, 1	; very good here
 	   00000001
- 00000166  EB 05							jmp		OutOfForloop
+ 000001B2  EB 05					jmp		OutOfForloop
+ 000001B4					FailJmp:
+ 000001B4  83 C1 06					add		ecx, 6			; add a 6 each itteration
+ 000001B7  EB C6					jmp		LoopCheck
 
- 00000168  83 C2 06						add		edx, 6				; add a 6 each itteration
- 0000016B  EB C8						jmp		LoopCheck
-
-
- 0000016D						OutOfForloop:
-
- 0000016D						WriteComposite:
- 0000016D  E8 00000000 E					call	WriteDec
- 00000172  BA 000002FC R					mov		edx, OFFSET seperator
- 00000177  E8 00000000 E					call	WriteString
-								;call	CrLf
-								;loop	CompositeLoop
-
- 0000017C						SkipWite:
-
-							;loop	CompositeLoop
-
-
-
- 0000017C  C3				ret
- 0000017D			calculations ENDP
+ 000001B9				OutOfForloop:
+ 000001B9  C7 05 00000328 R			mov		compos_bool, 0
+	   00000000
+								
+ 000001C3  C3				ret
+ 000001C4			isComposite ENDP
 
 				;---------------------------------------------------------------;
-				;	The RunAgain label will test to see if the user is			;
+				;	The restart procedure will test to see if the user is		;
 				;	wanting to run the process one more time, which is 1		;
 				;	is inputed, will jump the user back into the				;
 				;	introduction where the user will be asked to input more		;
 				;	integers. If anything else is answered, the program will	;
 				;	exit to the OS.												;
 				;---------------------------------------------------------------;
- 0000017D			restart PROC
- 0000017D  BA 0000020D R		mov		edx, OFFSET prompt_4		; run again prompt
- 00000182  E8 00000000 E		call	WriteString
- 00000187  E8 00000000 E		call	ReadInt						; read in the user input for an answer
- 0000018C  A3 00000318 R		mov		keep_going, eax				; move the user input to a readable register
- 00000191  83 F8 01			cmp		eax, 1						; compare if the user input was a '1'
- 00000194  E8 FFFFFEF1			call	inputs						; Jumps to int inputs if wanted, else end program
+ 000001C4			restart PROC
+ 000001C4  BA 0000020D R		mov		edx, OFFSET prompt_4			; run again prompt
+ 000001C9  E8 00000000 E		call	WriteString
+ 000001CE  E8 00000000 E		call	ReadInt							; read in the user input for an answer
+ 000001D3  A3 0000031C R		mov		keep_going, eax					; move the user input to a readable register
+ 000001D8  83 F8 01			cmp		eax, 1							; compare if the user input was a '1'
+ 000001DB  E8 FFFFFEAA			call	inputs							; Jumps to int inputs if wanted, else end program
 
-					; exit the program
- 00000199  BA 000002D2 R		mov		edx, OFFSET finished		; program is done message
- 0000019E  E8 00000000 E		call	CrLf						; add an extra new line for good looks
- 000001A3  E8 00000000 E		call	WriteString
- 000001A8  BA 000002FF R		mov		edx, OFFSET userinput
- 000001AD  E8 00000000 E		call	WriteString
- 000001B2  E8 00000000 E		call	CrLf
+					; exit the program	
+ 000001E0  BA 000002D2 R		mov		edx, OFFSET finished			; program is done message
+ 000001E5  E8 00000000 E		call	CrLf							; add an extra new line for good looks
+ 000001EA  E8 00000000 E		call	WriteString
+ 000001EF  BA 00000303 R		mov		edx, OFFSET userinput
+ 000001F4  E8 00000000 E		call	WriteString
+ 000001F9  E8 00000000 E		call	CrLf
 
- 000001B7  C3				ret
- 000001B8			restart ENDP
+ 000001FE  C3				ret
+ 000001FF			restart ENDP
 
 				END main									; the symbolyses that the main program is finished
-Microsoft (R) Macro Assembler Version 14.15.26726.0	    02/06/19 10:49:43
-Program 3		(Project3.asm			     Symbols 2 - 1
+Microsoft (R) Macro Assembler Version 14.15.26726.0	    02/09/19 11:07:33
+Program 4		(Project4.asm			     Symbols 2 - 1
 
 
 
@@ -522,8 +544,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000328 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 000001B8 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000330 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 000001FF Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -630,21 +652,23 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-calculations . . . . . . . . . .	P Near	 000000D3 _TEXT	Length= 000000AA Public STDCALL
-  CompositeLoop  . . . . . . . .	L Near	 000000F8 _TEXT	
-  LoopCheck  . . . . . . . . . .	L Near	 00000135 _TEXT	
-  SuccessJmp . . . . . . . . . .	L Near	 0000015C _TEXT	
-  OutOfForloop . . . . . . . . .	L Near	 0000016D _TEXT	
-  WriteComposite . . . . . . . .	L Near	 0000016D _TEXT	
-  SkipWite . . . . . . . . . . .	L Near	 0000017C _TEXT	
+getComposites  . . . . . . . . .	P Near	 000000D3 _TEXT	Length= 000000A7 Public STDCALL
+  CompositeLoop  . . . . . . . .	L Near	 00000102 _TEXT	
+  WriteComposite . . . . . . . .	L Near	 0000014E _TEXT	
+  SkipWrite  . . . . . . . . . .	L Near	 00000168 _TEXT	
 inputs . . . . . . . . . . . . .	P Near	 0000008A _TEXT	Length= 00000049 Public STDCALL
   StartInp . . . . . . . . . . .	L Near	 0000008A _TEXT	
   LowerInput . . . . . . . . . .	L Near	 000000B0 _TEXT	
   HigherInput  . . . . . . . . .	L Near	 000000C1 _TEXT	
 intro  . . . . . . . . . . . . .	P Near	 0000001B _TEXT	Length= 0000006F Public STDCALL
+isComposite  . . . . . . . . . .	P Near	 0000017A _TEXT	Length= 0000004A Public STDCALL
+  LoopCheck  . . . . . . . . . .	L Near	 0000017F _TEXT	
+  SuccessJmp . . . . . . . . . .	L Near	 000001A8 _TEXT	
+  FailJmp  . . . . . . . . . . .	L Near	 000001B4 _TEXT	
+  OutOfForloop . . . . . . . . .	L Near	 000001B9 _TEXT	
 main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 0000001B Public STDCALL
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
-restart  . . . . . . . . . . . .	P Near	 0000017D _TEXT	Length= 0000003B Public STDCALL
+restart  . . . . . . . . . . . .	P Near	 000001C4 _TEXT	Length= 0000003B Public STDCALL
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 
@@ -870,9 +894,10 @@ WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
-byteCount  . . . . . . . . . . .	DWord	 00000314 _DATA	
-compos_bool  . . . . . . . . . .	DWord	 00000324 _DATA	
-compos_current . . . . . . . . .	DWord	 00000320 _DATA	
+byteCount  . . . . . . . . . . .	DWord	 00000318 _DATA	
+compos_bool  . . . . . . . . . .	DWord	 00000328 _DATA	
+compos_count . . . . . . . . . .	DWord	 0000032C _DATA	
+compos_current . . . . . . . . .	DWord	 00000324 _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
 failed_input_1 . . . . . . . . .	Byte	 00000245 _DATA	
@@ -883,7 +908,7 @@ green  . . . . . . . . . . . . .	Number	 00000002h
 intro_1  . . . . . . . . . . . .	Byte	 0000002B _DATA	
 intro_2  . . . . . . . . . . . .	Byte	 0000007A _DATA	
 intro_3  . . . . . . . . . . . .	Byte	 000000C8 _DATA	
-keep_going . . . . . . . . . . .	DWord	 00000318 _DATA	
+keep_going . . . . . . . . . . .	DWord	 0000031C _DATA	
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
 lightCyan  . . . . . . . . . . .	Number	 0000000Bh   
 lightGray  . . . . . . . . . . .	Number	 00000007h   
@@ -892,7 +917,7 @@ lightMagenta . . . . . . . . . .	Number	 0000000Dh
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
 outro_1  . . . . . . . . . . . .	Byte	 000002A6 _DATA	
-printCount . . . . . . . . . . .	DWord	 0000031C _DATA	
+printCount . . . . . . . . . . .	DWord	 00000320 _DATA	
 project  . . . . . . . . . . . .	Byte	 00000000 _DATA	
 prompt_1 . . . . . . . . . . . .	Byte	 000001B1 _DATA	
 prompt_2 . . . . . . . . . . . .	Byte	 000001CA _DATA	
@@ -900,7 +925,8 @@ prompt_3 . . . . . . . . . . . .	Byte	 000001D4 _DATA
 prompt_4 . . . . . . . . . . . .	Byte	 0000020D _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
 seperator  . . . . . . . . . . .	Byte	 000002FC _DATA	
-userinput  . . . . . . . . . . .	Byte	 000002FF _DATA	
+testFail . . . . . . . . . . . .	Byte	 000002FF _DATA	
+userinput  . . . . . . . . . . .	Byte	 00000303 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   

@@ -1,8 +1,8 @@
-TITLE Program 3		(Project3.asm)
+TITLE Program 4		(Project4.asm)
 
 ; Author: Bryce Hahn
-; Course/Project ID: CS 271 Project 3
-; Date: 1/21/2019
+; Course/Project ID: CS 271 Project 4
+; Date: 2/09/2019
 ; Description:
 ;	This program asks users to enter the number of composite
 ;		numbers they would like to see between 1 and 400. If
@@ -34,6 +34,7 @@ failed_input_2	BYTE	"The entered number was bellow the allowed range!", 0							
 outro_1			BYTE	"---  Outputting your composite numbers  ---", 0									; Start the calc section with letting the user know it's printing
 finished		BYTE	"Thank you for using my program! Goodbye, ", 0										; Thank the user and say goodbye by name input
 seperator		BYTE	", ", 0
+testFail		BYTE	"***", 0
 
 MAXNUM			=		400																					; The maximum range of negative numbers
 MINNUM			=		1																					; The minimum range we want to calculate
@@ -43,7 +44,8 @@ byteCount		DWORD	?																					; used for holding information about user
 keep_going		DWORD	?																					; User inputed responce to run again
 printCount		DWORD	?																					; user inputed number of composites to print
 compos_current	DWORD	4																					; the current composite number
-compos_bool		DWORD	0																					; boolean 0 or 1
+compos_bool		DWORD	0																					; a boolean operator to keep track through the methods
+compos_count	DWORD	?																					; number of calculated composites
 
 ;------------------------;
 ;    Code Declaration    ;
@@ -61,10 +63,10 @@ compos_bool		DWORD	0																					; boolean 0 or 1
 main PROC
 		call	intro
 		call	inputs
-		call	calculations
+		call	getComposites
 		call	restart
-	exit									; close program, return to OS
-main ENDP									; the main PROC is finished, this symbolyses that we are done with the proc
+	exit										; close program, return to OS
+main ENDP										; the main PROC is finished, this symbolyses that we are done with the proc
 
 
 
@@ -76,19 +78,19 @@ main ENDP									; the main PROC is finished, this symbolyses that we are done 
 ;	scripts.													;
 ;---------------------------------------------------------------;
 intro PROC
-	mov		eax, lightGray + (blue * 16)	; color varaibles consist of: black, white, brown, yellow, blue, green, cyan, red, magenta, gray, lightBlue, lightGreen, lightCyan, lightRed, lightMagenta, and lightGray.
-	call	setTextColor					; EXTRA CREDIT: change background and foreground colors
-	mov		edx, OFFSET intro_1				; print the program introduction (Called only once when the program starts since the user doesn't need to see this after they restart)
+	mov		eax, lightGray + (blue * 16)		; color varaibles consist of: black, white, brown, yellow, blue, green, cyan, red, magenta, gray, lightBlue, lightGreen, lightCyan, lightRed, lightMagenta, and lightGray.
+	call	setTextColor						; EXTRA CREDIT: change background and foreground colors
+	mov		edx, OFFSET intro_1					; print the program introduction (Called only once when the program starts since the user doesn't need to see this after they restart)
 	call	WriteString
-	call	CrLf							; new line
-	mov		edx, OFFSET intro_2				; print the program introduction pt.2
+	call	CrLf								; new line
+	mov		edx, OFFSET intro_2					; print the program introduction pt.2
 	call	WriteString
-	call	CrLf							; new line
-	mov		edx, OFFSET intro_3				; print the program introduction pt.3
-	call	WriteString
-	call	CrLf							; new line
+	call	CrLf								; new line
+	mov		edx, OFFSET intro_3					; print the program introduction pt.3
+	call	WriteString	
+	call	CrLf								; new line
 
-	mov		edx, OFFSET prompt_1			; prompt the user for their name
+	mov		edx, OFFSET prompt_1				; prompt the user for their name
 	call	WriteString
 	mov		edx, OFFSET userinput
 	mov		ecx, SIZEOF	userinput
@@ -115,7 +117,7 @@ intro ENDP
 ;---------------------------------------------------------------;
 inputs PROC
 	StartInp:	
-		mov		edx, OFFSET prompt_3		; ask for number of composite numbers
+		mov		edx, OFFSET prompt_3			; ask for number of composite numbers
 		call	WriteString
 		mov		eax, 0
 		call	ReadInt
@@ -124,15 +126,15 @@ inputs PROC
 		jg		HigherInput
 		cmp		eax, MINNUM
 		jl		LowerInput
-		ret
+		ret										; if the input is good, continue to next procedure
 
-	LowerInput:
+	LowerInput:									; if the input is bellow range, ask for another
 		mov		edx, OFFSET failed_input_2
 		call	WriteString
 		call	CrLf
 		jmp		StartInp
 
-	HigherInput:
+	HigherInput:								; if the input is above range, ask for another one
 		mov		edx, OFFSET failed_input_1
 		call	WriteString
 		call	CrLf
@@ -141,95 +143,111 @@ inputs PROC
 inputs ENDP
 
 ;---------------------------------------------------------------;
-;	The Calculations label will be the bulk of the process,		;
+;	The getComposites procedure will be the bulk of the process,;
 ;	where we calculate the different math operations, and		;
 ;	output them (very smoothly with proper symbols) to the		;
 ;	output.														;
 ;---------------------------------------------------------------;
-calculations PROC
-
-
-
+getComposites PROC
 	mov		edx, OFFSET outro_1
-		call	WriteString
-		call	CrLf
-		call	CrLf
-		mov		compos_current, 0
+	call	WriteString
+	call	CrLf
+	call	CrLf
+	mov		compos_current, 4
+	mov		compos_count, 0
 
-		mov		ecx, printCount				; we will loop through the calculations this many times
-		dec		ecx							; decrease the loop count by 1 though because we already start at 4
-		CompositeLoop:
-			inc		compos_current			; jump up one to next number
+	mov		ecx, printCount					; we will loop through the calculations this many times
+	dec		ecx								; decrease the loop count by 1 though because we already start at 4
+	CompositeLoop:	
+		inc		compos_current				; jump up one to next number
 
-			; Compare method 1
-			mov		eax, compos_current		; we will loop through each number and check if they're composite
-		;	cdq
-			mov		ebx, 2
-		;	cdq
-			div		ebx						; divide current composite by 2
-			cmp		eax, 0					; if eax is 0, move on
-			mov		compos_bool, 1			; so far so good
+		; Compare method 1
+		mov		eax, compos_current			; we will loop through each number and check if they're composite
+		cdq
+		mov		ebx, 2
+		cdq
+		div		ebx							; divide current composite by 2
+		cmp		eax, 0						; if eax is 0, move on
+		mov		compos_bool, 1				; so far so good
 
-			; Compare method 2
-			mov		eax, compos_current
-		;	cdq
-			mov		ebx, 3
-		;	cdq
-			div		ebx
-			cmp		eax, 0
-			mov		compos_bool, 1			; so far so good
+		; Compare method 2
+		mov		eax, compos_current
+		cdq
+		mov		ebx, 3
+		cdq
+		div		ebx
+		cmp		eax, 0
+		mov		compos_bool, 1				; so far so good
 
-			;for (int i=5; i*i<=n; i=i+6) 
-				;if (n%i == 0 || n%(i+2) == 0) 
-					;return true; 
+		call	getComposites				; run the check method, if 
 
+		cmp		compos_bool, 1
+		je		WriteComposite
+		jmp		SkipWrite
 
-			mov		edx, 5					; start the itteration at 5
-			LoopCheck:
-				mul		edx					; multiply edx by edx
-				cmp		edx, compos_current	; compare return val to current checking composite
-				jg		OutOfForloop
+		WriteComposite:
+			call	WriteDec
+			mov		edx, OFFSET seperator
+			call	WriteString
+			call	CrLf
+			inc		compos_count
 
-				mov		eax, compos_current	;
-				div		edx					; divide current num by current iteration position (edx)
-				cmp		eax, 0
-				je		SuccessJmp			; "return true"
-
-				mov		eax, compos_current	;
-				mov		esi, edx			; open a new register to change values
-				add		esi, 2				; add 2 to the itteration value (without changing the itteration position)
-				div		esi					; divide eax by esi
-				cmp		eax, 0
-				je		SuccessJmp			; "return true"
-
-				SuccessJmp:
-					mov		compos_bool, 1	; very good here
-					jmp		OutOfForloop
-
-				add		edx, 6				; add a 6 each itteration
-				jmp		LoopCheck
-
-
-			OutOfForloop:
-
-			WriteComposite:
-				call	WriteDec
-				mov		edx, OFFSET seperator
-				call	WriteString
-				;call	CrLf
-				;loop	CompositeLoop
-
-			SkipWite:
-
-			;loop	CompositeLoop
-
-
+		SkipWrite:
+			mov		edx, OFFSET testFail
+			call	WriteString
+			call	WriteDec
+			loop	CompositeLoop
 
 	ret
-calculations ENDP
+getComposites ENDP
+
 
 ;---------------------------------------------------------------;
-;	The RunAgain label will test to see if the user is			;
+;	The isComposite procedure will be called during the			;
+;	getComposite procedure as a means to keep the looping to	;
+;	labels acessible. Keeping the other procedure relatively	;
+;	clean and organized.										;
+;---------------------------------------------------------------;
+isComposite PROC
+	;this is a c++ equivelent of getting a composite number, conversion time
+	;for (int i = 5; i * i <= n; i = i + 6)
+				;if (n % i == 0 || n % (i + 2) == 0)
+					;return true;
+
+	mov		ecx, 5							; start the itteration at 5
+	LoopCheck:
+		mul		ecx							; multiply edx by edx
+		cmp		ecx, compos_current			; compare return val to current checking composite
+		jg		OutOfForloop
+
+		mov		eax, compos_current
+		div		ecx							; divide current num by current iteration position (edx)
+		cmp		edx, 0
+		je		SuccessJmp					; "return true"
+
+		mov		eax, compos_current
+		mov		esi, ecx					; open a new register to change values
+		add		esi, 2						; add 2 to the itteration value (without changing the itteration position)
+		div		esi							; divide eax by esi
+		cmp		edx, 0
+		je		SuccessJmp					; "return true"
+		jmp		FailJmp						; can't return true on this loop, but go to next loop
+
+		SuccessJmp:
+			mov		compos_bool, 1			; very good here
+			jmp		OutOfForloop
+		FailJmp:
+			add		ecx, 6					; add a 6 each itteration
+			jmp		LoopCheck
+
+	OutOfForloop:
+		mov		compos_bool, 0
+				
+	ret
+isComposite ENDP
+
+;---------------------------------------------------------------;
+;	The restart procedure will test to see if the user is		;
 ;	wanting to run the process one more time, which is 1		;
 ;	is inputed, will jump the user back into the				;
 ;	introduction where the user will be asked to input more		;
@@ -237,16 +255,16 @@ calculations ENDP
 ;	exit to the OS.												;
 ;---------------------------------------------------------------;
 restart PROC
-	mov		edx, OFFSET prompt_4		; run again prompt
+	mov		edx, OFFSET prompt_4			; run again prompt
 	call	WriteString
-	call	ReadInt						; read in the user input for an answer
-	mov		keep_going, eax				; move the user input to a readable register
-	cmp		eax, 1						; compare if the user input was a '1'
-	call	inputs						; Jumps to int inputs if wanted, else end program
+	call	ReadInt							; read in the user input for an answer
+	mov		keep_going, eax					; move the user input to a readable register
+	cmp		eax, 1							; compare if the user input was a '1'
+	call	inputs							; Jumps to int inputs if wanted, else end program
 
-	; exit the program
-	mov		edx, OFFSET finished		; program is done message
-	call	CrLf						; add an extra new line for good looks
+	; exit the program	
+	mov		edx, OFFSET finished			; program is done message
+	call	CrLf							; add an extra new line for good looks
 	call	WriteString
 	mov		edx, OFFSET userinput
 	call	WriteString

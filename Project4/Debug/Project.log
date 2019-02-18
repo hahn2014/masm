@@ -1,2 +1,1 @@
-﻿  Assembling Project4.asm...
-  Project.vcxproj -> \\depot.engr.oregonstate.edu\users\hahnb\Windows.Documents\Desktop\Project4\Debug\Project.exe
+﻿LINK : fatal error LNK1168: cannot open \\depot.engr.oregonstate.edu\users\hahnb\Windows.Documents\Desktop\Project4\Debug\Project.exe for writing

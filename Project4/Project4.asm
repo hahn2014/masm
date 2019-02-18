@@ -27,7 +27,6 @@ EC_intro_2		BYTE	"EC: I continue printing pages after the inputted number has be
 prompt_1		BYTE	"Please input your name: ", 0														; Prompt for users name firstly
 prompt_2		BYTE	"Welcome, ", 0																		; Greet the user
 prompt_3		BYTE	"Please enter how many composite numbers I should print: ", 0						; Prompt for a negative number
-prompt_4		BYTE	"Do you want to run the program again? (enter 1 for yes)", 0						; Prompt the user to run again
 failed_input_1	BYTE	"The entered number was above the allowed range!", 0								; Warn the user that they can't input such a RIDICULOUSLY high number
 failed_input_2	BYTE	"The entered number was bellow the allowed range!", 0								; Warn the user that they can't input such a CRAZY low number
 outro_1			BYTE	"---  Outputting your composite numbers  ---", 0									; Start the calc section with letting the user know it's printing
@@ -88,6 +87,9 @@ intro	PROC
 	call	WriteString	
 	call	CrLf								; new line
 	mov		edx, OFFSET EC_intro_1
+	call	WriteString
+	call	CrLf
+	mov		edx, OFFSET EC_intro_2
 	call	WriteString
 	call	CrLf
 
@@ -168,6 +170,7 @@ getComposites	PROC
 		inc		linecount						; keep track of how many composites per line are printed
 		cmp		linecount, 10					; check if we're now at 10 on a line
 		je		Lining
+
 		jne		Spacer
 
 		Lining:
@@ -185,7 +188,7 @@ getComposites	PROC
 		mov		edx, OFFSET outro_2
 		call	WriteString
 		mov		eax, 0
-		mov		ecx, 50
+		mov		ecx, 100
 		call	ReadInt
 		cmp		eax, 1
 		je		CompositeLoop
@@ -282,25 +285,12 @@ isComposite	ENDP
 ;	exit to the OS.												;
 ;---------------------------------------------------------------;
 restart		PROC
-	call	CrLf
-	mov		edx, OFFSET prompt_4				; run again prompt
+	mov		edx, OFFSET finished				; program is done message
+	call	CrLf								; add an extra new line for good looks
 	call	WriteString
-	call	ReadInt								; read in the user input for an answer
-	mov		keep_going, eax						; move the user input to a readable register
-	cmp		eax, 1								; compare if the user input was a '1'
-	je		RestartProg
-	jne		FinishProg
-
-	RestartProg:
-		call	inputs								; Jumps to int inputs if wanted, else end program
-
-	FinishProg:
-		mov		edx, OFFSET finished				; program is done message
-		call	CrLf								; add an extra new line for good looks
-		call	WriteString
-		mov		edx, OFFSET userinput
-		call	WriteString
-		call	CrLf
+	mov		edx, OFFSET userinput
+	call	WriteString
+	call	CrLf
 
 	ret
 restart		ENDP

@@ -10,6 +10,6 @@ Microsoft Assembly Projects
 4.  Project 4
   -  Develop a program that takes in an integer between a specified range, then print how the provided n number of composite number terms (between range of 1 and 400)
 5.  Project 5
-  -  Unknown
+  -  Develop a program that asks the user how many random numbers in the range of 100 to 999 will be generated. Store the numbers into an array then print. Sort the array from largest to smallest, print the mean number, and then finally print the array in sorted order.
 6.  Project 6
   -  Unknown

@@ -28,27 +28,26 @@ intro_2			BYTE	"represent how many random numbers you want to generate [from 100
 intro_3			BYTE	"I will verify integer inputs. I will then print the demanded number of ", 0		; Intro 3
 intro_4			BYTE	"generated numbers to screen, print the median number, and then sort from ", 0		; Intro 4
 intro_5			BYTE	"greatest to smallest, then finally print them in order.", 0						; Intro 5
-
 EC_intro_1		BYTE	"EC: I align the composites in columns", 0											; EC
 EC_intro_2		BYTE	"EC: I continue printing pages after the inputted number has been printed", 0		; EC
-
 prompt_1		BYTE	"Please input your name: ", 0														; Prompt for users name firstly
 prompt_2		BYTE	"Welcome, ", 0																		; Greet the user
-prompt_3		BYTE	"Please enter how many composite numbers I should print: ", 0						; Prompt for a negative number
-
+prompt_3		BYTE	"Please enter how many random numbers I should generate: ", 0						; Prompt for a random number
 failed_input_1	BYTE	"The entered number was above the allowed range!", 0								; Warn the user that they can't input such a RIDICULOUSLY high number
 failed_input_2	BYTE	"The entered number was bellow the allowed range!", 0								; Warn the user that they can't input such a CRAZY low number
-
-outro_1			BYTE	"---  Outputting your array  ---", 0
+outro_1			BYTE	"---  Outputting your unsorted array  ---", 0
 outro_2			BYTE	"The array median is: ", 0
+outro_3			BYTE	"---  Outputting your sorted array  ---", 0
 finished		BYTE	"Thank you for using my program! Goodbye, ", 0										; Thank the user and say goodbye by name input
 space			BYTE	" ", 0
+
 
 MAXNUM			=		200																					; The maximum range for generated numbers
 MINNUM			=		10																					; The minimum range for generated numbers
 LOWEST			=		100																					; The lowest number that can be generated
 HIGHEST			=		999																					; The largest number that can be generated
-userinput		BYTE	21 DUP(0)																			; Byte array for the username input
+userinput		BYTE	21	DUP(0)																			; Byte array for the username input
+arrayHold		DWORD	max DUP(?)
 byteCount		DWORD	?
 
 
@@ -66,10 +65,50 @@ byteCount		DWORD	?
 ;	will implement this into further projects.					;
 ;---------------------------------------------------------------;
 main	PROC
-		call	Randomize
+		call	Randomize						; set the time seed for the randomize functions in order to keep the generator psuedo-random
+
+	;------------------------------				; Display Program Intro
+		push	OFFSET	project					; +40
+		push	OFFSET	intro_1					; +36
+		push	OFFSET	intro_2					; +32
+		push	OFFSET	intro_3					; +28
+		push	OFFSET	intro_4					; +24
+		push	OFFSET	intro_5					; +20
+		push	OFFSET	EC_intro_1				; +16
+		push	OFFSET	EC_intro_2				; +12
+		push	OFFSET	prompt_1				; +8
+		push	OFFSET	prompt_2				; +4
 		call	intro
-		call	inputs
-		call	generate
+	;------------------------------				; Get User Data (Inputs)
+		push	OFFSET	prompt_3				; +12
+		push	OFFSET	failed_input_1			; +8
+		push	OFFSET	failed_input_1			; +4
+		call	getData
+	;------------------------------				; Fill The User Array
+		push	OFFSET	arrayHold				; +8
+		push	byteCount						; +4
+		call	fillArray
+	;------------------------------				; Print The Array To The Screen
+		push	OFFSET	arrayHold				; +12
+		push	byteCount						; +8
+		push	OFFSET	outro_1					; +4
+		call	printArray
+	;------------------------------				; Sort The User Array
+		push	OFFSET	arrayHold				; +8
+		push	byteCount						; +4
+		call	sortArray
+	;------------------------------				; Calculate The Median
+		push	OFFSET	arrayHold				; +12
+		push	byteCount						; +8
+		push	OFFSET	outro_2					; +4
+		call	getMedian
+	;------------------------------				; Print The Array To The Screen
+		push	OFFSET	arrayHold				; +12
+		push	byteCount						; +8
+		push	OFFSET	outro_3					; +4
+		call	printArray
+	;------------------------------				; End Of The Program
+		push	OFFSET	finished				; +4
 		call	restart
 	exit										; close program, return to OS
 main	ENDP									; the main PROC is finished, this symbolyses that we are done with the proc
@@ -82,6 +121,14 @@ main	ENDP									; the main PROC is finished, this symbolyses that we are done 
 ;	scripts.													;
 ;---------------------------------------------------------------;
 intro	PROC
+	pushad										; push all the general purpose regs to stack
+
+	mov		ebp, esp							; save the return address
+
+
+
+
+
 	mov		eax, lightGray + (blue * 16)		; color varaibles consist of: black, white, brown, yellow, blue, green, cyan, red, magenta, gray, lightBlue, lightGreen, lightCyan, lightRed, lightMagenta, and lightGray.
 	call	setTextColor						; EXTRA CREDIT: change background and foreground colors
 	mov		edx, OFFSET intro_1					; print the program introduction
@@ -130,7 +177,7 @@ intro	ENDP
 ;	the new int is above num1. If successful, will jump the		;
 ;	user to the calculations label.								;
 ;---------------------------------------------------------------;
-inputs	PROC		; "get data" equivelent
+getData	PROC
 	StartInp:	
 		mov		edx, OFFSET prompt_3			; ask for number of generated numbers
 		call	WriteString
@@ -154,7 +201,7 @@ inputs	PROC		; "get data" equivelent
 		call	CrLf
 		jmp		StartInp
 	ret
-inputs	ENDP
+getData	ENDP
 
 ;---------------------------------------------------------------;
 ;	The generate procedure will be the initial procedure to		;
@@ -162,7 +209,7 @@ inputs	ENDP
 ;	recursively call the RandomRange function to generate the	;
 ;	array of numbers.											;
 ;---------------------------------------------------------------;
-generate	PROC	; "fill array" equivelent
+fillArray	PROC
 
 	mov		ecx, eax
 	testLoop:
@@ -178,7 +225,7 @@ generate	PROC	; "fill array" equivelent
 
 
 	ret
-generate	ENDP
+fillArray	ENDP
 
 ;---------------------------------------------------------------;
 ;	The propSpacing procedure will be called when spacing out	;

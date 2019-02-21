@@ -30,15 +30,13 @@ intro_4			BYTE	"generated numbers to screen, print the median number, and then s
 intro_5			BYTE	"greatest to smallest, then finally print them in order.", 0						; Intro 5
 EC_intro_1		BYTE	"EC: I align the composites in columns", 0											; EC
 EC_intro_2		BYTE	"EC: I continue printing pages after the inputted number has been printed", 0		; EC
-prompt_1		BYTE	"Please input your name: ", 0														; Prompt for users name firstly
-prompt_2		BYTE	"Welcome, ", 0																		; Greet the user
-prompt_3		BYTE	"Please enter how many random numbers I should generate: ", 0						; Prompt for a random number
+prompt_1		BYTE	"Please enter how many random numbers I should generate: ", 0						; Prompt for a random number
 failed_input_1	BYTE	"The entered number was above the allowed range!", 0								; Warn the user that they can't input such a RIDICULOUSLY high number
 failed_input_2	BYTE	"The entered number was bellow the allowed range!", 0								; Warn the user that they can't input such a CRAZY low number
 outro_1			BYTE	"---  Outputting your unsorted array  ---", 0
 outro_2			BYTE	"The array median is: ", 0
 outro_3			BYTE	"---  Outputting your sorted array  ---", 0
-finished		BYTE	"Thank you for using my program! Goodbye, ", 0										; Thank the user and say goodbye by name input
+finished		BYTE	"Thank you for using my program! Goodbye.", 0										; Thank the user and say goodbye by name input
 space			BYTE	" ", 0
 
 
@@ -47,7 +45,7 @@ MINNUM			=		10																					; The minimum range for generated numbers
 LOWEST			=		100																					; The lowest number that can be generated
 HIGHEST			=		999																					; The largest number that can be generated
 userinput		BYTE	21	DUP(0)																			; Byte array for the username input
-arrayHold		DWORD	max DUP(?)
+arrayHold		DWORD	MAXNUM DUP(?)
 byteCount		DWORD	?
 
 
@@ -67,48 +65,53 @@ byteCount		DWORD	?
 main	PROC
 		call	Randomize						; set the time seed for the randomize functions in order to keep the generator psuedo-random
 
-	;------------------------------				; Display Program Intro
-		push	OFFSET	project					; +40
-		push	OFFSET	intro_1					; +36
-		push	OFFSET	intro_2					; +32
-		push	OFFSET	intro_3					; +28
-		push	OFFSET	intro_4					; +24
-		push	OFFSET	intro_5					; +20
-		push	OFFSET	EC_intro_1				; +16
-		push	OFFSET	EC_intro_2				; +12
-		push	OFFSET	prompt_1				; +8
-		push	OFFSET	prompt_2				; +4
+	;-----------Display Program Intro-----------;
+		push	OFFSET	project					; +36
+		push	OFFSET	intro_1					; +32
+		push	OFFSET	intro_2					; +28
+		push	OFFSET	intro_3					; +24
+		push	OFFSET	intro_4					; +20
+		push	OFFSET	intro_5					; +16
+		push	OFFSET	EC_intro_1				; +12
+		push	OFFSET	EC_intro_2				; +8
 		call	intro
-	;------------------------------				; Get User Data (Inputs)
-		push	OFFSET	prompt_3				; +12
-		push	OFFSET	failed_input_1			; +8
-		push	OFFSET	failed_input_1			; +4
+
+	;----------Get User Data (Inputs)-----------;
+		push	OFFSET	prompt_1				; +16
+		push	OFFSET	failed_input_1			; +12
+		push	OFFSET	failed_input_2			; +8
 		call	getData
-	;------------------------------				; Fill The User Array
-		push	OFFSET	arrayHold				; +8
-		push	byteCount						; +4
+
+	;-----------Fill The User Array-------------;
+		;push	OFFSET	arrayHold				; +12
+		;push	byteCount						; +8
 		call	fillArray
-	;------------------------------				; Print The Array To The Screen
-		push	OFFSET	arrayHold				; +12
-		push	byteCount						; +8
-		push	OFFSET	outro_1					; +4
+
+	;-------Print The Array To The Screen-------;
+		;push	OFFSET	arrayHold				; +16
+		;push	byteCount						; +12
+		push	OFFSET	outro_1					; +8
 		call	printArray
-	;------------------------------				; Sort The User Array
-		push	OFFSET	arrayHold				; +8
-		push	byteCount						; +4
+
+	;-----------Sort The User Array-------------;
+		;push	OFFSET	arrayHold				; +12
+		;push	byteCount						; +8
 		call	sortArray
-	;------------------------------				; Calculate The Median
-		push	OFFSET	arrayHold				; +12
-		push	byteCount						; +8
-		push	OFFSET	outro_2					; +4
+
+	;-----------Calculate The Median------------;
+		;push	OFFSET	arrayHold				; +16
+		;push	byteCount						; +12
+		push	OFFSET	outro_2					; +8
 		call	getMedian
-	;------------------------------				; Print The Array To The Screen
-		push	OFFSET	arrayHold				; +12
-		push	byteCount						; +8
-		push	OFFSET	outro_3					; +4
+
+	;-------Print The Array To The Screen-------;
+		;push	OFFSET	arrayHold				; +16
+		;push	byteCount						; +12
+		push	OFFSET	outro_3					; +8
 		call	printArray
-	;------------------------------				; End Of The Program
-		push	OFFSET	finished				; +4
+
+	;------------End Of The Program-------------;
+		push	OFFSET	finished				; +8
 		call	restart
 	exit										; close program, return to OS
 main	ENDP									; the main PROC is finished, this symbolyses that we are done with the proc
@@ -121,52 +124,41 @@ main	ENDP									; the main PROC is finished, this symbolyses that we are done 
 ;	scripts.													;
 ;---------------------------------------------------------------;
 intro	PROC
-	pushad										; push all the general purpose regs to stack
-
-	mov		ebp, esp							; save the return address
-
-
-
-
-
 	mov		eax, lightGray + (blue * 16)		; color varaibles consist of: black, white, brown, yellow, blue, green, cyan, red, magenta, gray, lightBlue, lightGreen, lightCyan, lightRed, lightMagenta, and lightGray.
 	call	setTextColor						; EXTRA CREDIT: change background and foreground colors
-	mov		edx, OFFSET intro_1					; print the program introduction
-	call	WriteString
-	call	CrLf
-	mov		edx, OFFSET intro_2					; print the program introduction pt.2
-	call	WriteString
-	call	CrLf
-	mov		edx, OFFSET intro_3					; print the program introduction pt.3
-	call	WriteString	
-	call	CrLf
-	mov		edx, OFFSET intro_4					; print the program introduction pt.3
-	call	WriteString	
-	call	CrLf
-	mov		edx, OFFSET intro_5					; print the program introduction pt.3
-	call	WriteString	
-	call	CrLf
 
-	mov		edx, OFFSET EC_intro_1				; display extra credit information for GTA
-	call	WriteString
-	call	CrLf
-	mov		edx, OFFSET EC_intro_2
-	call	WriteString
-	call	CrLf
+	push	ebp									; push all the general purpose regs to stack
+	mov		ebp, esp							; save the stack into ebp to not alter data
 
-	mov		edx, OFFSET prompt_1				; prompt the user for their name
+	mov		edx, [ebp+36]						; program
 	call	WriteString
-	mov		edx, OFFSET userinput
-	mov		ecx, SIZEOF	userinput
-	call	ReadString
-	mov		byteCount, eax
-	mov		edx, OFFSET prompt_2
+	call	CrLf
+	mov		edx, [ebp+32]						; intro_1
 	call	WriteString
-	mov		edx, OFFSET userinput
+	call	CrLf
+	mov		edx, [ebp+28]						; intro_2
+	call	WriteString
+	call	CrLf
+	mov		edx, [ebp+24]						; intro_3
+	call	WriteString
+	call	CrLf
+	mov		edx, [ebp+20]						; intro_4
+	call	WriteString
+	call	CrLf
+	mov		edx, [ebp+16]						; intro_5
+	call	WriteString
+	call	CrLf
+	
+	mov		edx, [ebp+12]						; EC_intro_1
+	call	WriteString
+	call	CrLf
+	mov		edx, [ebp+8]						; EC_intro_2
 	call	WriteString
 	call	CrLf
 
-	ret
+	pop		ebx
+
+	ret		32									; clean the stack 32 bytes up
 intro	ENDP
 
 ;---------------------------------------------------------------;
@@ -178,8 +170,12 @@ intro	ENDP
 ;	user to the calculations label.								;
 ;---------------------------------------------------------------;
 getData	PROC
-	StartInp:	
-		mov		edx, OFFSET prompt_3			; ask for number of generated numbers
+	push	ebp
+	mov		ebp, esp
+
+
+	StartInp:
+		mov		edx, [ebp+16]					; prompt_1
 		call	WriteString
 		mov		eax, 0
 		call	ReadInt
@@ -187,20 +183,22 @@ getData	PROC
 		jg		HigherInput
 		cmp		eax, MINNUM
 		jl		LowerInput
-		ret										; if the input is good, continue to next procedure
+		pop		ebp
+		ret		12								; clean the stack 12 bytes up
 
-	LowerInput:									; if the input is bellow range, ask for another
-		mov		edx, OFFSET failed_input_2
+	; Input entered was too low
+	LowerInput:
+		mov		edx, [ebp+8]					; failed_input_2
 		call	WriteString
 		call	CrLf
 		jmp		StartInp
 
-	HigherInput:								; if the input is above range, ask for another one
-		mov		edx, OFFSET failed_input_1
+	; Input entered was too high
+	HigherInput:
+		mov		edx, [ebp+12]					; failed_input_1
 		call	WriteString
 		call	CrLf
 		jmp		StartInp
-	ret
 getData	ENDP
 
 ;---------------------------------------------------------------;
@@ -252,8 +250,18 @@ sortArray	ENDP
 ;	array and print it to the screen.							;
 ;---------------------------------------------------------------;
 getMedian	PROC
+	push	ebp
+	mov		ebp, esp
+	
+	call	CrLf
+	mov		edx, [ebp+8]
+	call	WriteString
+	
 
-	ret
+
+	call	CrLf
+	pop		ebp
+	ret		4
 getMedian	ENDP
 
 ;---------------------------------------------------------------;
@@ -262,12 +270,17 @@ getMedian	ENDP
 ;---------------------------------------------------------------;
 printArray	PROC
 	;temporary
-	mov		edx, OFFSET outro_1
+	push	ebp
+	mov		ebp, esp
+
+
+	call	CrLf
+	mov		edx, [ebp+8]
 	call	WriteString
 	call	CrLf
 
-
-	ret
+	pop		ebp
+	ret		4
 printArray	ENDP
 
 ;---------------------------------------------------------------;
@@ -279,14 +292,15 @@ printArray	ENDP
 ;	exit to the OS.												;
 ;---------------------------------------------------------------;
 restart		PROC
-	mov		edx, OFFSET finished				; program is done message
-	call	CrLf								; add an extra new line for good looks
-	call	WriteString
-	mov		edx, OFFSET userinput
-	call	WriteString
+	push	ebp
+	mov		ebp, esp
+	
 	call	CrLf
+	mov		edx, [ebp+8]
+	call	WriteString
 
-	ret
+	pop		ebp
+	ret		4
 restart		ENDP
 
 END main										; the symbolyses that the main program is finished

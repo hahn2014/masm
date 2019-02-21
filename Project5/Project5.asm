@@ -44,9 +44,8 @@ MAXNUM			=		200																					; The maximum range for generated numbers
 MINNUM			=		10																					; The minimum range for generated numbers
 LOWEST			=		100																					; The lowest number that can be generated
 HIGHEST			=		999																					; The largest number that can be generated
-userinput		BYTE	21	DUP(0)																			; Byte array for the username input
+generationCount	DWORD	?
 arrayHold		DWORD	MAXNUM DUP(?)
-byteCount		DWORD	?
 
 
 ;------------------------;
@@ -77,36 +76,39 @@ main	PROC
 		call	intro
 
 	;----------Get User Data (Inputs)-----------;
-		push	OFFSET	prompt_1				; +16
-		push	OFFSET	failed_input_1			; +12
-		push	OFFSET	failed_input_2			; +8
+		push	OFFSET	prompt_1				; +20
+		push	OFFSET	failed_input_1			; +16
+		push	OFFSET	failed_input_2			; +12
+		push	generationCount					; +8
 		call	getData
 
 	;-----------Fill The User Array-------------;
-		;push	OFFSET	arrayHold				; +12
-		;push	byteCount						; +8
+		push	OFFSET	arrayHold				; +12
+		push	generationCount					; +8
 		call	fillArray
 
 	;-------Print The Array To The Screen-------;
-		;push	OFFSET	arrayHold				; +16
-		;push	byteCount						; +12
+		push	OFFSET	arrayHold				; +20
+		push	generationCount					; +16
+		push	OFFSET	space					; +12
 		push	OFFSET	outro_1					; +8
 		call	printArray
 
 	;-----------Sort The User Array-------------;
-		;push	OFFSET	arrayHold				; +12
-		;push	byteCount						; +8
+		push	OFFSET	arrayHold				; +12
+		push	generationCount					; +8
 		call	sortArray
 
 	;-----------Calculate The Median------------;
-		;push	OFFSET	arrayHold				; +16
-		;push	byteCount						; +12
+		push	OFFSET	arrayHold				; +16
+		push	generationCount					; +12
 		push	OFFSET	outro_2					; +8
 		call	getMedian
 
 	;-------Print The Array To The Screen-------;
-		;push	OFFSET	arrayHold				; +16
-		;push	byteCount						; +12
+		push	OFFSET	arrayHold				; +20
+		push	generationCount					; +16
+		push	OFFSET	space					; +12
 		push	OFFSET	outro_3					; +8
 		call	printArray
 
@@ -156,7 +158,7 @@ intro	PROC
 	call	WriteString
 	call	CrLf
 
-	pop		ebx
+	pop		ebp
 
 	ret		32									; clean the stack 32 bytes up
 intro	ENDP
@@ -172,10 +174,10 @@ intro	ENDP
 getData	PROC
 	push	ebp
 	mov		ebp, esp
-
+	mov		ebx, [ebp+8]
 
 	StartInp:
-		mov		edx, [ebp+16]					; prompt_1
+		mov		edx, [ebp+20]					; prompt_1
 		call	WriteString
 		mov		eax, 0
 		call	ReadInt
@@ -183,19 +185,21 @@ getData	PROC
 		jg		HigherInput
 		cmp		eax, MINNUM
 		jl		LowerInput
+		mov		[ebp-4], eax
+		mov		generationCount, eax
 		pop		ebp
 		ret		12								; clean the stack 12 bytes up
 
 	; Input entered was too low
 	LowerInput:
-		mov		edx, [ebp+8]					; failed_input_2
+		mov		edx, [ebp+12]					; failed_input_2
 		call	WriteString
 		call	CrLf
 		jmp		StartInp
 
 	; Input entered was too high
 	HigherInput:
-		mov		edx, [ebp+12]					; failed_input_1
+		mov		edx, [ebp+16]					; failed_input_1
 		call	WriteString
 		call	CrLf
 		jmp		StartInp
@@ -208,21 +212,26 @@ getData	ENDP
 ;	array of numbers.											;
 ;---------------------------------------------------------------;
 fillArray	PROC
+	push	ebp
+	mov		ebp, esp
 
-	mov		ecx, eax
-	testLoop:
+	mov		edi, [ebp+12]
+	mov		ecx, [ebp+8]						; loop count
+
+	generateNew:
 		mov		eax, HIGHEST
-		mov		ebx, 100
-		sub		eax, ebx
+		sub		eax, LOWEST
+
 		call	RandomRange
-		add		eax, 100
-		call	WriteDec
-		call	CrLf
-		loop	testLoop
+		add		eax, LOWEST
+		mov		[edi], eax
+		add		edi, 4
+		
+		
+		loop	generateNew
 
-
-
-	ret
+	pop		ebp
+	ret		8
 fillArray	ENDP
 
 ;---------------------------------------------------------------;
@@ -241,7 +250,15 @@ propSpacing	ENDP
 ;	(SORT METHOD HERE) sorting method.							;
 ;---------------------------------------------------------------;
 sortArray	PROC
-
+	push	ebp
+	mov		ebp, esp
+	mov		esi, [ebp+12]						; array
+	mov		ebx, [ebp+8]						; generationCount
+	
+	
+	
+	
+	
 	ret
 sortArray	ENDP
 
@@ -254,9 +271,12 @@ getMedian	PROC
 	mov		ebp, esp
 	
 	call	CrLf
-	mov		edx, [ebp+8]
+	mov		edx, [ebp+8]						; outro_2
 	call	WriteString
 	
+
+
+
 
 
 	call	CrLf
@@ -269,16 +289,38 @@ getMedian	ENDP
 ;	the screen, this saves space in the calculation procedure.	;
 ;---------------------------------------------------------------;
 printArray	PROC
-	;temporary
 	push	ebp
 	mov		ebp, esp
-
-
+	mov		edx, [ebp+8]						; outro_1 / outro_3
+	mov		ecx, [ebp+16]						; loop count
+	mov		esi, [ebp+20]						; array
+	mov		ebx, 0								; line count
+	
 	call	CrLf
-	mov		edx, [ebp+8]
 	call	WriteString
 	call	CrLf
 
+	printing:
+		mov		eax, [esi]						; move the address of the array position
+		call	WriteDec						; write the current number to the screen
+		add		esi, 4							; move the array location by 4 bytes (next number)
+
+		mov		edx, [ebp+12]					; spacer
+		call	WriteString
+
+		inc		ebx								; move the line counter up by 1
+		cmp		ebx, 10
+		je		newLine
+		jne		continue
+
+		newLine:
+			mov		ebx, 0
+			call	CrLf
+
+		continue:
+			loop	printing						; keep looping the print until the loop (ecx counter) is done
+
+	call	CrLf
 	pop		ebp
 	ret		4
 printArray	ENDP

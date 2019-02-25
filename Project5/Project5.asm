@@ -162,16 +162,16 @@ intro	PROC
 	call	CrLf
 	
 	mov		edx, [ebp + 20]						; EC_intro_1
-	call	WriteString
-	call	CrLf
+	;call	WriteString
+	;call	CrLf
 	mov		edx, [ebp + 16]						; EC_intro_2
-	call	WriteString
-	call	CrLf
+	;call	WriteString
+	;call	CrLf
 	mov		edx, [ebp + 12]						; EC_intro_3
-	call	WriteString
+	;call	WriteString
 	call	CrLf
 	mov		edx, [ebp + 8]						; EC_intro_4
-	call	WriteString
+	;call	WriteString
 	call	CrLf
 
 	pop		ebp
@@ -248,20 +248,7 @@ fillArray	PROC
 		call	RandomRange
 		add		eax, LOWEST
 		mov		[edi], eax
-
-		; WRITE TO FILE EC
-		;mov		ebx, ecx						; perserve ecx value since stupid writefile procedure uses the register
-		;lea		edx, filename
-		;call	CreateOutputFile
-		;mov		outputfile, esi
-		;
-		;lea		edx, eax
-		;mov		eax, outputfile
-		;mov		ecx, 10
-		;call	WriteToFile
-		
-
-		;mov		ecx, ebx
+		;mov	ecx, ebx
 		add		edi, 4
 		
 		loop	generateNew

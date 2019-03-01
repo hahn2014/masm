@@ -12,4 +12,4 @@ Microsoft Assembly Projects
 5.  Project 5
   -  Develop a program that asks the user how many random numbers in the range of 100 to 999 will be generated. Store the numbers into an array then print. Sort the array from largest to smallest, print the mean number, and then finally print the array in sorted order.
 6.  Project 6
-  -  Unknown
+  -  Develop a program that will generate a random problem in format (n!)/(r!(n-r)!) and ask the user to answer. It will continue to generate problems until the user asks to stop.

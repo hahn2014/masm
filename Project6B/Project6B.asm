@@ -2,7 +2,7 @@ TITLE Program 6B		(Project6B.asm)
 
 ; Author: Bryce Hahn
 ; Course/Project ID: CS 271 Project 6
-; Date: 3/1/2019
+; Date: 3/4/2019
 ; Description:
 ;	This program will produce a random equation in the format
 ;		(n!)/(r!(n-r)!) generating n from [3 to 12] and r 
@@ -80,9 +80,12 @@ main	PROC
 		call	intro
 
 	;-----------Generate A Problem--------------;
-		push	OFFSET	problem_1				; +24
-		push	OFFSET	problem_2				; +20
-		push	OFFSET	problem_3				; +16
+		push	OFFSET	problem_1				; +36
+		push	OFFSET	problem_2				; +32
+		push	OFFSET	problem_3				; +28
+		push	n								; +24
+		push	r								; +20
+		push	answer							; +16
 		push	problemNum						; +12
 		push	problemsRight					; +8
 		call	showProblem
@@ -158,56 +161,131 @@ showProblem	PROC
 	push	ebp
 	mov		ebp, esp
 
-	mov		edx, [ebp + 24]						; problem_1
+	mov		edx, [ebp + 36]						; problem_1
 	call	WriteString
 	mov		eax, [ebp + 12]						; problemNum
 	call	WriteDec
 	call	CrLf
-	mov		edx, [ebp + 20]						; problem_2
+	mov		edx, [ebp + 32]						; problem_2
 	call	WriteString
 
 	mov		eax, nMAXNUM						; set the max to eax
 	sub		eax, nMINNUM						; subtract the lowest from eax (this will give us a range of 1 to (max-min))
 	call	RandomRange							; generate random number in range (1 to (max-min))
 	add		eax, nMINNUM						; add lowest to generated number (this fixes the range to be from min to max)
+	mov		[ebp + 24], eax						; move the n value to the stack
 
-	call	WriteDec							; temp, this prints our N value to the screen
+	call	WriteDec							; this prints our N value to the screen
 
 	call	CrLf
-	mov		edx, [ebp + 16]						; problem_3
+	mov		edx, [ebp + 28]						; problem_3
 	call	WriteString
 
 	sub		eax, rMINNUM						; subtract the lowest from eax (this will give us a range of 1 to (max-min))
 	call	RandomRange							; generate random number in range (1 to (max-min))
 	add		eax, rMINNUM						; add lowest to generated number (this fixes the range to be from min to max)
+	mov		[ebp + 20], eax						; move the r value to the stack
 
-	call	WriteDec							; temp, this prints our R value to the screen
+	call	WriteDec							; this prints our R value to the screen
 	call	CrLf
 
+
+	
+
+	;TEMP : print the answer
+	call	combinations						; this will add 4 bytes to the index distance of the addresses (to compensate for return address)
+
+
+	
 	pop		ebp
-	ret		20
+	ret		34
 showProblem	ENDP
 
 ;---------------------------------------------------------------;
-;
-;
-;
-;
+;	The combinations process calculates (n!)/(r!(n-r)!), and	;
+;	stores the value in result. It will call factorial process	;
+;	3 times, for n!, r!, and (n-r)! respectively, then multiply	;
+;	and divide as needed.										;
+;	Parameters: n, r as values, answer as reference				;
+;	Returns: the problems calculation value to answer			;
+;	Pre-Conditions, n and r are real integer values				;
 ;---------------------------------------------------------------;
 combinations	PROC
-	
+	mov		eax, [ebp + 24]						; The N value
+	mov		ebx, [ebp + 20]						; The R value
+	mov		ecx, eax							; N
+	sub		ecx, ebx							; N - R Value
+
+	sub		ebp, 8								; make 2 local variable spaces (2*4) for factorial and factorial index
+
+	;------------------N!-----------------------;
+	mov		[ebp - 8], eax						; set the factorial index to N value
+	call	factorial
+	mov		eax, [ebp - 4]						; move the total to eax
+	call	WriteDec
+	call	CrLf
+	;------------------R!-----------------------;
+	mov		[ebp - 8], ebx						; set the factorial index to R value
+	call	factorial
+	mov		eax, [ebp - 4]						; move the total to eax
+	call	WriteDec
+	call	CrLf
+	;-----------------(N-R)!--------------------;
+	mov		[ebp - 8], ecx						; set the factorial index to N-R value
+	call	factorial
+	mov		eax, [ebp - 4]						; move the total to eax
+	call	WriteDec
+	call	CrLf
+
+
+	call	CrLf
+	call	CrLf
+	call	CrLf
+
 	ret
 combinations	ENDP
 
 ;---------------------------------------------------------------;
-;
-;
-;
-;
+;	The factorial procedure will take an input on the stack, i,	;
+;	and recursively multiply itself until it has reached 1.		;
+;	Parameters: i as current factorial, iS as factorial sum		;
+;	returns: iS value of the factorial							;
+;	Pre-Conditions: i as a valid integer.						;
 ;---------------------------------------------------------------;
 factorial	PROC
+	mov		eax, [ebp - 8]						; factorial index, I.E How many iterations the factorial process will be called
+	mov		ebx, [ebp - 4]
 
-	ret
+	cmp		ebx, 0
+	je		FirstRun
+	jg		RecursiveRun
+
+	FirstRun:
+		mov		[ebp - 4], eax					; Since it's the first run, we just change the value of the total
+		dec		eax								; go to the next number
+		mov		[ebp - 8], eax					; set the index to n-1
+		jmp		checkIndex						; see if we're done
+
+	RecursiveRun:
+		mov		ecx, eax						; store the index value before multiplying
+		mul		ebx								; since this is at least the second itteration, multiply the total by the current index
+		mov		[ebp - 4], eax					; store the new total
+		dec		ecx								; set the index to n-1
+		mov		[ebp - 8], ecx					; store the new index
+		jmp		checkIndex						; see if we're done
+
+	checkIndex:
+		mov		eax, [ebp - 8]					; if we just came from the RecursiveRun Label eax needs to be reset
+		cmp		eax, 0							; if the index is now at 0, we don't want to multiply by 0 so we're done
+		jg		nextCall						; but the index is > 0 so go to next recursive call
+		je		endProc							; we've done
+
+	nextCall:
+		;call	factorial
+		ret
+
+	endProc:
+		ret
 factorial	ENDP
 
 ;---------------------------------------------------------------;

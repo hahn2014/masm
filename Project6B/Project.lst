@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/01/19 11:44:08
+Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/04/19 17:24:56
 Program 6B		(Project6B.asm			     Page 1 - 1
 
 
@@ -6,7 +6,7 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/01/19 11:44:08
 
 				; Author: Bryce Hahn
 				; Course/Project ID: CS 271 Project 6
-				; Date: 3/1/2019
+				; Date: 3/4/2019
 				; Description:
 				;	This program will produce a random equation in the format
 				;		(n!)/(r!(n-r)!) generating n from [3 to 12] and r 
@@ -301,28 +301,31 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/01/19 11:44:08
  0000001E  68 0000016D R			push	OFFSET	intro_5					; +26
  00000023  68 0000019A R			push	OFFSET	EC_intro_1				; +12
  00000028  68 000001DE R			push	OFFSET	EC_intro_2				; +8
- 0000002D  E8 00000041				call	intro
+ 0000002D  E8 00000053				call	intro
 
 					;-----------Generate A Problem--------------;
- 00000032  68 00000228 R			push	OFFSET	problem_1				; +24
- 00000037  68 00000231 R			push	OFFSET	problem_2				; +20
- 0000003C  68 00000251 R			push	OFFSET	problem_3				; +16
- 00000041  FF 35 00000435 R			push	problemNum						; +12
- 00000047  FF 35 00000439 R			push	problemsRight					; +8
- 0000004D  E8 0000009A				call	showProblem
+ 00000032  68 00000228 R			push	OFFSET	problem_1				; +36
+ 00000037  68 00000231 R			push	OFFSET	problem_2				; +32
+ 0000003C  68 00000251 R			push	OFFSET	problem_3				; +28
+ 00000041  FF 35 0000043D R			push	n								; +24
+ 00000047  FF 35 00000441 R			push	r								; +20
+ 0000004D  FF 35 00000445 R			push	answer							; +16
+ 00000053  FF 35 00000435 R			push	problemNum						; +12
+ 00000059  FF 35 00000439 R			push	problemsRight					; +8
+ 0000005F  E8 0000009A				call	showProblem
 
 					;-----------Get User Input------------------;
- 00000052  68 0000027D R			push	OFFSET	prompt_1				; +12
- 00000057  FF 35 00000445 R			push	answer							; +8
- 0000005D  E8 000000E7				call	getData
+ 00000064  68 0000027D R			push	OFFSET	prompt_1				; +12
+ 00000069  FF 35 00000445 R			push	answer							; +8
+ 0000006F  E8 0000017B				call	getData
 
 					;------------End Of The Program-------------;
- 00000062  68 0000040C R			push	OFFSET	finished				; +8
- 00000067  E8 000000EC				call	restart
+ 00000074  68 0000040C R			push	OFFSET	finished				; +8
+ 00000079  E8 00000180				call	restart
 					exit										; close program, return to OS
- 0000006C  6A 00	   *	    push   +000000000h
- 0000006E  E8 00000000 E   *	    call   ExitProcess
- 00000073			main	ENDP									; the main PROC is finished, this symbolyses that we are done with the proc
+ 0000007E  6A 00	   *	    push   +000000000h
+ 00000080  E8 00000000 E   *	    call   ExitProcess
+ 00000085			main	ENDP									; the main PROC is finished, this symbolyses that we are done with the proc
 
 				;---------------------------------------------------------------;
 				;	The intro procedure will be called right off the bat, sort	;
@@ -335,42 +338,42 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/01/19 11:44:08
 				;	Returns: 40 bytes from the stack							;
 				;	Pre-Conditions: none										;
 				;---------------------------------------------------------------;
- 00000073			intro	PROC
- 00000073  B8 00000017			mov		eax, lightGray + (blue * 16)		; color varaibles consist of: black, white, brown, yellow, blue, green, cyan, red, magenta, gray, lightBlue, lightGreen, lightCyan, lightRed, lightMagenta, and lightGray.
- 00000078  E8 00000000 E		call	setTextColor						; EXTRA CREDIT: change background and foreground colors
+ 00000085			intro	PROC
+ 00000085  B8 00000017			mov		eax, lightGray + (blue * 16)		; color varaibles consist of: black, white, brown, yellow, blue, green, cyan, red, magenta, gray, lightBlue, lightGreen, lightCyan, lightRed, lightMagenta, and lightGray.
+ 0000008A  E8 00000000 E		call	setTextColor						; EXTRA CREDIT: change background and foreground colors
 
- 0000007D  55				push	ebp									; push all the general purpose regs to stack
- 0000007E  8B EC			mov		ebp, esp							; save the stack into ebp to not alter data
+ 0000008F  55				push	ebp									; push all the general purpose regs to stack
+ 00000090  8B EC			mov		ebp, esp							; save the stack into ebp to not alter data
 
- 00000080  8B 55 24			mov		edx, [ebp + 36]						; program
- 00000083  E8 00000000 E		call	WriteString
- 00000088  E8 00000000 E		call	CrLf
- 0000008D  8B 55 20			mov		edx, [ebp + 32]						; intro_1
- 00000090  E8 00000000 E		call	WriteString
- 00000095  E8 00000000 E		call	CrLf
- 0000009A  8B 55 1C			mov		edx, [ebp + 28]						; intro_2
- 0000009D  E8 00000000 E		call	WriteString
- 000000A2  E8 00000000 E		call	CrLf
- 000000A7  8B 55 18			mov		edx, [ebp + 24]						; intro_3
- 000000AA  E8 00000000 E		call	WriteString
- 000000AF  E8 00000000 E		call	CrLf
- 000000B4  8B 55 14			mov		edx, [ebp + 20]						; intro_4
- 000000B7  E8 00000000 E		call	WriteString
- 000000BC  E8 00000000 E		call	CrLf
- 000000C1  8B 55 10			mov		edx, [ebp + 16]						; intro_5
- 000000C4  E8 00000000 E		call	WriteString
- 000000C9  E8 00000000 E		call	CrLf
+ 00000092  8B 55 24			mov		edx, [ebp + 36]						; program
+ 00000095  E8 00000000 E		call	WriteString
+ 0000009A  E8 00000000 E		call	CrLf
+ 0000009F  8B 55 20			mov		edx, [ebp + 32]						; intro_1
+ 000000A2  E8 00000000 E		call	WriteString
+ 000000A7  E8 00000000 E		call	CrLf
+ 000000AC  8B 55 1C			mov		edx, [ebp + 28]						; intro_2
+ 000000AF  E8 00000000 E		call	WriteString
+ 000000B4  E8 00000000 E		call	CrLf
+ 000000B9  8B 55 18			mov		edx, [ebp + 24]						; intro_3
+ 000000BC  E8 00000000 E		call	WriteString
+ 000000C1  E8 00000000 E		call	CrLf
+ 000000C6  8B 55 14			mov		edx, [ebp + 20]						; intro_4
+ 000000C9  E8 00000000 E		call	WriteString
+ 000000CE  E8 00000000 E		call	CrLf
+ 000000D3  8B 55 10			mov		edx, [ebp + 16]						; intro_5
+ 000000D6  E8 00000000 E		call	WriteString
+ 000000DB  E8 00000000 E		call	CrLf
 					
- 000000CE  8B 55 0C			mov		edx, [ebp + 12]						; EC_intro_1
- 000000D1  E8 00000000 E		call	WriteString
- 000000D6  E8 00000000 E		call	CrLf
- 000000DB  8B 55 08			mov		edx, [ebp + 8]						; EC_intro_2
- 000000DE  E8 00000000 E		call	WriteString
- 000000E3  E8 00000000 E		call	CrLf
+ 000000E0  8B 55 0C			mov		edx, [ebp + 12]						; EC_intro_1
+ 000000E3  E8 00000000 E		call	WriteString
+ 000000E8  E8 00000000 E		call	CrLf
+ 000000ED  8B 55 08			mov		edx, [ebp + 8]						; EC_intro_2
+ 000000F0  E8 00000000 E		call	WriteString
+ 000000F5  E8 00000000 E		call	CrLf
 
- 000000E8  5D				pop		ebp
- 000000E9  C2 0022			ret		34									; clean the stack 34 bytes up
- 000000EC			intro	ENDP
+ 000000FA  5D				pop		ebp
+ 000000FB  C2 0022			ret		34									; clean the stack 34 bytes up
+ 000000FE			intro	ENDP
 
 				;---------------------------------------------------------------;
 				;	The generateProblem procedure will generate the 2 numbers	;
@@ -380,61 +383,134 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/01/19 11:44:08
 				;	check answers and see if the user is correct.				;
 				;	Parameters: 
 				;---------------------------------------------------------------;
- 000000EC			showProblem	PROC
- 000000EC  55				push	ebp
- 000000ED  8B EC			mov		ebp, esp
+ 000000FE			showProblem	PROC
+ 000000FE  55				push	ebp
+ 000000FF  8B EC			mov		ebp, esp
 
- 000000EF  8B 55 18			mov		edx, [ebp + 24]						; problem_1
- 000000F2  E8 00000000 E		call	WriteString
- 000000F7  8B 45 0C			mov		eax, [ebp + 12]						; problemNum
- 000000FA  E8 00000000 E		call	WriteDec
- 000000FF  E8 00000000 E		call	CrLf
- 00000104  8B 55 14			mov		edx, [ebp + 20]						; problem_2
- 00000107  E8 00000000 E		call	WriteString
+ 00000101  8B 55 24			mov		edx, [ebp + 36]						; problem_1
+ 00000104  E8 00000000 E		call	WriteString
+ 00000109  8B 45 0C			mov		eax, [ebp + 12]						; problemNum
+ 0000010C  E8 00000000 E		call	WriteDec
+ 00000111  E8 00000000 E		call	CrLf
+ 00000116  8B 55 20			mov		edx, [ebp + 32]						; problem_2
+ 00000119  E8 00000000 E		call	WriteString
 
- 0000010C  B8 0000000C			mov		eax, nMAXNUM						; set the max to eax
- 00000111  83 E8 03			sub		eax, nMINNUM						; subtract the lowest from eax (this will give us a range of 1 to (max-min))
- 00000114  E8 00000000 E		call	RandomRange							; generate random number in range (1 to (max-min))
- 00000119  83 C0 03			add		eax, nMINNUM						; add lowest to generated number (this fixes the range to be from min to max)
+ 0000011E  B8 0000000C			mov		eax, nMAXNUM						; set the max to eax
+ 00000123  83 E8 03			sub		eax, nMINNUM						; subtract the lowest from eax (this will give us a range of 1 to (max-min))
+ 00000126  E8 00000000 E		call	RandomRange							; generate random number in range (1 to (max-min))
+ 0000012B  83 C0 03			add		eax, nMINNUM						; add lowest to generated number (this fixes the range to be from min to max)
+ 0000012E  89 45 18			mov		[ebp + 24], eax						; move the n value to the stack
 
- 0000011C  E8 00000000 E		call	WriteDec							; temp, this prints our N value to the screen
+ 00000131  E8 00000000 E		call	WriteDec							; this prints our N value to the screen
 
- 00000121  E8 00000000 E		call	CrLf
- 00000126  8B 55 10			mov		edx, [ebp + 16]						; problem_3
- 00000129  E8 00000000 E		call	WriteString
+ 00000136  E8 00000000 E		call	CrLf
+ 0000013B  8B 55 1C			mov		edx, [ebp + 28]						; problem_3
+ 0000013E  E8 00000000 E		call	WriteString
 
- 0000012E  83 E8 01			sub		eax, rMINNUM						; subtract the lowest from eax (this will give us a range of 1 to (max-min))
- 00000131  E8 00000000 E		call	RandomRange							; generate random number in range (1 to (max-min))
- 00000136  83 C0 01			add		eax, rMINNUM						; add lowest to generated number (this fixes the range to be from min to max)
+ 00000143  83 E8 01			sub		eax, rMINNUM						; subtract the lowest from eax (this will give us a range of 1 to (max-min))
+ 00000146  E8 00000000 E		call	RandomRange							; generate random number in range (1 to (max-min))
+ 0000014B  83 C0 01			add		eax, rMINNUM						; add lowest to generated number (this fixes the range to be from min to max)
+ 0000014E  89 45 14			mov		[ebp + 20], eax						; move the r value to the stack
 
- 00000139  E8 00000000 E		call	WriteDec							; temp, this prints our R value to the screen
- 0000013E  E8 00000000 E		call	CrLf
+ 00000151  E8 00000000 E		call	WriteDec							; this prints our R value to the screen
+ 00000156  E8 00000000 E		call	CrLf
 
- 00000143  5D				pop		ebp
- 00000144  C2 0014			ret		20
- 00000147			showProblem	ENDP
 
-				;---------------------------------------------------------------;
-				;
-				;
-				;
-				;
-				;---------------------------------------------------------------;
- 00000147			combinations	PROC
 					
- 00000147  C3				ret
- 00000148			combinations	ENDP
+
+					;TEMP : print the answer
+ 0000015B  E8 00000004			call	combinations						; this will add 4 bytes to the index distance of the addresses (to compensate for return address)
+
+
+					
+ 00000160  5D				pop		ebp
+ 00000161  C2 0022			ret		34
+ 00000164			showProblem	ENDP
 
 				;---------------------------------------------------------------;
-				;
-				;
-				;
-				;
+				;	The combinations process calculates (n!)/(r!(n-r)!), and	;
+				;	stores the value in result. It will call factorial process	;
+				;	3 times, for n!, r!, and (n-r)! respectively, then multiply	;
+				;	and divide as needed.										;
+				;	Parameters: n, r as values, answer as reference				;
+				;	Returns: the problems calculation value to answer			;
+				;	Pre-Conditions, n and r are real integer values				;
 				;---------------------------------------------------------------;
- 00000148			factorial	PROC
+ 00000164			combinations	PROC
+ 00000164  8B 45 18			mov		eax, [ebp + 24]						; The N value
+ 00000167  8B 5D 14			mov		ebx, [ebp + 20]						; The R value
+ 0000016A  8B C8			mov		ecx, eax							; N
+ 0000016C  2B CB			sub		ecx, ebx							; N - R Value
 
- 00000148  C3				ret
- 00000149			factorial	ENDP
+ 0000016E  83 ED 08			sub		ebp, 8								; make 2 local variable spaces (2*4) for factorial and factorial index
+					
+ 00000171  89 45 F8			mov		[ebp - 8], eax						; set the factorial index to N value
+ 00000174  E8 00000047			call	factorial
+ 00000179  8B 45 FC			mov		eax, [ebp - 4]						; move the total to eax
+ 0000017C  E8 00000000 E		call	WriteDec
+ 00000181  E8 00000000 E		call	CrLf
+
+ 00000186  89 5D F8			mov		[ebp - 8], ebx						; set the factorial index to R value
+ 00000189  E8 00000032			call	factorial
+ 0000018E  8B 45 FC			mov		eax, [ebp - 4]						; move the total to eax
+ 00000191  E8 00000000 E		call	WriteDec
+ 00000196  E8 00000000 E		call	CrLf
+ 0000019B  89 4D F8			mov		[ebp - 8], ecx						; set the factorial index to N-R value
+ 0000019E  E8 0000001D			call	factorial
+ 000001A3  8B 45 FC			mov		eax, [ebp - 4]						; move the total to eax
+ 000001A6  E8 00000000 E		call	WriteDec
+ 000001AB  E8 00000000 E		call	CrLf
+
+
+ 000001B0  E8 00000000 E		call	CrLf
+ 000001B5  E8 00000000 E		call	CrLf
+ 000001BA  E8 00000000 E		call	CrLf
+
+ 000001BF  C3				ret
+ 000001C0			combinations	ENDP
+
+				;---------------------------------------------------------------;
+				;	The factorial procedure will take an input on the stack, i,	;
+				;	and recursively multiply itself until it has reached 1.		;
+				;	Parameters: i as current factorial, iS as factorial sum		;
+				;	returns: iS value of the factorial							;
+				;	Pre-Conditions: i as a valid integer.						;
+				;---------------------------------------------------------------;
+ 000001C0			factorial	PROC
+ 000001C0  8B 45 F8			mov		eax, [ebp - 8]						; factorial index, I.E How many iterations the factorial process will be called
+ 000001C3  8B 5D FC			mov		ebx, [ebp - 4]
+
+ 000001C6  83 FB 00			cmp		ebx, 0
+ 000001C9  74 02			je		FirstRun
+ 000001CB  7F 09			jg		RecursiveRun
+
+ 000001CD				FirstRun:
+ 000001CD  89 45 FC				mov		[ebp - 4], eax					; Since it's the first run, we just change the value of the total
+ 000001D0  48					dec		eax								; go to the next number
+ 000001D1  89 45 F8				mov		[ebp - 8], eax					; set the index to n-1
+ 000001D4  EB 0D				jmp		checkIndex						; see if we're done
+
+ 000001D6				RecursiveRun:
+ 000001D6  8B C8				mov		ecx, eax						; store the index value before multiplying
+ 000001D8  F7 E3				mul		ebx								; since this is at least the second itteration, multiply the total by the current index
+ 000001DA  89 45 FC				mov		[ebp - 4], eax					; store the new total
+ 000001DD  49					dec		ecx								; set the index to n-1
+ 000001DE  89 4D F8				mov		[ebp - 8], ecx					; store the new index
+ 000001E1  EB 00				jmp		checkIndex						; see if we're done
+
+ 000001E3				checkIndex:
+ 000001E3  8B 45 F8				mov		eax, [ebp - 8]					; if we just came from the RecursiveRun Label eax needs to be reset
+ 000001E6  83 F8 00				cmp		eax, 0							; if the index is now at 0, we don't want to multiply by 0 so we're done
+ 000001E9  7F 02				jg		nextCall						; but the index is > 0 so go to next recursive call
+ 000001EB  74 01				je		endProc							; we've done
+
+ 000001ED				nextCall:
+						;call	factorial
+ 000001ED  C3					ret
+
+ 000001EE				endProc:
+ 000001EE  C3					ret
+ 000001EF			factorial	ENDP
 
 				;---------------------------------------------------------------;
 				;	The getData procedure will get the user input as a string	;
@@ -445,12 +521,12 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/01/19 11:44:08
 				;	Returns: if user answer was correct							;
 				;	Pre-Condition: answer should be a valid integer				;
 				;---------------------------------------------------------------;
- 00000149			getData	PROC
- 00000149  55				push	ebp
- 0000014A  8B EC			mov		ebp, esp
+ 000001EF			getData	PROC
+ 000001EF  55				push	ebp
+ 000001F0  8B EC			mov		ebp, esp
 					
- 0000014C  8B 55 0C			mov		edx, [ebp + 12]						; prompt_1
- 0000014F  E8 00000000 E		call	WriteString
+ 000001F2  8B 55 0C			mov		edx, [ebp + 12]						; prompt_1
+ 000001F5  E8 00000000 E		call	WriteString
 
 					;mov		ecx, SIZEOF	userinput
 					;call	ReadString
@@ -459,9 +535,9 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/01/19 11:44:08
 
 
 
- 00000154  5D				pop		ebp
- 00000155  C2 0008			ret		8									; clean the stack 12 bytes
- 00000158			getData	ENDP
+ 000001FA  5D				pop		ebp
+ 000001FB  C2 0008			ret		8									; clean the stack 12 bytes
+ 000001FE			getData	ENDP
 
 				;---------------------------------------------------------------;
 				;	The restart procedure will test to see if the user is		;
@@ -474,20 +550,20 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/01/19 11:44:08
 				;	Returns: none												;
 				;	Pre-Conditions: none										;
 				;---------------------------------------------------------------;
- 00000158			restart		PROC
- 00000158  55				push	ebp
- 00000159  8B EC			mov		ebp, esp
+ 000001FE			restart		PROC
+ 000001FE  55				push	ebp
+ 000001FF  8B EC			mov		ebp, esp
 					
- 0000015B  E8 00000000 E		call	CrLf
- 00000160  8B 55 08			mov		edx, [ebp + 8]						; finished
- 00000163  E8 00000000 E		call	WriteString
+ 00000201  E8 00000000 E		call	CrLf
+ 00000206  8B 55 08			mov		edx, [ebp + 8]						; finished
+ 00000209  E8 00000000 E		call	WriteString
 
- 00000168  5D				pop		ebp
- 00000169  C2 0004			ret		4
- 0000016C			restart		ENDP
+ 0000020E  5D				pop		ebp
+ 0000020F  C2 0004			ret		4
+ 00000212			restart		ENDP
 
 				END main										; the symbolyses that the main program is finished
-Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/01/19 11:44:08
+Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/04/19 17:24:56
 Program 6B		(Project6B.asm			     Symbols 2 - 1
 
 
@@ -582,7 +658,7 @@ Segments and Groups:
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
 _DATA  . . . . . . . . . . . . .	32 Bit	 00000449 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 0000016C Para	  Public  'CODE'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000212 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -689,15 +765,20 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-combinations . . . . . . . . . .	P Near	 00000147 _TEXT	Length= 00000001 Public STDCALL
-factorial  . . . . . . . . . . .	P Near	 00000148 _TEXT	Length= 00000001 Public STDCALL
-getData  . . . . . . . . . . . .	P Near	 00000149 _TEXT	Length= 0000000F Public STDCALL
-intro  . . . . . . . . . . . . .	P Near	 00000073 _TEXT	Length= 00000079 Public STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000073 Public STDCALL
+combinations . . . . . . . . . .	P Near	 00000164 _TEXT	Length= 0000005C Public STDCALL
+factorial  . . . . . . . . . . .	P Near	 000001C0 _TEXT	Length= 0000002F Public STDCALL
+  FirstRun . . . . . . . . . . .	L Near	 000001CD _TEXT	
+  RecursiveRun . . . . . . . . .	L Near	 000001D6 _TEXT	
+  checkIndex . . . . . . . . . .	L Near	 000001E3 _TEXT	
+  nextCall . . . . . . . . . . .	L Near	 000001ED _TEXT	
+  endProc  . . . . . . . . . . .	L Near	 000001EE _TEXT	
+getData  . . . . . . . . . . . .	P Near	 000001EF _TEXT	Length= 0000000F Public STDCALL
+intro  . . . . . . . . . . . . .	P Near	 00000085 _TEXT	Length= 00000079 Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000085 Public STDCALL
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
-restart  . . . . . . . . . . . .	P Near	 00000158 _TEXT	Length= 00000014 Public STDCALL
+restart  . . . . . . . . . . . .	P Near	 000001FE _TEXT	Length= 00000014 Public STDCALL
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
-showProblem  . . . . . . . . . .	P Near	 000000EC _TEXT	Length= 0000005B Public STDCALL
+showProblem  . . . . . . . . . .	P Near	 000000FE _TEXT	Length= 00000066 Public STDCALL
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 
 

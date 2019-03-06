@@ -29,14 +29,13 @@ intro_5			BYTE	"until the user expressively demands to stop.", 0									; Intro
 EC_intro_1		BYTE	"EC: I keep track of how many problems the user gets right vs. wrong",0; EC 1
 EC_intro_2		BYTE	"EC: I utalise the floating point operators and registers for calculations", 0		; EC 2
 
-problem_1		BYTE	"PROBLEM ", 0																		; The problem, then the problem number
-problem_2		BYTE	"Number of elements in the set: ", 0
-problem_3		BYTE	"Number of elements to choose from the set: ", 0
+problem_1		BYTE	"Number of elements in the set: ", 0
+problem_2		BYTE	"Number of elements to choose from the set: ", 0
 
 prompt_1		BYTE	"Please enter your solution to the problem: ", 0									; Prompt for user solution
 prompt_2		BYTE	"Would you like to practice another problem? (Y/N) ", 0								; as the user to keep going
 failed_input_1	BYTE	"The entered value was not a number, please try again.", 0							; The user didn't input a number in for the solution
-failed_input_2	BYTE	"Invalid Responce! ", 0
+failed_input_2	BYTE	"Invalid Responce! The given input was not an integer.", 0
 
 outro_1			BYTE	"There are ", 0
 outro_2			BYTE	" combinations of ", 0
@@ -48,7 +47,7 @@ finished		BYTE	"Thank you for using my program! Goodbye.", 0										; Thank th
 nMAXNUM			=		12																					; The maximum range for n
 nMINNUM			=		3																					; The minimum range for n
 rMINNUM			=		1																					; The lowest number that can be generated for r
-problemNum		DWORD	1
+problemNum		DWORD	0
 problemsRight	DWORD	0
 n				DWORD	?
 r				DWORD	?
@@ -56,6 +55,63 @@ answer			DWORD	?
 byteCount		DWORD	?
 userinput		BYTE	10 DUP(0)
 
+
+;---------------------------------------------------------------;
+;	Macro mPrintString replaces having to move a byte to edx	;
+;	and call writeString with only one line. also allows for	;
+;	pretty lazy debuging which is a plus.						;
+;	THIS METHOD ONLY WORKS WITH VARAIBLES						;
+;---------------------------------------------------------------;
+mWriteString	MACRO	buffer:REQ
+	push	edx
+	mov		edx, OFFSET buffer
+	call	WriteString
+	pop		edx
+ENDM
+
+;---------------------------------------------------------------;
+;	Macro mWriteStringLn is the same as mWriteString but adds	;
+;	a new line after the printed text so you don't have to write;
+;	a new line call in the main functions.						;
+;---------------------------------------------------------------;
+mWriteStringLn	MACRO	buffer:REQ
+	mWriteString	buffer
+	call	CrLf
+ENDM
+
+mWriteDec		MACRO	decimal
+	push	eax
+	mov		eax, decimal
+	call	WriteDec
+	pop		eax
+ENDM
+
+;---------------------------------------------------------------;
+;	Macro mWrite lets you write a string to the output without	;
+;	pre-emptively defining it, I.E in quotes you can write		;
+;	anything to the output.										;
+;---------------------------------------------------------------;
+mWrite		MACRO	text
+	LOCAL	string
+	.data
+	string	BYTE	text, 0
+
+	.code
+	push	edx
+	mov		edx, OFFSET string
+	call	WriteString
+	pop		edx
+ENDM
+
+;---------------------------------------------------------------;
+;	Macro mWriteLn is the same as mWrite but adds a new line	;
+;	call at the end so you don't have to write on in the code	;
+;	section of the functions.									;
+;---------------------------------------------------------------;
+mWriteLn	MACRO	text
+	mWrite	text
+	call	CrLf
+ENDM
 
 ;------------------------;
 ;    Code Declaration    ;
@@ -74,20 +130,9 @@ main	PROC
 		call	Randomize						; set the time seed for the randomize functions in order to keep the generator psuedo-random
 
 	;-----------Display Program Intro-----------;
-		push	OFFSET	project					; +36
-		push	OFFSET	intro_1					; +32
-		push	OFFSET	intro_2					; +28
-		push	OFFSET	intro_3					; +24
-		push	OFFSET	intro_4					; +20
-		push	OFFSET	intro_5					; +26
-		push	OFFSET	EC_intro_1				; +12
-		push	OFFSET	EC_intro_2				; +8
 		call	intro
 
 	;-----------Generate A Problem--------------;
-		push	OFFSET	problem_1				; +36
-		push	OFFSET	problem_2				; +32
-		push	OFFSET	problem_3				; +28
 		push	n								; +24
 		push	r								; +20
 		push	answer							; +16
@@ -95,23 +140,24 @@ main	PROC
 		push	problemsRight					; +8
 		call	showProblem
 
-
 		;TEMPORARY PLEASE REMOVE
-		mov		eax, 0
+		mWrite "The answer is: "
 		mov		eax, answer
 		call	WriteDec
 		call	CrLf
 
 	;-----------Get User Input------------------;
-		push	OFFSET	prompt_1				; +24
-		push	OFFSET	failed_input_1			; +20
+		push	n								; +28
+		push	r								; +24
+		push	problemsRight					; +20
 		push	byteCount						; +16
 		push	OFFSET	userinput				; +12
-		push	answer							; +8
+		push	OFFSET	answer					; +8
 		call	getData
 
 	;------------End Of The Program-------------;
-		push	OFFSET	finished				; +8
+		push	byteCount						; +12
+		push	OFFSET	userinput				; +8
 		call	restart
 	exit										; close program, return to OS
 main	ENDP									; the main PROC is finished, this symbolyses that we are done with the proc
@@ -131,37 +177,16 @@ intro	PROC
 	mov		eax, lightGray + (blue * 16)		; color varaibles consist of: black, white, brown, yellow, blue, green, cyan, red, magenta, gray, lightBlue, lightGreen, lightCyan, lightRed, lightMagenta, and lightGray.
 	call	setTextColor						; EXTRA CREDIT: change background and foreground colors
 
-	push	ebp									; push all the general purpose regs to stack
-	mov		ebp, esp							; save the stack into ebp to not alter data
+	mWriteStringLn	project
+	mWriteStringLn	intro_1
+	mWriteStringLn	intro_2
+	mWriteStringLn	intro_3
+	mWriteStringLn	intro_4
+	mWriteStringLn	intro_5
+	mWriteStringLn	EC_intro_1
+	mWriteStringLn	EC_intro_2
 
-	mov		edx, [ebp + 36]						; program
-	call	WriteString
-	call	CrLf
-	mov		edx, [ebp + 32]						; intro_1
-	call	WriteString
-	call	CrLf
-	mov		edx, [ebp + 28]						; intro_2
-	call	WriteString
-	call	CrLf
-	mov		edx, [ebp + 24]						; intro_3
-	call	WriteString
-	call	CrLf
-	mov		edx, [ebp + 20]						; intro_4
-	call	WriteString
-	call	CrLf
-	mov		edx, [ebp + 16]						; intro_5
-	call	WriteString
-	call	CrLf
-	
-	mov		edx, [ebp + 12]						; EC_intro_1
-	call	WriteString
-	call	CrLf
-	mov		edx, [ebp + 8]						; EC_intro_2
-	call	WriteString
-	call	CrLf
-
-	pop		ebp
-	ret		34									; clean the stack 34 bytes up
+	ret
 intro	ENDP
 
 ;---------------------------------------------------------------;
@@ -177,13 +202,21 @@ showProblem	PROC
 	mov		ebp, esp
 	sub		esp, 12								; make space for 3 local variables for factorial
 
-	mov		edx, [ebp + 36]						; problem_1
-	call	WriteString
-	mov		eax, [ebp + 12]						; problemNum
-	call	WriteDec
-	call	CrLf
-	mov		edx, [ebp + 32]						; problem_2
-	call	WriteString
+	mov		eax, [ebp + 12]
+	inc		eax
+	mov		[ebp + 12], eax
+
+
+	mWrite			"Problem "
+	mWriteDec		[ebp + 12]					; problemNum
+	mWrite			" (%"
+	;mov		eax, [ebp + 8]
+	;mov		ebx, [ebp + 12]
+	;div		ebx
+	;mWriteDec		edx							; quotient of (number right / number asked) for the percentage
+	mWriteLn		")"
+
+	mWriteString	problem_1
 
 	mov		eax, nMAXNUM						; set the max to eax
 	sub		eax, nMINNUM						; subtract the lowest from eax (this will give us a range of 1 to (max-min))
@@ -194,8 +227,7 @@ showProblem	PROC
 	call	WriteDec							; this prints our N value to the screen
 
 	call	CrLf
-	mov		edx, [ebp + 28]						; problem_3
-	call	WriteString
+	mWriteString	problem_2
 
 	sub		eax, rMINNUM						; subtract the lowest from eax (this will give us a range of 1 to (max-min))
 	call	RandomRange							; generate random number in range (1 to (max-min))
@@ -274,7 +306,6 @@ factorial	PROC
 	mov		ebp, esp
 	
 	mov		eax, [ebp + 8]						; the designated stack location for the index value
-	;call	WriteDec
 	cmp		eax, 0								; check to see if index > 0
 	ja		RecursiveCall						; i > 0
 	mov		eax, 1
@@ -306,19 +337,56 @@ factorial	ENDP
 getData	PROC
 	push	ebp
 	mov		ebp, esp
-	
-	mov		edx, [ebp + 24]						; prompt_1
-	call	WriteString
 
-	mov		edx, [ebp + 12]						; userinput
-	mov		ecx, 10
-	call	ReadString
-	mov		[ebp + 16], eax						; bytecount
+	StartCall:
+		mWriteString	prompt_1
 
-	call	CrLf
-	mov		edx, [ebp + 12]
-	call	WriteString
+		mov		edx, [ebp + 12]						; userinput
+		mov		ecx, 10
+		call	ReadString
+		mov		[ebp + 16], eax						; bytecount
+		mov		ecx, eax							; loop through each char
+		mov		esi, [ebp + 12]						; we need to point towards the start of the string array
 
+	ValidateInput:
+		lodsb										; load string as byte to ax 8 bit register
+		cmp		ax, 48d								; compare input to 0 decimal value
+		jl		failedInput							; if its lower, they entered something other than an int
+		cmp		ax, 57d								; compare input to 9 decimal value
+		jg		failedInput							; if its higher, they entered something other than an int
+
+		cmp		ecx, 0
+		je		verify								; its within the integer range
+		loop	ValidateInput
+
+	failedInput:
+		mWriteStringlN	failed_input_2
+		jmp		StartCall
+
+	Verify:
+		mov		eax, [ebp + 12]						; user input
+		mov		ebx, [ebp + 8]						; answer
+		cmp		ebx, eax
+		je		answerMatch
+		jne		answerWrong
+
+	answerMatch:
+		;There are 126  combinations of 4 items from a set of 9.
+		mWrite			"There are "
+		mWriteDec		ebx
+		mWrite			"combinations of "
+		mWriteDec		n
+		mWrite			" items from a set of "
+		mWriteDec		r
+		mWrite			". You are correct!"
+		mov		eax, [ebp + 20]
+		inc		eax
+		mov		[ebp + 20], eax
+		pop		ebp
+		ret		8
+
+	answerWrong:
+		
 
 	pop		ebp
 	ret		8									; clean the stack 12 bytes
@@ -338,13 +406,40 @@ getData	ENDP
 restart		PROC
 	push	ebp
 	mov		ebp, esp
+	startOfCall:
+		mWriteString	prompt_2
 	
-	call	CrLf
-	mov		edx, [ebp + 8]						; finished
-	call	WriteString
+		mov		edx, [ebp + 8]						; userinput
+		mov		ecx, 10
+		call	ReadString
+		mov		[ebp + 12], eax						; bytecount
 
-	pop		ebp
-	ret		4
+		mov		esi, [ebp + 8]
+		lodsb										; load string as byte to ax 8 bit register
+		cmp		ax, 89d								; compare input to Y decimal value
+		je		startOver
+		cmp		ax, 121d							; compare input to y decimal value
+		je		startOver
+		cmp		ax, 78d								; compare input to N decimal value
+		je		endProg
+		cmp		ax, 110d							; compare input to n decimal value
+		je		endProg
+		jmp		failedInput							; some other input
+
+	startOver:
+		call	intro
+
+	endProg:
+		call	CrLf
+		mWriteStringLn	finished
+		pop ebp
+		ret
+
+	failedInput:
+		mWriteString	failed_input_2
+		jmp		startOfCall
+
+	
 restart		ENDP
 
 END main										; the symbolyses that the main program is finished

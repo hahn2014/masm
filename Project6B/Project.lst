@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/04/19 17:24:56
+Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/05/19 16:54:39
 Program 6B		(Project6B.asm			     Page 1 - 1
 
 
@@ -317,11 +317,11 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/04/19 17:24:56
 					;-----------Get User Input------------------;
  00000064  68 0000027D R			push	OFFSET	prompt_1				; +12
  00000069  FF 35 00000445 R			push	answer							; +8
- 0000006F  E8 0000017B				call	getData
+ 0000006F  E8 00000131				call	getData
 
 					;------------End Of The Program-------------;
  00000074  68 0000040C R			push	OFFSET	finished				; +8
- 00000079  E8 00000180				call	restart
+ 00000079  E8 00000136				call	restart
 					exit										; close program, return to OS
  0000007E  6A 00	   *	    push   +000000000h
  00000080  E8 00000000 E   *	    call   ExitProcess
@@ -416,13 +416,9 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/04/19 17:24:56
  00000156  E8 00000000 E		call	CrLf
 
 
-					
-
-					;TEMP : print the answer
  0000015B  E8 00000004			call	combinations						; this will add 4 bytes to the index distance of the addresses (to compensate for return address)
-
-
 					
+
  00000160  5D				pop		ebp
  00000161  C2 0022			ret		34
  00000164			showProblem	ENDP
@@ -437,80 +433,63 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/04/19 17:24:56
 				;	Pre-Conditions, n and r are real integer values				;
 				;---------------------------------------------------------------;
  00000164			combinations	PROC
- 00000164  8B 45 18			mov		eax, [ebp + 24]						; The N value
- 00000167  8B 5D 14			mov		ebx, [ebp + 20]						; The R value
- 0000016A  8B C8			mov		ecx, eax							; N
- 0000016C  2B CB			sub		ecx, ebx							; N - R Value
+					;sub		esp, 12								; make space for 3 local variables
 
- 0000016E  83 ED 08			sub		ebp, 8								; make 2 local variable spaces (2*4) for factorial and factorial index
+					;------------------N!-----------------------;
+ 00000164  FF 75 18			push	[ebp + 24]							; push the N value to the stack [ebp + 8] in factorial
+ 00000167  E8 00000017			call	factorial							; returns the N! to eax
+					;mov		DWORD PTR [ebp - 4], eax
+
+					;------------------R!-----------------------;
+ 0000016C  FF 75 14			push	[ebp + 20]							; push the R value to the stack [ebp + 8] in factorial
+ 0000016F  E8 0000000F			call	factorial							; returns the R! to eax
+					;mov		DWORD PTR [ebp - 8], eax
+
+					;-----------------(N-R)!--------------------;
+ 00000174  8B 45 18			mov		eax, [ebp + 24]						; The N value
+ 00000177  8B 5D 14			mov		ebx, [ebp + 20]						; The R value
+ 0000017A  2B C3			sub		eax, ebx							; N - R Value
+ 0000017C  50				push	eax
+ 0000017D  E8 00000001			call	factorial							; returns the (N - R)! to eax
+					;mov		DWORD PTR [ebp - 12], eax
+
 					
- 00000171  89 45 F8			mov		[ebp - 8], eax						; set the factorial index to N value
- 00000174  E8 00000047			call	factorial
- 00000179  8B 45 FC			mov		eax, [ebp - 4]						; move the total to eax
- 0000017C  E8 00000000 E		call	WriteDec
- 00000181  E8 00000000 E		call	CrLf
 
- 00000186  89 5D F8			mov		[ebp - 8], ebx						; set the factorial index to R value
- 00000189  E8 00000032			call	factorial
- 0000018E  8B 45 FC			mov		eax, [ebp - 4]						; move the total to eax
- 00000191  E8 00000000 E		call	WriteDec
- 00000196  E8 00000000 E		call	CrLf
- 0000019B  89 4D F8			mov		[ebp - 8], ecx						; set the factorial index to N-R value
- 0000019E  E8 0000001D			call	factorial
- 000001A3  8B 45 FC			mov		eax, [ebp - 4]						; move the total to eax
- 000001A6  E8 00000000 E		call	WriteDec
- 000001AB  E8 00000000 E		call	CrLf
-
-
- 000001B0  E8 00000000 E		call	CrLf
- 000001B5  E8 00000000 E		call	CrLf
- 000001BA  E8 00000000 E		call	CrLf
-
- 000001BF  C3				ret
- 000001C0			combinations	ENDP
+					;mov		esp, ebp							; remove locals from stack
+ 00000182  C3				ret
+ 00000183			combinations	ENDP
 
 				;---------------------------------------------------------------;
 				;	The factorial procedure will take an input on the stack, i,	;
 				;	and recursively multiply itself until it has reached 1.		;
 				;	Parameters: i as current factorial, iS as factorial sum		;
-				;	returns: iS value of the factorial							;
+				;	returns: EAX = value of the factorial						;
 				;	Pre-Conditions: i as a valid integer.						;
 				;---------------------------------------------------------------;
- 000001C0			factorial	PROC
- 000001C0  8B 45 F8			mov		eax, [ebp - 8]						; factorial index, I.E How many iterations the factorial process will be called
- 000001C3  8B 5D FC			mov		ebx, [ebp - 4]
+ 00000183			factorial	PROC
+ 00000183  55				push	ebp
+ 00000184  8B EC			mov		ebp, esp
+					
+ 00000186  8B 45 08			mov		eax, [ebp + 8]						; the designated stack location for the index value
+					;call	WriteDec
+ 00000189  83 F8 00			cmp		eax, 0								; check to see if index > 0
+ 0000018C  77 07			ja		RecursiveCall						; i > 0
+ 0000018E  B8 00000001			mov		eax, 1
+ 00000193  EB 0C			jmp		endRecursion						; we need to loop back to the first call
 
- 000001C6  83 FB 00			cmp		ebx, 0
- 000001C9  74 02			je		FirstRun
- 000001CB  7F 09			jg		RecursiveRun
+ 00000195				RecursiveCall:
+ 00000195  48					dec		eax								; i - 1
+ 00000196  50					push	eax								; used as the next layer of recursions new index
+ 00000197  E8 FFFFFFE7				call	factorial
 
- 000001CD				FirstRun:
- 000001CD  89 45 FC				mov		[ebp - 4], eax					; Since it's the first run, we just change the value of the total
- 000001D0  48					dec		eax								; go to the next number
- 000001D1  89 45 F8				mov		[ebp - 8], eax					; set the index to n-1
- 000001D4  EB 0D				jmp		checkIndex						; see if we're done
+ 0000019C				Return:										; only called when we keep looping back layers of recursion
+ 0000019C  8B 5D 08				mov		ebx, [ebp + 8]					; get index
+ 0000019F  F7 E3				mul		ebx								; prod * index
 
- 000001D6				RecursiveRun:
- 000001D6  8B C8				mov		ecx, eax						; store the index value before multiplying
- 000001D8  F7 E3				mul		ebx								; since this is at least the second itteration, multiply the total by the current index
- 000001DA  89 45 FC				mov		[ebp - 4], eax					; store the new total
- 000001DD  49					dec		ecx								; set the index to n-1
- 000001DE  89 4D F8				mov		[ebp - 8], ecx					; store the new index
- 000001E1  EB 00				jmp		checkIndex						; see if we're done
-
- 000001E3				checkIndex:
- 000001E3  8B 45 F8				mov		eax, [ebp - 8]					; if we just came from the RecursiveRun Label eax needs to be reset
- 000001E6  83 F8 00				cmp		eax, 0							; if the index is now at 0, we don't want to multiply by 0 so we're done
- 000001E9  7F 02				jg		nextCall						; but the index is > 0 so go to next recursive call
- 000001EB  74 01				je		endProc							; we've done
-
- 000001ED				nextCall:
-						;call	factorial
- 000001ED  C3					ret
-
- 000001EE				endProc:
- 000001EE  C3					ret
- 000001EF			factorial	ENDP
+ 000001A1				endRecursion:
+ 000001A1  5D					pop		ebp								; remove the current layer of recursion's ebp placer
+ 000001A2  C2 0004				ret		4								; clear the dedicated stack bytes for the index value
+ 000001A5			factorial	ENDP
 
 				;---------------------------------------------------------------;
 				;	The getData procedure will get the user input as a string	;
@@ -521,12 +500,12 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/04/19 17:24:56
 				;	Returns: if user answer was correct							;
 				;	Pre-Condition: answer should be a valid integer				;
 				;---------------------------------------------------------------;
- 000001EF			getData	PROC
- 000001EF  55				push	ebp
- 000001F0  8B EC			mov		ebp, esp
+ 000001A5			getData	PROC
+ 000001A5  55				push	ebp
+ 000001A6  8B EC			mov		ebp, esp
 					
- 000001F2  8B 55 0C			mov		edx, [ebp + 12]						; prompt_1
- 000001F5  E8 00000000 E		call	WriteString
+ 000001A8  8B 55 0C			mov		edx, [ebp + 12]						; prompt_1
+ 000001AB  E8 00000000 E		call	WriteString
 
 					;mov		ecx, SIZEOF	userinput
 					;call	ReadString
@@ -535,9 +514,9 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/04/19 17:24:56
 
 
 
- 000001FA  5D				pop		ebp
- 000001FB  C2 0008			ret		8									; clean the stack 12 bytes
- 000001FE			getData	ENDP
+ 000001B0  5D				pop		ebp
+ 000001B1  C2 0008			ret		8									; clean the stack 12 bytes
+ 000001B4			getData	ENDP
 
 				;---------------------------------------------------------------;
 				;	The restart procedure will test to see if the user is		;
@@ -550,20 +529,20 @@ Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/04/19 17:24:56
 				;	Returns: none												;
 				;	Pre-Conditions: none										;
 				;---------------------------------------------------------------;
- 000001FE			restart		PROC
- 000001FE  55				push	ebp
- 000001FF  8B EC			mov		ebp, esp
+ 000001B4			restart		PROC
+ 000001B4  55				push	ebp
+ 000001B5  8B EC			mov		ebp, esp
 					
- 00000201  E8 00000000 E		call	CrLf
- 00000206  8B 55 08			mov		edx, [ebp + 8]						; finished
- 00000209  E8 00000000 E		call	WriteString
+ 000001B7  E8 00000000 E		call	CrLf
+ 000001BC  8B 55 08			mov		edx, [ebp + 8]						; finished
+ 000001BF  E8 00000000 E		call	WriteString
 
- 0000020E  5D				pop		ebp
- 0000020F  C2 0004			ret		4
- 00000212			restart		ENDP
+ 000001C4  5D				pop		ebp
+ 000001C5  C2 0004			ret		4
+ 000001C8			restart		ENDP
 
 				END main										; the symbolyses that the main program is finished
-Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/04/19 17:24:56
+Microsoft (R) Macro Assembler Version 14.15.26726.0	    03/05/19 16:54:39
 Program 6B		(Project6B.asm			     Symbols 2 - 1
 
 
@@ -658,7 +637,7 @@ Segments and Groups:
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
 _DATA  . . . . . . . . . . . . .	32 Bit	 00000449 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000212 Para	  Public  'CODE'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 000001C8 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -765,18 +744,16 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-combinations . . . . . . . . . .	P Near	 00000164 _TEXT	Length= 0000005C Public STDCALL
-factorial  . . . . . . . . . . .	P Near	 000001C0 _TEXT	Length= 0000002F Public STDCALL
-  FirstRun . . . . . . . . . . .	L Near	 000001CD _TEXT	
-  RecursiveRun . . . . . . . . .	L Near	 000001D6 _TEXT	
-  checkIndex . . . . . . . . . .	L Near	 000001E3 _TEXT	
-  nextCall . . . . . . . . . . .	L Near	 000001ED _TEXT	
-  endProc  . . . . . . . . . . .	L Near	 000001EE _TEXT	
-getData  . . . . . . . . . . . .	P Near	 000001EF _TEXT	Length= 0000000F Public STDCALL
+combinations . . . . . . . . . .	P Near	 00000164 _TEXT	Length= 0000001F Public STDCALL
+factorial  . . . . . . . . . . .	P Near	 00000183 _TEXT	Length= 00000022 Public STDCALL
+  RecursiveCall  . . . . . . . .	L Near	 00000195 _TEXT	
+  Return . . . . . . . . . . . .	L Near	 0000019C _TEXT	
+  endRecursion . . . . . . . . .	L Near	 000001A1 _TEXT	
+getData  . . . . . . . . . . . .	P Near	 000001A5 _TEXT	Length= 0000000F Public STDCALL
 intro  . . . . . . . . . . . . .	P Near	 00000085 _TEXT	Length= 00000079 Public STDCALL
 main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000085 Public STDCALL
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
-restart  . . . . . . . . . . . .	P Near	 000001FE _TEXT	Length= 00000014 Public STDCALL
+restart  . . . . . . . . . . . .	P Near	 000001B4 _TEXT	Length= 00000014 Public STDCALL
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 showProblem  . . . . . . . . . .	P Near	 000000FE _TEXT	Length= 00000066 Public STDCALL
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C

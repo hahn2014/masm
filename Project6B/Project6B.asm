@@ -190,13 +190,9 @@ showProblem	PROC
 	call	CrLf
 
 
-	
-
-	;TEMP : print the answer
 	call	combinations						; this will add 4 bytes to the index distance of the addresses (to compensate for return address)
-
-
 	
+
 	pop		ebp
 	ret		34
 showProblem	ENDP
@@ -211,37 +207,29 @@ showProblem	ENDP
 ;	Pre-Conditions, n and r are real integer values				;
 ;---------------------------------------------------------------;
 combinations	PROC
-	mov		eax, [ebp + 24]						; The N value
-	mov		ebx, [ebp + 20]						; The R value
-	mov		ecx, eax							; N
-	sub		ecx, ebx							; N - R Value
-
-	sub		ebp, 8								; make 2 local variable spaces (2*4) for factorial and factorial index
+	;sub		esp, 12								; make space for 3 local variables
 
 	;------------------N!-----------------------;
-	mov		[ebp - 8], eax						; set the factorial index to N value
-	call	factorial
-	mov		eax, [ebp - 4]						; move the total to eax
-	call	WriteDec
-	call	CrLf
+	push	[ebp + 24]							; push the N value to the stack [ebp + 8] in factorial
+	call	factorial							; returns the N! to eax
+	;mov		DWORD PTR [ebp - 4], eax
+
 	;------------------R!-----------------------;
-	mov		[ebp - 8], ebx						; set the factorial index to R value
-	call	factorial
-	mov		eax, [ebp - 4]						; move the total to eax
-	call	WriteDec
-	call	CrLf
+	push	[ebp + 20]							; push the R value to the stack [ebp + 8] in factorial
+	call	factorial							; returns the R! to eax
+	;mov		DWORD PTR [ebp - 8], eax
+
 	;-----------------(N-R)!--------------------;
-	mov		[ebp - 8], ecx						; set the factorial index to N-R value
-	call	factorial
-	mov		eax, [ebp - 4]						; move the total to eax
-	call	WriteDec
-	call	CrLf
+	mov		eax, [ebp + 24]						; The N value
+	mov		ebx, [ebp + 20]						; The R value
+	sub		eax, ebx							; N - R Value
+	push	eax
+	call	factorial							; returns the (N - R)! to eax
+	;mov		DWORD PTR [ebp - 12], eax
 
+	
 
-	call	CrLf
-	call	CrLf
-	call	CrLf
-
+	;mov		esp, ebp							; remove locals from stack
 	ret
 combinations	ENDP
 
@@ -249,43 +237,32 @@ combinations	ENDP
 ;	The factorial procedure will take an input on the stack, i,	;
 ;	and recursively multiply itself until it has reached 1.		;
 ;	Parameters: i as current factorial, iS as factorial sum		;
-;	returns: iS value of the factorial							;
+;	returns: EAX = value of the factorial						;
 ;	Pre-Conditions: i as a valid integer.						;
 ;---------------------------------------------------------------;
 factorial	PROC
-	mov		eax, [ebp - 8]						; factorial index, I.E How many iterations the factorial process will be called
-	mov		ebx, [ebp - 4]
+	push	ebp
+	mov		ebp, esp
+	
+	mov		eax, [ebp + 8]						; the designated stack location for the index value
+	;call	WriteDec
+	cmp		eax, 0								; check to see if index > 0
+	ja		RecursiveCall						; i > 0
+	mov		eax, 1
+	jmp		endRecursion						; we need to loop back to the first call
 
-	cmp		ebx, 0
-	je		FirstRun
-	jg		RecursiveRun
+	RecursiveCall:
+		dec		eax								; i - 1
+		push	eax								; used as the next layer of recursions new index
+		call	factorial
 
-	FirstRun:
-		mov		[ebp - 4], eax					; Since it's the first run, we just change the value of the total
-		dec		eax								; go to the next number
-		mov		[ebp - 8], eax					; set the index to n-1
-		jmp		checkIndex						; see if we're done
+	Return:										; only called when we keep looping back layers of recursion
+		mov		ebx, [ebp + 8]					; get index
+		mul		ebx								; prod * index
 
-	RecursiveRun:
-		mov		ecx, eax						; store the index value before multiplying
-		mul		ebx								; since this is at least the second itteration, multiply the total by the current index
-		mov		[ebp - 4], eax					; store the new total
-		dec		ecx								; set the index to n-1
-		mov		[ebp - 8], ecx					; store the new index
-		jmp		checkIndex						; see if we're done
-
-	checkIndex:
-		mov		eax, [ebp - 8]					; if we just came from the RecursiveRun Label eax needs to be reset
-		cmp		eax, 0							; if the index is now at 0, we don't want to multiply by 0 so we're done
-		jg		nextCall						; but the index is > 0 so go to next recursive call
-		je		endProc							; we've done
-
-	nextCall:
-		;call	factorial
-		ret
-
-	endProc:
-		ret
+	endRecursion:
+		pop		ebp								; remove the current layer of recursion's ebp placer
+		ret		4								; clear the dedicated stack bytes for the index value
 factorial	ENDP
 
 ;---------------------------------------------------------------;

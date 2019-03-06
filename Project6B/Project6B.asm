@@ -28,17 +28,20 @@ intro_4			BYTE	"and the correct answer will then be displayed after. The program
 intro_5			BYTE	"until the user expressively demands to stop.", 0									; Intro 5
 EC_intro_1		BYTE	"EC: I keep track of how many problems the user gets right vs. wrong",0; EC 1
 EC_intro_2		BYTE	"EC: I utalise the floating point operators and registers for calculations", 0		; EC 2
+
 problem_1		BYTE	"PROBLEM ", 0																		; The problem, then the problem number
 problem_2		BYTE	"Number of elements in the set: ", 0
 problem_3		BYTE	"Number of elements to choose from the set: ", 0
-prompt_1		BYTE	"Please enter the solution to the problem: ", 0										; Prompt for a random number
+
+prompt_1		BYTE	"Please enter your solution to the problem: ", 0									; Prompt for user solution
 prompt_2		BYTE	"Would you like to practice another problem? (Y/N) ", 0								; as the user to keep going
-failed_input_1	BYTE	"The entered number was above the allowed range!", 0								; Warn the user that they can't input such a RIDICULOUSLY high number
-failed_input_2	BYTE	"The entered number was bellow the allowed range!", 0								; Warn the user that they can't input such a CRAZY low number
-failed_input_3	BYTE	"The entered value was not a number, please try again.", 0							; The user didn't input a number in for the solution
-outro_1			BYTE	"             ---  Outputting your unsorted array  ---             ", 0
-outro_2			BYTE	"The array median is: ", 0
-outro_3			BYTE	"             ---  Outputting your sorted array  ---             ", 0
+failed_input_1	BYTE	"The entered value was not a number, please try again.", 0							; The user didn't input a number in for the solution
+failed_input_2	BYTE	"Invalid Responce! ", 0
+
+outro_1			BYTE	"There are ", 0
+outro_2			BYTE	" combinations of ", 0
+outro_3			BYTE	" items from a set of ", 0
+outro_4			BYTE	". That is correct!", 0
 finished		BYTE	"Thank you for using my program! Goodbye.", 0										; Thank the user and say goodbye by name input
 
 
@@ -50,6 +53,8 @@ problemsRight	DWORD	0
 n				DWORD	?
 r				DWORD	?
 answer			DWORD	?
+byteCount		DWORD	?
+userinput		BYTE	10 DUP(0)
 
 
 ;------------------------;
@@ -90,8 +95,18 @@ main	PROC
 		push	problemsRight					; +8
 		call	showProblem
 
+
+		;TEMPORARY PLEASE REMOVE
+		mov		eax, 0
+		mov		eax, answer
+		call	WriteDec
+		call	CrLf
+
 	;-----------Get User Input------------------;
-		push	OFFSET	prompt_1				; +12
+		push	OFFSET	prompt_1				; +24
+		push	OFFSET	failed_input_1			; +20
+		push	byteCount						; +16
+		push	OFFSET	userinput				; +12
 		push	answer							; +8
 		call	getData
 
@@ -160,6 +175,7 @@ intro	ENDP
 showProblem	PROC
 	push	ebp
 	mov		ebp, esp
+	sub		esp, 12								; make space for 3 local variables for factorial
 
 	mov		edx, [ebp + 36]						; problem_1
 	call	WriteString
@@ -191,8 +207,10 @@ showProblem	PROC
 
 
 	call	combinations						; this will add 4 bytes to the index distance of the addresses (to compensate for return address)
+	mov		eax, [ebp + 16]						; make sure eax is answer
+	mov		answer, eax							; set the answer value
 	
-
+	mov		esp, ebp							; remove locals from stack
 	pop		ebp
 	ret		34
 showProblem	ENDP
@@ -207,17 +225,16 @@ showProblem	ENDP
 ;	Pre-Conditions, n and r are real integer values				;
 ;---------------------------------------------------------------;
 combinations	PROC
-	;sub		esp, 12								; make space for 3 local variables
 
 	;------------------N!-----------------------;
 	push	[ebp + 24]							; push the N value to the stack [ebp + 8] in factorial
 	call	factorial							; returns the N! to eax
-	;mov		DWORD PTR [ebp - 4], eax
+	mov		DWORD PTR [ebp - 4], eax			; store in local var 1
 
 	;------------------R!-----------------------;
 	push	[ebp + 20]							; push the R value to the stack [ebp + 8] in factorial
 	call	factorial							; returns the R! to eax
-	;mov		DWORD PTR [ebp - 8], eax
+	mov		DWORD PTR [ebp - 8], eax			; store in local var 2
 
 	;-----------------(N-R)!--------------------;
 	mov		eax, [ebp + 24]						; The N value
@@ -225,12 +242,24 @@ combinations	PROC
 	sub		eax, ebx							; N - R Value
 	push	eax
 	call	factorial							; returns the (N - R)! to eax
-	;mov		DWORD PTR [ebp - 12], eax
+	mov		DWORD PTR [ebp - 12], eax			; store in local var 3
 
-	
+	;now for the answer
+	;		n!
+	;	----------
+	;	r!(n - r)!
 
-	;mov		esp, ebp							; remove locals from stack
-	ret
+	mov		eax, DWORD PTR [ebp - 8]			; R!
+	mov		ebx, DWORD PTR [ebp - 12]			; (N - R)!
+	mul		ebx									; R! * (N - R)!
+
+	mov		ebx, eax							; set bottom value to divisor
+	mov		eax, DWORD PTR [ebp - 4]			; N!
+	div		ebx									; (n!)/(r!(n-r)!)			answer stored in eax
+
+	mov		[ebp + 16], eax						; move answer to the stack value
+
+	ret		12
 combinations	ENDP
 
 ;---------------------------------------------------------------;
@@ -278,14 +307,17 @@ getData	PROC
 	push	ebp
 	mov		ebp, esp
 	
-	mov		edx, [ebp + 12]						; prompt_1
+	mov		edx, [ebp + 24]						; prompt_1
 	call	WriteString
 
-	;mov		ecx, SIZEOF	userinput
-	;call	ReadString
-	;mov		byteCount, eax
+	mov		edx, [ebp + 12]						; userinput
+	mov		ecx, 10
+	call	ReadString
+	mov		[ebp + 16], eax						; bytecount
 
-
+	call	CrLf
+	mov		edx, [ebp + 12]
+	call	WriteString
 
 
 	pop		ebp

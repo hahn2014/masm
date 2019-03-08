@@ -53,6 +53,9 @@ n				DWORD	?
 r				DWORD	?
 answer			DWORD	?
 byteCount		DWORD	?
+flp_quotient	DWORD	0
+flp_remain		DWORD	0
+flp_by100		DWORD	100
 userinput		BYTE	10 DUP(0)
 
 
@@ -132,6 +135,8 @@ main	PROC
 	;-----------Display Program Intro-----------;
 		call	intro
 
+
+		NewProblem:
 	;-----------Generate A Problem--------------;
 		push	n								; +24
 		push	r								; +20
@@ -152,13 +157,16 @@ main	PROC
 		push	problemsRight					; +20
 		push	byteCount						; +16
 		push	OFFSET	userinput				; +12
-		push	OFFSET	answer					; +8
-		call	getData
+		push	answer							; +8
+		call	getDataInt						; Change to Int for temp solution, or just getData for true finished product
 
 	;------------End Of The Program-------------;
 		push	byteCount						; +12
 		push	OFFSET	userinput				; +8
 		call	restart
+
+		cmp		eax, 1
+		je		NewProblem
 	exit										; close program, return to OS
 main	ENDP									; the main PROC is finished, this symbolyses that we are done with the proc
 
@@ -205,16 +213,31 @@ showProblem	PROC
 	mov		eax, [ebp + 12]
 	inc		eax
 	mov		[ebp + 12], eax
+	mov		problemNum, eax
 
 
 	mWrite			"Problem "
 	mWriteDec		[ebp + 12]					; problemNum
-	mWrite			" (%"
-	;mov		eax, [ebp + 8]
-	;mov		ebx, [ebp + 12]
-	;div		ebx
-	;mWriteDec		edx							; quotient of (number right / number asked) for the percentage
-	mWriteLn		")"
+
+
+	mWrite			" ("
+
+	
+	;ffree	st[0]
+	;fld		dword ptr [ebp + 8]
+	;fidiv	dword ptr [ebp + 12]
+	;fst		flp_quotient
+	;fimul	flp_by100
+	;frndint
+	;fst		flp_remain
+
+	mWriteDec	problemsRight
+	mWrite		"/"
+	mov			eax, problemNum
+	dec			eax
+	mWriteDec	eax
+
+	mWriteLn	" answered correct)"
 
 	mWriteString	problem_1
 
@@ -222,6 +245,7 @@ showProblem	PROC
 	sub		eax, nMINNUM						; subtract the lowest from eax (this will give us a range of 1 to (max-min))
 	call	RandomRange							; generate random number in range (1 to (max-min))
 	add		eax, nMINNUM						; add lowest to generated number (this fixes the range to be from min to max)
+	mov		n, eax
 	mov		[ebp + 24], eax						; move the n value to the stack
 
 	call	WriteDec							; this prints our N value to the screen
@@ -232,6 +256,7 @@ showProblem	PROC
 	sub		eax, rMINNUM						; subtract the lowest from eax (this will give us a range of 1 to (max-min))
 	call	RandomRange							; generate random number in range (1 to (max-min))
 	add		eax, rMINNUM						; add lowest to generated number (this fixes the range to be from min to max)
+	mov		r, eax
 	mov		[ebp + 20], eax						; move the r value to the stack
 
 	call	WriteDec							; this prints our R value to the screen
@@ -350,17 +375,17 @@ getData	PROC
 
 	ValidateInput:
 		lodsb										; load string as byte to ax 8 bit register
-		cmp		ax, 48d								; compare input to 0 decimal value
+		cmp		al, 48								; compare input to 0 decimal value
 		jl		failedInput							; if its lower, they entered something other than an int
-		cmp		ax, 57d								; compare input to 9 decimal value
+		cmp		al, 57								; compare input to 9 decimal value
 		jg		failedInput							; if its higher, they entered something other than an int
 
 		cmp		ecx, 0
 		je		verify								; its within the integer range
-		loop	ValidateInput
+		loop	ValidateInput						; keep going until we've hit 0 on the ecx index counter
 
 	failedInput:
-		mWriteStringlN	failed_input_2
+		mWriteStringLn	failed_input_2
 		jmp		StartCall
 
 	Verify:
@@ -371,26 +396,78 @@ getData	PROC
 		jne		answerWrong
 
 	answerMatch:
-		;There are 126  combinations of 4 items from a set of 9.
 		mWrite			"There are "
 		mWriteDec		ebx
-		mWrite			"combinations of "
+		mWrite			" combinations of "
 		mWriteDec		n
 		mWrite			" items from a set of "
 		mWriteDec		r
-		mWrite			". You are correct!"
+		mWrite			". You're correct!"
 		mov		eax, [ebp + 20]
 		inc		eax
-		mov		[ebp + 20], eax
+		mov		[ebp + 20], eax						; increase number of problems solved right
 		pop		ebp
-		ret		8
+		ret		24
 
 	answerWrong:
-		
-
-	pop		ebp
-	ret		8									; clean the stack 12 bytes
+		mWrite			"There are "
+		mWriteDec		ebx
+		mWrite			" combinations of "
+		mWriteDec		n
+		mWrite			" items from a set of "
+		mWriteDec		r
+		mWrite			". You're incorrect!"
+		pop		ebp
+		ret		24
+													; clean the stack 12 bytes
 getData	ENDP
+
+
+
+
+
+getDataInt	PROC
+	push	ebp
+	mov		ebp, esp
+
+	mWriteString	prompt_1
+
+	call	ReadDec
+	cmp		eax, [ebp + 8]							; answer
+	je		answerRight	
+	jne		answerWrong
+
+
+	answerRight:
+		mWrite			"There are "
+		mWriteDec		answer
+		mWrite			" combinations of "
+		mWriteDec		[ebp + 24]
+		mWrite			" items from a set of "
+		mWriteDec		[ebp + 28]
+		mWriteLn		". You're correct!"
+		mov				eax, [ebp + 20]
+		inc				eax
+		mov				[ebp + 20], eax				; increase number of problems solved right
+		mov				problemsRight, eax
+		pop		ebp
+		ret		24
+
+	answerWrong:
+		mWrite			"There are "
+		mWriteDec		answer
+		mWrite			" combinations of "
+		mWriteDec		[ebp + 24]
+		mWrite			" items from a set of "
+		mWriteDec		[ebp + 28]
+		mWriteLn		". You're incorrect!"
+		pop		ebp
+		ret		24
+getDataInt	ENDP
+
+
+
+
 
 ;---------------------------------------------------------------;
 ;	The restart procedure will test to see if the user is		;
@@ -427,13 +504,18 @@ restart		PROC
 		jmp		failedInput							; some other input
 
 	startOver:
-		call	intro
+		mov		eax, 1
+		call	CrLf
+		call	CrLf
+		pop		ebp
+		ret		4
 
 	endProg:
+		mov		eax, 0
 		call	CrLf
 		mWriteStringLn	finished
 		pop ebp
-		ret
+		ret		4
 
 	failedInput:
 		mWriteString	failed_input_2

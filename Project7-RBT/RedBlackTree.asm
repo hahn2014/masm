@@ -12,8 +12,17 @@ TITLE Project 7 - RedBlackTree		(RedBlackTree.asm)
 INCLUDE Irvine32.inc
 
 .data
-MAXNUM			=		1																					; The min number of nodes that can be written
-MINNUM			=		500																					; The max number of nodes that can be written
+MINIMUM			=		1																					; The min number of nodes that can be written
+MAXIMUM			=		500																					; The max number of nodes that can be written
+unsorted_list	DWORD	MAXIMUM DUP(?)																		; The list that unsorted values will be placed in with a max array size of 500
+BUFFER_SIZE		=       5000																				; Max size for a file buffer
+buffer			DWORD   BUFFER_SIZE dup (?)																	; file buffer
+bytesRead		DWORD	0																					; temp to keep track of bytes
+infileH			DWORD   0
+inFilename		BYTE    "input.txt", 0																		; file name
+
+
+;#region Macro Setup
 
 ;---------------------------------------------------------------;
 ;	Macro mPrintString replaces having to move a byte to edx	;
@@ -70,6 +79,7 @@ mWriteLn		MACRO	text
 	mWrite	text
 	call	CrLf
 ENDM
+;#endregion
 
 .code
 ;---------------------------------------------------------------;
@@ -79,10 +89,10 @@ ENDM
 ;	will implement this into further projects.					;
 ;---------------------------------------------------------------;
 main	PROC
-		call		Randomize																				; set the time seed for the randomize functions in order to keep the generator psuedo-random
 		call		Intro																					; Introduce the user to the program
 		call		GetUserRunOption																		; Get the user desired run option
 		call		ExecuteRunOption																		; Start the tree construction based on user option
+		
 	exit																									; close program, return to OS
 main	ENDP																								; the main PROC is finished, this symbolyses that we are done with the proc
 
@@ -176,6 +186,90 @@ ExecuteRunOption PROC
 ExecuteRunOption ENDP
 
 ;---------------------------------------------------------------;
+;	The PrintUnsortedList process is called once all the data	;
+;	has been stored into the unsorted array, and will then be	;
+;	printed to the screen to give the user a heads up on the	;
+;	data going into the tree.									;
+;																;
+;	Parameters:		unsorted_list								;
+;	Returns:		n/a											;
+;	Pre-Conditions:	unsorted_list contains at least 1 value		;
+;	Changed Regs:	eax, ebx, ecx, edx, esi						;
+;---------------------------------------------------------------;
+PrintUnsortedList PROC
+	push			ebp
+	mov				ebp, esp
+
+	mov				ebx, 0
+	mov				ecx, 0
+	mov				esi, OFFSET unsorted_list
+
+	PrintLoop:
+		mov			eax, [esi + ebx * 4]																	; move current index value to eax
+		cmp			eax, 0																					; first 0 we encounter is the end of the list
+		je			EndPrint
+		mWriteDec	eax
+		inc			ecx																						; increase line print count
+		cmp			ecx, 10																					; see if we've printed 10 values on a line
+		je			NewLine
+		jne			OldLine
+
+		NewLine:
+			call	CrLf
+			mov		ecx, 0																					; start line count again
+			jmp		NextCall
+		OldLine:
+			mWrite	","
+			call	PropSpacing
+			jmp		NextCall
+		NextCall:
+			inc		ebx
+			cmp		ebx, LENGTHOF unsorted_list
+			je		EndPrint
+			jne		PrintLoop
+	EndPrint:
+		call		CrLf
+		pop			ebp
+		ret
+PrintUnsortedList ENDP
+
+;---------------------------------------------------------------;
+;	The PropSpacing procedure will be called when spacing out	;
+;	the unsorted values to align them properly.					;
+;																;
+;	Parameters:		current value [ebp - 8]						;
+;	Returns:		n/a											;
+;	Pre-Conditions:	unsorted_list contains at least 1 value		;
+;	Changed Regs:	eax, edx, edi								;
+;---------------------------------------------------------------;
+PropSpacing PROC
+	cmp				eax, 10
+	jl				singleDigit
+	cmp				eax, 100
+	jl				doubleDigit
+	jmp				tripleDigit
+
+	singleDigit:
+		mov			edi, 4
+		jmp			printLoop
+	doubleDigit:
+		mov			edi, 3
+		jmp			printLoop
+	tripleDigit:
+		mov			edi, 2
+		jmp			printLoop
+
+	printLoop:
+		mWrite		" "
+		dec			edi
+		cmp			edi, 0
+		jg			printLoop
+		ret
+propSpacing	ENDP
+
+;#region File Data Input
+
+;---------------------------------------------------------------;
 ;	The LoadFileOption procedure is called when the user chose	;
 ;	to load the RBT with values off a file, specifically from	;
 ;	input.txt. If the file doesn't exist, we will warn the user	;
@@ -187,9 +281,72 @@ ExecuteRunOption ENDP
 ;	Changed Regs:	
 ;---------------------------------------------------------------;
 LoadFileOption PROC
-	
-	ret
+	mWriteLn		"Loading data from input.txt..."
+	;------Open File------;
+	mov				edx, OFFSET inFilename
+	call			OpenInputFile
+	mov				infileH, eax
+	;------Read File------;
+	mov				edx, OFFSET buffer
+	mov				ecx, BUFFER_SIZE
+	call			ReadFromFile
+	mov				bytesRead, eax
+	;------Close File------;
+	mov				eax, infileH
+	call			CloseFile
+	;------Convert Chars to Int------;
+	lea				esi, OFFSET buffer
+	lea				edi, OFFSET unsorted_list
+	mov				edx, 0
+	ConvertLoop:
+		call		AsciiToInt
+		mov			[edi], eax
+		inc			edi
+		inc			esi
+		inc			edx
+		cmp			edx, MAXIMUM - 1																		; We hit the max number of inputs allowed, don't convert the rest of the file
+		jne			ConvertLoop
+		jmp			FinishUp
+
+	FinishUp:
+		mov			eax, edx
+		inc			eax
+		mWrite		"Now Printing "
+		mWriteDec	eax
+		mWriteLn	" values from input.txt to insert into tree:"
+		call		PrintUnsortedList																		; give the user a full list of unsorted values
+		push		OFFSET unsorted_list																	; make sure we have access to the unsorted list
+		call		SortToTree																				; call the sort procedure
+		ret
 LoadFileOption ENDP
+
+AsciiToInt PROC
+	mov				ecx, 0
+	mov				eax, 0
+	nextDigit:
+		mov			bl, [esi]
+		cmp			bl, '0'
+		jl			LoopFinished
+		cmp			bl, '9'
+		jg			LoopFinished
+		add			bl, -30h
+		imul		eax, 10
+		add			eax, ebx
+		;mov		[esi], eax
+		;mov		[edi], eax
+		inc			ecx
+		inc			esi
+		;inc		edi
+		jmp			nextDigit
+	LoopFinished:
+		ret
+AsciiToInt ENDP
+
+
+
+;#endregion
+
+;#region Generate Data Input
 
 ;---------------------------------------------------------------;
 ;	The GenerateValuesOption procedure is called when the user	;
@@ -199,12 +356,69 @@ LoadFileOption ENDP
 ;	Parameters:		n/a											;
 ;	Returns:		n/a											;
 ;	Pre-Conditions:	n/a											;
-;	Changed Regs:	eax, edx
+;	Changed Regs:	eax, edx, ecx, ebx, esi						;
 ;---------------------------------------------------------------;
 GenerateValuesOption PROC
-	
+	call			Randomize																				; set the time seed for the randomize functions in order to keep the generator psuedo-random
+	call			GetGenerationCount
+
+	mWrite			"Now generating "
+	mWriteDec		eax
+	mWriteLn			" values to insert into tree:"
+
+	mov				ecx, eax																				; loop through the desired generationcount num held on eax.
+	mov				esi, OFFSET unsorted_list																; point to array address
+	mov				ebx, 0
+	GenerateRandNum:
+		mov			eax, MAXIMUM																			; eax will be the max range to generate
+		dec			eax																						; 499 is where we want, because randomrange includes 0.
+		call		RandomRange
+		inc			eax																						; this now gives us a random value from 1 to 500.
+		mov			[esi + ebx * 4], eax																	; store the generated value into array[loop count * 4 bytes]
+		inc			ebx																						; update index counter
+		loop		GenerateRandNum																			; keep going until ecx = 0
+
+	call			PrintUnsortedList																		; give the user a full list of unsorted values
+	push			OFFSET unsorted_list																	; make sure we have access to the unsorted list
+	call			SortToTree																				; call the sort procedure
 	ret
 GenerateValuesOption ENDP
+
+;---------------------------------------------------------------;
+;	The GetGenerationCount procedure gets from user input their	;
+;	desired number of values to be added to the tree within the	;
+;	defined range of 1-500.										;
+;																;
+;	Parameters:		n/a											;
+;	Returns:		Generation count to eax						;
+;	Pre-Conditions:	n/a											;
+;	Changed Regs:	eax, edx									;
+;---------------------------------------------------------------;
+GetGenerationCount PROC
+	getInput:
+		mWrite		"Please enter how many values you wish to generate [1-500]: "
+		call		ReadDec
+
+	VerifyInput:
+		cmp			eax, 1																					; user inputed a value too low
+		jl			InvalidInput
+		cmp			eax, 500																				; user inputed a value too high
+		jg			InvalidInput
+		jmp			ValidInput																				; input is within range
+
+	InvalidInput:
+		mWrite		"The entered value "
+		mWriteDec	eax
+		mWriteLn	" is outside of the designated range."
+		jmp			getInput
+
+	ValidInput:
+		ret																									; return generation count on eax
+GetGenerationCount ENDP
+
+;#endregion
+
+;#region User Input Data
 
 ;---------------------------------------------------------------;
 ;	The InputValuesOption procedure is called when the user		;
@@ -215,14 +429,83 @@ GenerateValuesOption ENDP
 ;	Parameters:		n/a											;
 ;	Returns:		n/a											;
 ;	Pre-Conditions:	n/a											;
-;	Changed Regs:	eax, edx
+;	Changed Regs:	eax, ecx, edx, esi							;
 ;---------------------------------------------------------------;
 InputValuesOption PROC
-	
-	ret
+	mov				esi, OFFSET unsorted_list
+	mov				ecx, 0
+	NewInput:
+		call		GetUserInputData
+		cmp			eax, 0
+		je			DoneWithInput
+		jmp			AddToArray
+	AddToArray:
+		mov			[esi + ecx * 4], eax																	; store value to array[index * 4 bytes]
+		inc			ecx																						; next index value
+		cmp			ecx, MAXIMUM																			; make sure we haven't hit 500
+		je			MaxInputs
+		jmp			NewInput
+	MaxInputs:
+		mWriteLn	"You've Inputted the max number of inputs for the tree.."
+	DoneWithInput:
+		mWrite		"Now printing your "
+		mWriteDec	ecx
+		mWriteLn	" inputted values:"
+		call		PrintUnsortedList																		; give the user a full list of unsorted values
+		push		OFFSET unsorted_list																	; make sure we have access to the unsorted list
+		call		SortToTree																				; call the sort procedure
+		ret
 InputValuesOption ENDP
 
+;---------------------------------------------------------------;
+;	The GetUserInputData procedure is called when the program	;
+;	needs to fill the array with data. It will continue to be	;
+;	called while the user wishes to add more values to the tree.;
+;																;
+;	Parameters:		n/a											;
+;	Returns:		eax contains the new inputted value			;
+;	Pre-Conditions:	n/a											;
+;	Changed Regs:	eax, edx									;
+;---------------------------------------------------------------;
+GetUserInputData PROC
+	GetValue:
+		xor			eax, eax																				; completly clear eax register
+		mWrite		"Please enter a data value [1-500] or 0 to stop:"
+		call		ReadDec
+
+	VerifyInput:
+		cmp			eax, MAXIMUM
+		jg			InvalidInput
+		cmp			eax, 0
+		je			ValidInput
+		cmp			eax, MINIMUM
+		jl			InvalidInput
+		jmp			ValidInput
+
+	InvalidInput:
+		mWriteLn	"The entered value was not within the defined range."
+		jmp			GetValue
+	ValidInput:
+		ret
+GetUserInputData ENDP
 
 
+;#endregion
+
+;#region Red-Black Tree Methods
+
+SortToTree PROC
+	push			ebp
+	mov				ebp, esp
+
+	mWriteLn		"Now sorting list to Red-Black Tree:"
+	mWriteLn		"lol if you thought this would be done first you're incredibly mistaken"
+
+	pop				ebp
+	ret 4
+SortToTree ENDP
+
+
+;#endregion
 
 END main																									; the symbolyses that the main program is finished

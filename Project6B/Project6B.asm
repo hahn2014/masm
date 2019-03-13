@@ -1,8 +1,8 @@
 TITLE Program 6B		(Project6B.asm)
 
 ; Author: Bryce Hahn
-; Course/Project ID: CS 271 Project 6
-; Date: 3/4/2019
+; Course/Project ID: CS 271 Project 6B
+; Date: 3/12/2019
 ; Description:
 ;	This program will produce a random equation in the format
 ;		(n!)/(r!(n-r)!) generating n from [3 to 12] and r 
@@ -26,7 +26,7 @@ intro_2			BYTE	"be used to calculate the number of combinations of r items taken
 intro_3			BYTE	"of n items. The user is then prompted to answer the solution to the problem, ", 0	; Intro 3
 intro_4			BYTE	"and the correct answer will then be displayed after. The program will continue ", 0; Intro 4
 intro_5			BYTE	"until the user expressively demands to stop.", 0									; Intro 5
-EC_intro_1		BYTE	"EC: I keep track of how many problems the user gets right vs. wrong",0; EC 1
+EC_intro_1		BYTE	"EC: I keep track of how many problems the user gets right vs. wrong",0				; EC 1
 EC_intro_2		BYTE	"EC: I utalise the floating point operators and registers for calculations", 0		; EC 2
 
 problem_1		BYTE	"Number of elements in the set: ", 0
@@ -34,8 +34,8 @@ problem_2		BYTE	"Number of elements to choose from the set: ", 0
 
 prompt_1		BYTE	"Please enter your solution to the problem: ", 0									; Prompt for user solution
 prompt_2		BYTE	"Would you like to practice another problem? (Y/N) ", 0								; as the user to keep going
-failed_input_1	BYTE	"The entered value was not a number, please try again.", 0							; The user didn't input a number in for the solution
-failed_input_2	BYTE	"Invalid Responce! The given input was not an integer.", 0
+failed_input_1	BYTE	"Invalid Responce! The given input was not an integer.", 0							; The user didn't input a number in for the solution
+failed_input_2	BYTE	"Invalid Responce! The given input was not (Y/y, N/n). ", 0
 
 outro_1			BYTE	"There are ", 0
 outro_2			BYTE	" combinations of ", 0
@@ -52,10 +52,6 @@ problemsRight	DWORD	0
 n				DWORD	?
 r				DWORD	?
 answer			DWORD	?
-byteCount		DWORD	?
-flp_quotient	DWORD	0
-flp_remain		DWORD	0
-flp_by100		DWORD	100
 userinput		BYTE	10 DUP(0)
 
 
@@ -135,38 +131,29 @@ main	PROC
 	;-----------Display Program Intro-----------;
 		call	intro
 
-
 		NewProblem:
 	;-----------Generate A Problem--------------;
 		push	n								; +24
 		push	r								; +20
-		push	answer							; +16
-		push	problemNum						; +12
-		push	problemsRight					; +8
+		push	OFFSET	answer					; +16
+		push	OFFSET	problemNum				; +12
+		push	OFFSET	problemsRight			; +8
 		call	showProblem
 
-		;TEMPORARY PLEASE REMOVE
-		mWrite "The answer is: "
-		mov		eax, answer
-		call	WriteDec
-		call	CrLf
-
 	;-----------Get User Input------------------;
-		push	n								; +28
-		push	r								; +24
-		push	problemsRight					; +20
-		push	byteCount						; +16
+		push	n								; +24
+		push	r								; +20
+		push	OFFSET	problemsRight			; +16
 		push	OFFSET	userinput				; +12
-		push	answer							; +8
-		call	getDataInt						; Change to Int for temp solution, or just getData for true finished product
+		push	OFFSET	answer					; +8
+		call	getData							; Change to Int for temp solution, or just getData for true finished product
 
 	;------------End Of The Program-------------;
-		push	byteCount						; +12
 		push	OFFSET	userinput				; +8
 		call	restart
-
 		cmp		eax, 1
 		je		NewProblem
+
 	exit										; close program, return to OS
 main	ENDP									; the main PROC is finished, this symbolyses that we are done with the proc
 
@@ -177,9 +164,9 @@ main	ENDP									; the main PROC is finished, this symbolyses that we are done 
 ;	easier! This function litterally just calls all intro		;
 ;	scripts.													;
 ;	Parameters: program, intro_1, intro_2, intro_3, intro_4,	;
-;	intro_5, EC_intro_1, EC_intro_2, EC_intro_3, EC_intro_4		;
-;	Returns: 40 bytes from the stack							;
-;	Pre-Conditions: none										;
+;	intro_5, EC_intro_1, EC_intro_2								;
+;	Returns: n/a												;
+;	Pre-Conditions: called varaibles must be real strings		;
 ;---------------------------------------------------------------;
 intro	PROC
 	mov		eax, lightGray + (blue * 16)		; color varaibles consist of: black, white, brown, yellow, blue, green, cyan, red, magenta, gray, lightBlue, lightGreen, lightCyan, lightRed, lightMagenta, and lightGray.
@@ -203,39 +190,34 @@ intro	ENDP
 ;	The procedure will also solve the problem itself, and then	;
 ;	jump to the next procedure to wait for user answer to cross	;
 ;	check answers and see if the user is correct.				;
-;	Parameters: 
+;	Parameters: n, r, answer, problemNum, problemsRight			;
+;	Returns: n, r, and answer values to their address			;
+;	Pre-Conditions: none										;
 ;---------------------------------------------------------------;
 showProblem	PROC
 	push	ebp
 	mov		ebp, esp
 	sub		esp, 12								; make space for 3 local variables for factorial
 
-	mov		eax, [ebp + 12]
-	inc		eax
-	mov		[ebp + 12], eax
-	mov		problemNum, eax
-
+	mov		eax, [ebp + 12]						; offset to eax
+	mov		ebx, [eax]							; value of offset to ebx
+	inc		ebx									; increase 
+	mov		eax, [ebp + 12]						; offset to eax
+	mov		[eax], ebx							; value to value of offset
 
 	mWrite			"Problem "
-	mWriteDec		[ebp + 12]					; problemNum
+	mov				eax, [ebp + 12]
+	mWriteDec		[eax]						; problemNum
 
 
 	mWrite			" ("
-
-	
-	;ffree	st[0]
-	;fld		dword ptr [ebp + 8]
-	;fidiv	dword ptr [ebp + 12]
-	;fst		flp_quotient
-	;fimul	flp_by100
-	;frndint
-	;fst		flp_remain
-
-	mWriteDec	problemsRight
+	mov			eax, [ebp + 8]
+	mWriteDec	[eax]
 	mWrite		"/"
-	mov			eax, problemNum
-	dec			eax
-	mWriteDec	eax
+	mov			eax, [ebp + 12]
+	mov			ebx, [eax]
+	dec			ebx
+	mWriteDec	ebx
 
 	mWriteLn	" answered correct)"
 
@@ -262,10 +244,7 @@ showProblem	PROC
 	call	WriteDec							; this prints our R value to the screen
 	call	CrLf
 
-
 	call	combinations						; this will add 4 bytes to the index distance of the addresses (to compensate for return address)
-	mov		eax, [ebp + 16]						; make sure eax is answer
-	mov		answer, eax							; set the answer value
 	
 	mov		esp, ebp							; remove locals from stack
 	pop		ebp
@@ -314,7 +293,8 @@ combinations	PROC
 	mov		eax, DWORD PTR [ebp - 4]			; N!
 	div		ebx									; (n!)/(r!(n-r)!)			answer stored in eax
 
-	mov		[ebp + 16], eax						; move answer to the stack value
+	mov		ebx, [ebp + 16]						; answer offset to ebx
+	mov		[ebx], eax							; move answer to the stack value
 
 	ret		12
 combinations	ENDP
@@ -355,119 +335,120 @@ factorial	ENDP
 ;	and verify the input was an integer. It will then compare	;
 ;	the user input to the answer of the problem, and reply		;
 ;	accordingly.												;
-;	Parameters: prompt_1, failed_input_1, failed_input_2		;
+;	Parameters: prompt_1										;
 ;	Returns: if user answer was correct							;
 ;	Pre-Condition: answer should be a valid integer				;
 ;---------------------------------------------------------------;
-getData	PROC
-	push	ebp
-	mov		ebp, esp
+getData PROC
+	push    ebp
+	mov     ebp,esp
+	sub		esp, 8								; 2 local varaibles
 
-	StartCall:
-		mWriteString	prompt_1
+	tryAgain:
+		mWriteString   prompt_1
+		mov     edx, [ebp + 12]					; move OFFSET of temp to receive string of integers
+		mov     ecx, 12
+		call    ReadString
+		cmp     eax, 10							; user input was a number larger than 10 bytes
+		jg      invalidInput
 
-		mov		edx, [ebp + 12]						; userinput
-		mov		ecx, 10
-		call	ReadString
-		mov		[ebp + 16], eax						; bytecount
-		mov		ecx, eax							; loop through each char
-		mov		esi, [ebp + 12]						; we need to point towards the start of the string array
+		mov     ecx, eax						; loop through each char in input
+		mov     esi, [ebp + 12]					; point at char in string
+		mov		edx, 0
+		mov		[ebp - 8], edx					; start accumulation at 0
 
-	ValidateInput:
-		lodsb										; load string as byte to ax 8 bit register
-		cmp		al, 48								; compare input to 0 decimal value
-		jl		failedInput							; if its lower, they entered something other than an int
-		cmp		al, 57								; compare input to 9 decimal value
-		jg		failedInput							; if its higher, they entered something other than an int
+	loopString:									; loop validated each char in the input
+		mov     al, [esi]						; move value of char into al register
+		inc     esi								; point to next char in string
+		sub     al, 48d							; subtract 48 from ASCII value of char to get integer  
 
-		cmp		ecx, 0
-		je		verify								; its within the integer range
-		loop	ValidateInput						; keep going until we've hit 0 on the ecx index counter
+		cmp     al ,0							; make sure char is >= 0
+		jl      invalidInput
+		cmp     al, 9							; or <= 9
+		jg      invalidInput
+		; in order to convert, we want to do (i = curNum, n = char index, i * (10 ^ n)
+		; this will allow us to add each additional loop value to edx, to end up with converted string
+		mov		[ebp - 4], eax
+		;push	eax								; ebp - 4
+		mov		ebx, ecx						; n = ecx
+		dec		ebx
+		mov		eax, 1							; (10 ^ n) = eax
+		mov		edi, 10
+		PowerOf:
+			cmp		ebx, 0
+			je		PowerOfDone
+			mul		edi							; eax * 10
+			dec		ebx							; n - 1
+			cmp		ebx, 0
+			jg		PowerOf
+		PowerOfDone:
+		
+		;eax now = (10 ^ n)
+		mov		ebx, eax						; temporarily hold (10 ^ n) in ebx
+		mov		eax, [ebp - 4]					; set eax back to the input char value
 
-	failedInput:
-		mWriteStringLn	failed_input_2
-		jmp		StartCall
+		movzx	edi, al							; move value of al to edi as temp register
+		mov		eax, ebx						; move (10 ^ n) back to eax
+		mul		edi								; eax = i * (10 ^ n)
+		xor		edx, edx
+		mov		edx, [ebp - 8]
+		add		edx, eax						; add eax to accumulation total
+		mov		[ebp - 8], edx
+
+		loop    loopString
+		jmp     Verify
+
+	invalidInput:								; reset registers and variables to 0
+		mov     al, 0
+		mov     eax, 0
+		mov     ebx, [ebp + 8]
+		mov     [ebx], eax
+		mov     ebx, [ebp + 12]
+		mov     [ebx], eax       
+		mWriteStringLn   failed_input_1
+		jmp     tryAgain
 
 	Verify:
-		mov		eax, [ebp + 12]						; user input
-		mov		ebx, [ebp + 8]						; answer
-		cmp		ebx, eax
-		je		answerMatch
+		mov		eax, [ebp + 8]					; answer
+		mov		ebx, [eax]
+		cmp		ebx, edx						; compare answer to input result
+		je		answerRight
 		jne		answerWrong
-
-	answerMatch:
-		mWrite			"There are "
-		mWriteDec		ebx
-		mWrite			" combinations of "
-		mWriteDec		n
-		mWrite			" items from a set of "
-		mWriteDec		r
-		mWrite			". You're correct!"
-		mov		eax, [ebp + 20]
-		inc		eax
-		mov		[ebp + 20], eax						; increase number of problems solved right
-		pop		ebp
-		ret		24
-
-	answerWrong:
-		mWrite			"There are "
-		mWriteDec		ebx
-		mWrite			" combinations of "
-		mWriteDec		n
-		mWrite			" items from a set of "
-		mWriteDec		r
-		mWrite			". You're incorrect!"
-		pop		ebp
-		ret		24
-													; clean the stack 12 bytes
-getData	ENDP
-
-
-
-
-
-getDataInt	PROC
-	push	ebp
-	mov		ebp, esp
-
-	mWriteString	prompt_1
-
-	call	ReadDec
-	cmp		eax, [ebp + 8]							; answer
-	je		answerRight	
-	jne		answerWrong
 
 
 	answerRight:
+		mov				eax, [ebp + 8]
 		mWrite			"There are "
-		mWriteDec		answer
+		mWriteDec		[eax]
 		mWrite			" combinations of "
-		mWriteDec		[ebp + 24]
+		mWriteDec		[ebp + 20]
 		mWrite			" items from a set of "
-		mWriteDec		[ebp + 28]
+		mWriteDec		[ebp + 24]
 		mWriteLn		". You're correct!"
-		mov				eax, [ebp + 20]
+		mov				ebx, [ebp + 16]
+		mov				eax, [ebx]
 		inc				eax
-		mov				[ebp + 20], eax				; increase number of problems solved right
-		mov				problemsRight, eax
+		mov				ebx, [ebp + 16]
+		mov				[ebx], eax
+
+		mov		esp, ebp						; remove locals from stack
 		pop		ebp
-		ret		24
+		ret		20
 
 	answerWrong:
+		mov				eax, [ebp + 8]
 		mWrite			"There are "
-		mWriteDec		answer
+		mWriteDec		[eax]
 		mWrite			" combinations of "
-		mWriteDec		[ebp + 24]
+		mWriteDec		[ebp + 20]
 		mWrite			" items from a set of "
-		mWriteDec		[ebp + 28]
+		mWriteDec		[ebp + 24]
 		mWriteLn		". You're incorrect!"
+
+		mov		esp, ebp						; remove locals from stack
 		pop		ebp
-		ret		24
-getDataInt	ENDP
-
-
-
-
+		ret		20
+getData	ENDP
 
 ;---------------------------------------------------------------;
 ;	The restart procedure will test to see if the user is		;
@@ -476,8 +457,8 @@ getDataInt	ENDP
 ;	introduction where the user will be asked to input more		;
 ;	integers. If anything else is answered, the program will	;
 ;	exit to the OS.												;
-;	Parameters: finished										;
-;	Returns: none												;
+;	Parameters: userinput										;
+;	Returns: eax = 1 if user wishes to restart					;
 ;	Pre-Conditions: none										;
 ;---------------------------------------------------------------;
 restart		PROC
@@ -486,22 +467,21 @@ restart		PROC
 	startOfCall:
 		mWriteString	prompt_2
 	
-		mov		edx, [ebp + 8]						; userinput
+		mov		edx, [ebp + 8]					; userinput
 		mov		ecx, 10
 		call	ReadString
-		mov		[ebp + 12], eax						; bytecount
 
 		mov		esi, [ebp + 8]
-		lodsb										; load string as byte to ax 8 bit register
-		cmp		ax, 89d								; compare input to Y decimal value
+		lodsb									; load string as byte to ax 8 bit register
+		cmp		ax, 89d							; compare input to Y decimal value
 		je		startOver
-		cmp		ax, 121d							; compare input to y decimal value
+		cmp		ax, 121d						; compare input to y decimal value
 		je		startOver
-		cmp		ax, 78d								; compare input to N decimal value
+		cmp		ax, 78d							; compare input to N decimal value
 		je		endProg
-		cmp		ax, 110d							; compare input to n decimal value
+		cmp		ax, 110d						; compare input to n decimal value
 		je		endProg
-		jmp		failedInput							; some other input
+		jmp		failedInput						; some other input
 
 	startOver:
 		mov		eax, 1
@@ -514,11 +494,11 @@ restart		PROC
 		mov		eax, 0
 		call	CrLf
 		mWriteStringLn	finished
-		pop ebp
+		pop		ebp
 		ret		4
 
 	failedInput:
-		mWriteString	failed_input_2
+		mWriteStringLn	failed_input_2
 		jmp		startOfCall
 
 	

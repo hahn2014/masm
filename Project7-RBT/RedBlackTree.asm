@@ -14,6 +14,7 @@ INCLUDE Irvine32.inc
 .data
 MINIMUM			=		1																					; The min number of nodes that can be written
 MAXIMUM			=		500																					; The max number of nodes that can be written
+MAXIMUMVAL		=		1000																				; highest value enterable into the array
 unsorted_list	DWORD	MAXIMUM DUP(?)																		; The list that unsorted values will be placed in with a max array size of 500
 BUFFER_SIZE		=       5000																				; Max size for a file buffer
 buffer			DWORD   BUFFER_SIZE dup (?)																	; file buffer
@@ -247,15 +248,20 @@ PropSpacing PROC
 	jl				singleDigit
 	cmp				eax, 100
 	jl				doubleDigit
-	jmp				tripleDigit
+	cmp				eax, 1000
+	jl				tripleDigit
+	jmp				quadrupleDigit
 
 	singleDigit:
-		mov			edi, 4
+		mov			edi, 5
 		jmp			printLoop
 	doubleDigit:
-		mov			edi, 3
+		mov			edi, 4
 		jmp			printLoop
 	tripleDigit:
+		mov			edi, 3
+		jmp			printLoop
+	quadrupleDigit:
 		mov			edi, 2
 		jmp			printLoop
 
@@ -265,7 +271,51 @@ PropSpacing PROC
 		cmp			edi, 0
 		jg			printLoop
 		ret
-propSpacing	ENDP
+PropSpacing	ENDP
+
+;---------------------------------------------------------------;
+;	The VerifyDuplicates procedure will be called each time a	;
+;	a value is about to be inserted into the unsorted list.		;
+;	This will ensure that the list remains filled with variable	;
+;	values.														;
+;																;
+;	Parameters:		push all registers to stack to save any		;
+;						valuable information. Then the compare	;
+;						value (putting it at ebp + 8)			;
+;	Returns:		edi = 1 if duplicate, 0 if not duplicate	;
+;	Pre-Conditions:	ebp + 8 contains an integer					;
+;	Changed Regs:	eax, ecx, ebx, esi, edi, ebp				;
+;---------------------------------------------------------------;
+VerifyDuplicates PROC
+	push			ebp
+	mov				ebp, esp
+
+	mov				ebx, 0
+	mov				esi, OFFSET unsorted_list
+	LoopThroughArray:
+		mov			eax, [esi + ebx * 4]																	; move current index value to eax
+		mov			ecx, [ebp + 8]																			; move reference generated value to ecx
+		cmp			eax, 0																					; first 0 we encounter is the end of the array
+		je			NoDuplicateValue																		; if we're still in the loop and hit a 0, there were no dupes
+		cmp			eax, ecx																				; compare generated to current array index
+		je			DuplicateValue																			; if they're the same it's equal
+		inc			ebx																						; next index
+		cmp			ebx, LENGTHOF unsorted_list																; test if we're at the end of the list
+		je			NoDuplicateValue
+		jne			LoopThroughArray
+	DuplicateValue:
+		mov			edi, 1																					; return 1 (for compare method to know it's a dupe)
+		;mWriteDec	ecx
+		;mWriteLn	" is a duplicate value!"
+		pop			ebp
+		ret
+	NoDuplicateValue:
+		mov			edi, 0																					; return 0 (for compare method to know it's not a dupe)
+		;mWriteDec	ecx
+		;mWriteLn	" is not a duplicate value!"
+		pop			ebp
+		ret
+VerifyDuplicates ENDP
 
 ;#region File Data Input
 
@@ -342,8 +392,6 @@ AsciiToInt PROC
 		ret
 AsciiToInt ENDP
 
-
-
 ;#endregion
 
 ;#region Generate Data Input
@@ -370,11 +418,22 @@ GenerateValuesOption PROC
 	mov				esi, OFFSET unsorted_list																; point to array address
 	mov				ebx, 0
 	GenerateRandNum:
-		mov			eax, MAXIMUM																			; eax will be the max range to generate
-		dec			eax																						; 499 is where we want, because randomrange includes 0.
+		mov			eax, MAXIMUMVAL																			; eax will be the max range to generate
+		dec			eax																						; 999 is where we want, because randomrange includes 0.
 		call		RandomRange
-		inc			eax																						; this now gives us a random value from 1 to 500.
-		mov			[esi + ebx * 4], eax																	; store the generated value into array[loop count * 4 bytes]
+		inc			eax																						; this now gives us a random value from 1 to 1000.
+		
+		push		ebx																						; save all register values
+		push		ecx
+		push		eax
+		call		VerifyDuplicates																		; Ensure there is no dupe
+		pop			eax
+		pop			ecx
+		pop			ebx																						; restore all register values
+		
+		cmp			edi, 1																					; VerifyDuplicates will return 1 if true
+		je			GenerateRandNum																			; if true, we need to gen a different number on the same index
+		mov			[esi + ebx * 4], eax																	; no dupe, store the generated value into array[loop count * 4 bytes]
 		inc			ebx																						; update index counter
 		loop		GenerateRandNum																			; keep going until ecx = 0
 
@@ -400,9 +459,9 @@ GetGenerationCount PROC
 		call		ReadDec
 
 	VerifyInput:
-		cmp			eax, 1																					; user inputed a value too low
+		cmp			eax, MINIMUM																			; user inputed a value too low
 		jl			InvalidInput
-		cmp			eax, 500																				; user inputed a value too high
+		cmp			eax, MAXIMUM																			; user inputed a value too high
 		jg			InvalidInput
 		jmp			ValidInput																				; input is within range
 
@@ -470,11 +529,11 @@ InputValuesOption ENDP
 GetUserInputData PROC
 	GetValue:
 		xor			eax, eax																				; completly clear eax register
-		mWrite		"Please enter a data value [1-500] or 0 to stop:"
+		mWrite		"Please enter a data value [1-1000] or 0 to stop:"
 		call		ReadDec
 
 	VerifyInput:
-		cmp			eax, MAXIMUM
+		cmp			eax, MAXIMUMVAL
 		jg			InvalidInput
 		cmp			eax, 0
 		je			ValidInput

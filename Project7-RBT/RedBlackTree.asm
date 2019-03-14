@@ -499,10 +499,22 @@ InputValuesOption PROC
 		je			DoneWithInput
 		jmp			AddToArray
 	AddToArray:
+		push		ecx																						; save all register values
+		push		eax
+		call		VerifyDuplicates																		; Ensure there is no dupe
+		pop			eax
+		pop			ecx																						; restore all register values
+		
+		cmp			edi, 1																					; VerifyDuplicates will return 1 if true
+		je			DuplicateInput
 		mov			[esi + ecx * 4], eax																	; store value to array[index * 4 bytes]
 		inc			ecx																						; next index value
 		cmp			ecx, MAXIMUM																			; make sure we haven't hit 500
 		je			MaxInputs
+		jmp			NewInput
+	DuplicateInput:
+		mWriteDec	eax
+		mWriteLn	" was a duplicate! Please enter a different value."
 		jmp			NewInput
 	MaxInputs:
 		mWriteLn	"You've Inputted the max number of inputs for the tree.."

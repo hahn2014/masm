@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/14/19 14:41:54
+Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/14/19 14:47:20
 ,Project 7 - RedBlackTree		(RedBlackTree.asm    Page 1 - 1
 
 
@@ -579,7 +579,7 @@ Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/14/19 14:41:54
  0000022A  E8 00000000 E     1		call	CrLf
  0000022F  E8 FFFFFE9C				call		PrintUnsortedList																		; give the user a full list of unsorted values
  00000234  68 00000000 R			push		OFFSET unsorted_list																	; make sure we have access to the unsorted list
- 00000239  E8 0000017F				call		SortToTree																				; call the sort procedure
+ 00000239  E8 000001A9				call		SortToTree																				; call the sort procedure
  0000023E  C3					ret
  0000023F			LoadFileOption ENDP
 
@@ -679,7 +679,7 @@ Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/14/19 14:41:54
 
  000002C0  E8 FFFFFE0B			call			PrintUnsortedList																		; give the user a full list of unsorted values
  000002C5  68 00000000 R		push			OFFSET unsorted_list																	; make sure we have access to the unsorted list
- 000002CA  E8 000000EE			call			SortToTree																				; call the sort procedure
+ 000002CA  E8 00000118			call			SortToTree																				; call the sort procedure
  000002CF  C3				ret
  000002D0			GenerateValuesOption ENDP
 
@@ -781,20 +781,53 @@ Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/14/19 14:41:54
  00000318  BE 00000000 R		mov				esi, OFFSET unsorted_list
  0000031D  B9 00000000			mov				ecx, 0
  00000322				NewInput:
- 00000322  E8 0000005C				call		GetUserInputData
+ 00000322  E8 00000086				call		GetUserInputData
  00000327  83 F8 00				cmp			eax, 0
- 0000032A  74 21				je			DoneWithInput
+ 0000032A  74 4B				je			DoneWithInput
  0000032C  EB 00				jmp			AddToArray
  0000032E				AddToArray:
- 0000032E  89 04 8E				mov			[esi + ecx * 4], eax																	; store value to array[index * 4 bytes]
- 00000331  41					inc			ecx																						; next index value
- 00000332  81 F9 000001F4			cmp			ecx, MAXIMUM																			; make sure we haven't hit 500
- 00000338  74 02				je			MaxInputs
- 0000033A  EB E6				jmp			NewInput
- 0000033C				MaxInputs:
-						mWriteLn	"You've Inputted the max number of inputs for the tree.."
+ 0000032E  51					push		ecx																						; save all register values
+ 0000032F  50					push		eax
+ 00000330  E8 FFFFFE39				call		VerifyDuplicates																		; Ensure there is no dupe
+ 00000335  58					pop			eax
+ 00000336  59					pop			ecx																						; restore all register values
+						
+ 00000337  83 FF 01				cmp			edi, 1																					; VerifyDuplicates will return 1 if true
+ 0000033A  74 0E				je			DuplicateInput
+ 0000033C  89 04 8E				mov			[esi + ecx * 4], eax																	; store value to array[index * 4 bytes]
+ 0000033F  41					inc			ecx																						; next index value
+ 00000340  81 F9 000001F4			cmp			ecx, MAXIMUM																			; make sure we haven't hit 500
+ 00000346  74 1E				je			MaxInputs
+ 00000348  EB D8				jmp			NewInput
+ 0000034A				DuplicateInput:
+						mWriteDec	eax
+ 0000034A  50		     1		push	eax
+ 0000034B  8B C0	     1		mov		eax, eax
+ 0000034D  E8 00000000 E     1		call	WriteDec
+ 00000352  58		     1		pop		eax
+						mWriteLn	" was a duplicate! Please enter a different value."
  00005869		     2		.data
- 00005869 59 6F 75 27 76     2		??0011	BYTE	"You've Inputted the max number of inputs for the tree..", 0
+ 00005869 20 77 61 73 20     2		??0011	BYTE	" was a duplicate! Please enter a different value.", 0
+	   61 20 64 75 70
+	   6C 69 63 61 74
+	   65 21 20 50 6C
+	   65 61 73 65 20
+	   65 6E 74 65 72
+	   20 61 20 64 69
+	   66 66 65 72 65
+	   6E 74 20 76 61
+	   6C 75 65 2E 00
+ 00000353		     2		.code
+ 00000353  52		     2		push	edx
+ 00000354  BA 00005869 R     2		mov		edx, OFFSET ??0011
+ 00000359  E8 00000000 E     2		call	WriteString
+ 0000035E  5A		     2		pop		edx
+ 0000035F  E8 00000000 E     1		call	CrLf
+ 00000364  EB BC				jmp			NewInput
+ 00000366				MaxInputs:
+						mWriteLn	"You've Inputted the max number of inputs for the tree.."
+ 0000589B		     2		.data
+ 0000589B 59 6F 75 27 76     2		??0012	BYTE	"You've Inputted the max number of inputs for the tree..", 0
 	   65 20 49 6E 70
 	   75 74 74 65 64
 	   20 74 68 65 20
@@ -806,46 +839,46 @@ Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/14/19 14:41:54
 	   74 68 65 20 74
 	   72 65 65 2E 2E
 	   00
- 0000033C		     2		.code
- 0000033C  52		     2		push	edx
- 0000033D  BA 00005869 R     2		mov		edx, OFFSET ??0011
- 00000342  E8 00000000 E     2		call	WriteString
- 00000347  5A		     2		pop		edx
- 00000348  E8 00000000 E     1		call	CrLf
- 0000034D				DoneWithInput:
+ 00000366		     2		.code
+ 00000366  52		     2		push	edx
+ 00000367  BA 0000589B R     2		mov		edx, OFFSET ??0012
+ 0000036C  E8 00000000 E     2		call	WriteString
+ 00000371  5A		     2		pop		edx
+ 00000372  E8 00000000 E     1		call	CrLf
+ 00000377				DoneWithInput:
 						mWrite		"Now printing your "
- 000058A1		     1		.data
- 000058A1 4E 6F 77 20 70     1		??0012	BYTE	"Now printing your ", 0
+ 000058D3		     1		.data
+ 000058D3 4E 6F 77 20 70     1		??0013	BYTE	"Now printing your ", 0
 	   72 69 6E 74 69
 	   6E 67 20 79 6F
 	   75 72 20 00
- 0000034D		     1		.code
- 0000034D  52		     1		push	edx
- 0000034E  BA 000058A1 R     1		mov		edx, OFFSET ??0012
- 00000353  E8 00000000 E     1		call	WriteString
- 00000358  5A		     1		pop		edx
+ 00000377		     1		.code
+ 00000377  52		     1		push	edx
+ 00000378  BA 000058D3 R     1		mov		edx, OFFSET ??0013
+ 0000037D  E8 00000000 E     1		call	WriteString
+ 00000382  5A		     1		pop		edx
 						mWriteDec	ecx
- 00000359  50		     1		push	eax
- 0000035A  8B C1	     1		mov		eax, ecx
- 0000035C  E8 00000000 E     1		call	WriteDec
- 00000361  58		     1		pop		eax
+ 00000383  50		     1		push	eax
+ 00000384  8B C1	     1		mov		eax, ecx
+ 00000386  E8 00000000 E     1		call	WriteDec
+ 0000038B  58		     1		pop		eax
 						mWriteLn	" inputted values:"
- 000058B4		     2		.data
- 000058B4 20 69 6E 70 75     2		??0013	BYTE	" inputted values:", 0
+ 000058E6		     2		.data
+ 000058E6 20 69 6E 70 75     2		??0014	BYTE	" inputted values:", 0
 	   74 74 65 64 20
 	   76 61 6C 75 65
 	   73 3A 00
- 00000362		     2		.code
- 00000362  52		     2		push	edx
- 00000363  BA 000058B4 R     2		mov		edx, OFFSET ??0013
- 00000368  E8 00000000 E     2		call	WriteString
- 0000036D  5A		     2		pop		edx
- 0000036E  E8 00000000 E     1		call	CrLf
- 00000373  E8 FFFFFD58				call		PrintUnsortedList																		; give the user a full list of unsorted values
- 00000378  68 00000000 R			push		OFFSET unsorted_list																	; make sure we have access to the unsorted list
- 0000037D  E8 0000003B				call		SortToTree																				; call the sort procedure
- 00000382  C3					ret
- 00000383			InputValuesOption ENDP
+ 0000038C		     2		.code
+ 0000038C  52		     2		push	edx
+ 0000038D  BA 000058E6 R     2		mov		edx, OFFSET ??0014
+ 00000392  E8 00000000 E     2		call	WriteString
+ 00000397  5A		     2		pop		edx
+ 00000398  E8 00000000 E     1		call	CrLf
+ 0000039D  E8 FFFFFD2E				call		PrintUnsortedList																		; give the user a full list of unsorted values
+ 000003A2  68 00000000 R			push		OFFSET unsorted_list																	; make sure we have access to the unsorted list
+ 000003A7  E8 0000003B				call		SortToTree																				; call the sort procedure
+ 000003AC  C3					ret
+ 000003AD			InputValuesOption ENDP
 
 				;---------------------------------------------------------------;
 				;	The GetUserInputData procedure is called when the program	;
@@ -857,12 +890,12 @@ Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/14/19 14:41:54
 				;	Pre-Conditions:	n/a											;
 				;	Changed Regs:	eax, edx									;
 				;---------------------------------------------------------------;
- 00000383			GetUserInputData PROC
- 00000383				GetValue:
- 00000383  33 C0				xor			eax, eax																				; completly clear eax register
+ 000003AD			GetUserInputData PROC
+ 000003AD				GetValue:
+ 000003AD  33 C0				xor			eax, eax																				; completly clear eax register
 						mWrite		"Please enter a data value [1-1000] or 0 to stop:"
- 000058C6		     1		.data
- 000058C6 50 6C 65 61 73     1		??0014	BYTE	"Please enter a data value [1-1000] or 0 to stop:", 0
+ 000058F8		     1		.data
+ 000058F8 50 6C 65 61 73     1		??0015	BYTE	"Please enter a data value [1-1000] or 0 to stop:", 0
 	   65 20 65 6E 74
 	   65 72 20 61 20
 	   64 61 74 61 20
@@ -872,26 +905,26 @@ Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/14/19 14:41:54
 	   6F 72 20 30 20
 	   74 6F 20 73 74
 	   6F 70 3A 00
- 00000385		     1		.code
- 00000385  52		     1		push	edx
- 00000386  BA 000058C6 R     1		mov		edx, OFFSET ??0014
- 0000038B  E8 00000000 E     1		call	WriteString
- 00000390  5A		     1		pop		edx
- 00000391  E8 00000000 E			call		ReadDec
+ 000003AF		     1		.code
+ 000003AF  52		     1		push	edx
+ 000003B0  BA 000058F8 R     1		mov		edx, OFFSET ??0015
+ 000003B5  E8 00000000 E     1		call	WriteString
+ 000003BA  5A		     1		pop		edx
+ 000003BB  E8 00000000 E			call		ReadDec
 
- 00000396				VerifyInput:
- 00000396  3D 000003E8				cmp			eax, MAXIMUMVAL
- 0000039B  7F 0C				jg			InvalidInput
- 0000039D  83 F8 00				cmp			eax, 0
- 000003A0  74 1A				je			ValidInput
- 000003A2  83 F8 01				cmp			eax, MINIMUM
- 000003A5  7C 02				jl			InvalidInput
- 000003A7  EB 13				jmp			ValidInput
+ 000003C0				VerifyInput:
+ 000003C0  3D 000003E8				cmp			eax, MAXIMUMVAL
+ 000003C5  7F 0C				jg			InvalidInput
+ 000003C7  83 F8 00				cmp			eax, 0
+ 000003CA  74 1A				je			ValidInput
+ 000003CC  83 F8 01				cmp			eax, MINIMUM
+ 000003CF  7C 02				jl			InvalidInput
+ 000003D1  EB 13				jmp			ValidInput
 
- 000003A9				InvalidInput:
+ 000003D3				InvalidInput:
 						mWriteLn	"The entered value was not within the defined range."
- 000058F7		     2		.data
- 000058F7 54 68 65 20 65     2		??0015	BYTE	"The entered value was not within the defined range.", 0
+ 00005929		     2		.data
+ 00005929 54 68 65 20 65     2		??0016	BYTE	"The entered value was not within the defined range.", 0
 	   6E 74 65 72 65
 	   64 20 76 61 6C
 	   75 65 20 77 61
@@ -902,29 +935,29 @@ Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/14/19 14:41:54
 	   69 6E 65 64 20
 	   72 61 6E 67 65
 	   2E 00
- 000003A9		     2		.code
- 000003A9  52		     2		push	edx
- 000003AA  BA 000058F7 R     2		mov		edx, OFFSET ??0015
- 000003AF  E8 00000000 E     2		call	WriteString
- 000003B4  5A		     2		pop		edx
- 000003B5  E8 00000000 E     1		call	CrLf
- 000003BA  EB C7				jmp			GetValue
- 000003BC				ValidInput:
- 000003BC  C3					ret
- 000003BD			GetUserInputData ENDP
+ 000003D3		     2		.code
+ 000003D3  52		     2		push	edx
+ 000003D4  BA 00005929 R     2		mov		edx, OFFSET ??0016
+ 000003D9  E8 00000000 E     2		call	WriteString
+ 000003DE  5A		     2		pop		edx
+ 000003DF  E8 00000000 E     1		call	CrLf
+ 000003E4  EB C7				jmp			GetValue
+ 000003E6				ValidInput:
+ 000003E6  C3					ret
+ 000003E7			GetUserInputData ENDP
 
 
 				;#endregion
 
 				;#region Red-Black Tree Methods
 
- 000003BD			SortToTree PROC
- 000003BD  55				push			ebp
- 000003BE  8B EC			mov				ebp, esp
+ 000003E7			SortToTree PROC
+ 000003E7  55				push			ebp
+ 000003E8  8B EC			mov				ebp, esp
 
 					mWriteLn		"Now sorting list to Red-Black Tree:"
- 0000592B		     2		.data
- 0000592B 4E 6F 77 20 73     2		??0016	BYTE	"Now sorting list to Red-Black Tree:", 0
+ 0000595D		     2		.data
+ 0000595D 4E 6F 77 20 73     2		??0017	BYTE	"Now sorting list to Red-Black Tree:", 0
 	   6F 72 74 69 6E
 	   67 20 6C 69 73
 	   74 20 74 6F 20
@@ -932,15 +965,15 @@ Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/14/19 14:41:54
 	   6C 61 63 6B 20
 	   54 72 65 65 3A
 	   00
- 000003C0		     2		.code
- 000003C0  52		     2		push	edx
- 000003C1  BA 0000592B R     2		mov		edx, OFFSET ??0016
- 000003C6  E8 00000000 E     2		call	WriteString
- 000003CB  5A		     2		pop		edx
- 000003CC  E8 00000000 E     1		call	CrLf
+ 000003EA		     2		.code
+ 000003EA  52		     2		push	edx
+ 000003EB  BA 0000595D R     2		mov		edx, OFFSET ??0017
+ 000003F0  E8 00000000 E     2		call	WriteString
+ 000003F5  5A		     2		pop		edx
+ 000003F6  E8 00000000 E     1		call	CrLf
 					mWriteLn		"lol if you thought this would be done first you're incredibly mistaken"
- 0000594F		     2		.data
- 0000594F 6C 6F 6C 20 69     2		??0017	BYTE	"lol if you thought this would be done first you're incredibly mistaken", 0
+ 00005981		     2		.data
+ 00005981 6C 6F 6C 20 69     2		??0018	BYTE	"lol if you thought this would be done first you're incredibly mistaken", 0
 	   66 20 79 6F 75
 	   20 74 68 6F 75
 	   67 68 74 20 74
@@ -955,22 +988,22 @@ Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/14/19 14:41:54
 	   79 20 6D 69 73
 	   74 61 6B 65 6E
 	   00
- 000003D1		     2		.code
- 000003D1  52		     2		push	edx
- 000003D2  BA 0000594F R     2		mov		edx, OFFSET ??0017
- 000003D7  E8 00000000 E     2		call	WriteString
- 000003DC  5A		     2		pop		edx
- 000003DD  E8 00000000 E     1		call	CrLf
+ 000003FB		     2		.code
+ 000003FB  52		     2		push	edx
+ 000003FC  BA 00005981 R     2		mov		edx, OFFSET ??0018
+ 00000401  E8 00000000 E     2		call	WriteString
+ 00000406  5A		     2		pop		edx
+ 00000407  E8 00000000 E     1		call	CrLf
 
- 000003E2  5D				pop				ebp
- 000003E3  C2 0004			ret 4
- 000003E6			SortToTree ENDP
+ 0000040C  5D				pop				ebp
+ 0000040D  C2 0004			ret 4
+ 00000410			SortToTree ENDP
 
 
 				;#endregion
 
 				END main																									; the symbolyses that the main program is finished
-Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/14/19 14:41:54
+Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/14/19 14:47:20
 ,Project 7 - RedBlackTree		(RedBlackTree.asm    Symbols 2 - 1
 
 
@@ -1075,8 +1108,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00005996 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 000003E6 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 000059C8 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000410 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -1131,11 +1164,11 @@ GetStdHandle . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 GetSystemTime  . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 GetTextColor . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 GetTickCount . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-GetUserInputData . . . . . . . .	P Near	 00000383 _TEXT	Length= 0000003A Public STDCALL
-  GetValue . . . . . . . . . . .	L Near	 00000383 _TEXT	
-  VerifyInput  . . . . . . . . .	L Near	 00000396 _TEXT	
-  InvalidInput . . . . . . . . .	L Near	 000003A9 _TEXT	
-  ValidInput . . . . . . . . . .	L Near	 000003BC _TEXT	
+GetUserInputData . . . . . . . .	P Near	 000003AD _TEXT	Length= 0000003A Public STDCALL
+  GetValue . . . . . . . . . . .	L Near	 000003AD _TEXT	
+  VerifyInput  . . . . . . . . .	L Near	 000003C0 _TEXT	
+  InvalidInput . . . . . . . . .	L Near	 000003D3 _TEXT	
+  ValidInput . . . . . . . . . .	L Near	 000003E6 _TEXT	
 GetUserRunOption . . . . . . . .	P Near	 0000006A _TEXT	Length= 00000031 Public STDCALL
   startUserInput . . . . . . . .	L Near	 0000006A _TEXT	
   verifyUserInput  . . . . . . .	L Near	 0000007D _TEXT	
@@ -1146,11 +1179,12 @@ HeapCreate . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 HeapDestroy  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 HeapFree . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 HeapSize . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-InputValuesOption  . . . . . . .	P Near	 00000318 _TEXT	Length= 0000006B Public STDCALL
+InputValuesOption  . . . . . . .	P Near	 00000318 _TEXT	Length= 00000095 Public STDCALL
   NewInput . . . . . . . . . . .	L Near	 00000322 _TEXT	
   AddToArray . . . . . . . . . .	L Near	 0000032E _TEXT	
-  MaxInputs  . . . . . . . . . .	L Near	 0000033C _TEXT	
-  DoneWithInput  . . . . . . . .	L Near	 0000034D _TEXT	
+  DuplicateInput . . . . . . . .	L Near	 0000034A _TEXT	
+  MaxInputs  . . . . . . . . . .	L Near	 00000366 _TEXT	
+  DoneWithInput  . . . . . . . .	L Near	 00000377 _TEXT	
 Intro  . . . . . . . . . . . . .	P Near	 00000016 _TEXT	Length= 00000054 Public STDCALL
 IsDigit  . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 LoadFileOption . . . . . . . . .	P Near	 000001A3 _TEXT	Length= 0000009C Public STDCALL
@@ -1203,7 +1237,7 @@ SetLocalTime . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 SetTextColor . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 ShowFPUStack . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Sleep  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-SortToTree . . . . . . . . . . .	P Near	 000003BD _TEXT	Length= 00000029 Public STDCALL
+SortToTree . . . . . . . . . . .	P Near	 000003E7 _TEXT	Length= 00000029 Public STDCALL
 StrLength  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Str_compare  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 Str_copy . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
@@ -1261,12 +1295,13 @@ Symbols:
 ??000F . . . . . . . . . . . . .	Byte	 00005831 _DATA	
 ??0010 . . . . . . . . . . . . .	Byte	 00005844 _DATA	
 ??0011 . . . . . . . . . . . . .	Byte	 00005869 _DATA	
-??0012 . . . . . . . . . . . . .	Byte	 000058A1 _DATA	
-??0013 . . . . . . . . . . . . .	Byte	 000058B4 _DATA	
-??0014 . . . . . . . . . . . . .	Byte	 000058C6 _DATA	
-??0015 . . . . . . . . . . . . .	Byte	 000058F7 _DATA	
-??0016 . . . . . . . . . . . . .	Byte	 0000592B _DATA	
-??0017 . . . . . . . . . . . . .	Byte	 0000594F _DATA	
+??0012 . . . . . . . . . . . . .	Byte	 0000589B _DATA	
+??0013 . . . . . . . . . . . . .	Byte	 000058D3 _DATA	
+??0014 . . . . . . . . . . . . .	Byte	 000058E6 _DATA	
+??0015 . . . . . . . . . . . . .	Byte	 000058F8 _DATA	
+??0016 . . . . . . . . . . . . .	Byte	 00005929 _DATA	
+??0017 . . . . . . . . . . . . .	Byte	 0000595D _DATA	
+??0018 . . . . . . . . . . . . .	Byte	 00005981 _DATA	
 @CodeSize  . . . . . . . . . . .	Number	 00000000h   
 @DataSize  . . . . . . . . . . .	Number	 00000000h   
 @Interface . . . . . . . . . . .	Number	 00000003h   

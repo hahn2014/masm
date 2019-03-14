@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/12/19 17:45:29
+Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/14/19 11:41:37
 Program 6B		(Project6B.asm			     Page 1 - 1
 
 
@@ -245,12 +245,13 @@ Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/12/19 17:45:29
  = 0000000C			nMAXNUM			=		12																					; The maximum range for n
  = 00000003			nMINNUM			=		3																					; The minimum range for n
  = 00000001			rMINNUM			=		1																					; The lowest number that can be generated for r
- 000003AF 00000000		problemNum		DWORD	0
- 000003B3 00000000		problemsRight	DWORD	0
- 000003B7 00000000		n				DWORD	?
- 000003BB 00000000		r				DWORD	?
- 000003BF 00000000		answer			DWORD	?
- 000003C3  0000000A [		userinput		BYTE	10 DUP(0)
+ 000003AF 00000000		FLValue			DWORD	?
+ 000003B3 00000000		problemNum		DWORD	0
+ 000003B7 00000000		problemsRight	DWORD	0
+ 000003BB 00000000		n				DWORD	?
+ 000003BF 00000000		r				DWORD	?
+ 000003C3 00000000		answer			DWORD	?
+ 000003C7  0000000A [		userinput		BYTE	10 DUP(0)
 	    00
 	   ]
 
@@ -329,35 +330,36 @@ Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/12/19 17:45:29
  00000000  E8 00000000 E			call	Randomize						; set the time seed for the randomize functions in order to keep the generator psuedo-random
 
 					;-----------Display Program Intro-----------;
- 00000005  E8 00000056				call	intro
+ 00000005  E8 0000005C				call	intro
 
  0000000A					NewProblem:
 					;-----------Generate A Problem--------------;
- 0000000A  FF 35 000003B7 R			push	n								; +24
- 00000010  FF 35 000003BB R			push	r								; +20
- 00000016  68 000003BF R			push	OFFSET	answer					; +16
- 0000001B  68 000003AF R			push	OFFSET	problemNum				; +12
- 00000020  68 000003B3 R			push	OFFSET	problemsRight			; +8
- 00000025  E8 000000C9				call	showProblem
+ 0000000A  FF 35 000003AF R			push	FLValue							; +28
+ 00000010  FF 35 000003BB R			push	n								; +24
+ 00000016  FF 35 000003BF R			push	r								; +20
+ 0000001C  68 000003C3 R			push	OFFSET	answer					; +16
+ 00000021  68 000003B3 R			push	OFFSET	problemNum				; +12
+ 00000026  68 000003B7 R			push	OFFSET	problemsRight			; +8
+ 0000002B  E8 000000D3				call	showProblem
 
 					;-----------Get User Input------------------;
- 0000002A  FF 35 000003B7 R			push	n								; +24
- 00000030  FF 35 000003BB R			push	r								; +20
- 00000036  68 000003B3 R			push	OFFSET	problemsRight			; +16
- 0000003B  68 000003C3 R			push	OFFSET	userinput				; +12
- 00000040  68 000003BF R			push	OFFSET	answer					; +8
- 00000045  E8 000001D8				call	getData							; Change to Int for temp solution, or just getData for true finished product
+ 00000030  FF 35 000003BB R			push	n								; +24
+ 00000036  FF 35 000003BF R			push	r								; +20
+ 0000003C  68 000003B7 R			push	OFFSET	problemsRight			; +16
+ 00000041  68 000003C7 R			push	OFFSET	userinput				; +12
+ 00000046  68 000003C3 R			push	OFFSET	answer					; +8
+ 0000004B  E8 000001EA				call	getData							; Change to Int for temp solution, or just getData for true finished product
 
 					;------------End Of The Program-------------;
- 0000004A  68 000003C3 R			push	OFFSET	userinput				; +8
- 0000004F  E8 00000336				call	restart
+ 00000050  68 000003C7 R			push	OFFSET	userinput				; +8
+ 00000055  E8 00000348				call	restart
+ 0000005A  83 F8 01				cmp		eax, 1
+ 0000005D  74 AB				je		NewProblem
 
- 00000054  83 F8 01				cmp		eax, 1
- 00000057  74 B1				je		NewProblem
 					exit										; close program, return to OS
- 00000059  6A 00	   *	    push   +000000000h
- 0000005B  E8 00000000 E   *	    call   ExitProcess
- 00000060			main	ENDP									; the main PROC is finished, this symbolyses that we are done with the proc
+ 0000005F  6A 00	   *	    push   +000000000h
+ 00000061  E8 00000000 E   *	    call   ExitProcess
+ 00000066			main	ENDP									; the main PROC is finished, this symbolyses that we are done with the proc
 
 				;---------------------------------------------------------------;
 				;	The intro procedure will be called right off the bat, sort	;
@@ -370,61 +372,63 @@ Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/12/19 17:45:29
 				;	Returns: n/a												;
 				;	Pre-Conditions: called varaibles must be real strings		;
 				;---------------------------------------------------------------;
- 00000060			intro	PROC
- 00000060  B8 00000017			mov		eax, lightGray + (blue * 16)		; color varaibles consist of: black, white, brown, yellow, blue, green, cyan, red, magenta, gray, lightBlue, lightGreen, lightCyan, lightRed, lightMagenta, and lightGray.
- 00000065  E8 00000000 E		call	setTextColor						; EXTRA CREDIT: change background and foreground colors
+ 00000066			intro	PROC
+ 00000066  B8 00000003			mov		eax, cyan + (black * 16)			; color varaibles consist of: black, white, brown, yellow, blue, green, cyan, red, magenta, gray, lightBlue, lightGreen, lightCyan, lightRed, lightMagenta, and lightGray.
+ 0000006B  E8 00000000 E		call	setTextColor						; EXTRA CREDIT: change background and foreground colors
 
 					mWriteStringLn	project
- 0000006A  52		     2		push	edx
- 0000006B  BA 00000000 R     2		mov		edx, OFFSET project
- 00000070  E8 00000000 E     2		call	WriteString
- 00000075  5A		     2		pop		edx
- 00000076  E8 00000000 E     1		call	CrLf
+ 00000070  52		     2		push	edx
+ 00000071  BA 00000000 R     2		mov		edx, OFFSET project
+ 00000076  E8 00000000 E     2		call	WriteString
+ 0000007B  5A		     2		pop		edx
+ 0000007C  E8 00000000 E     1		call	CrLf
 					mWriteStringLn	intro_1
- 0000007B  52		     2		push	edx
- 0000007C  BA 00000031 R     2		mov		edx, OFFSET intro_1
- 00000081  E8 00000000 E     2		call	WriteString
- 00000086  5A		     2		pop		edx
- 00000087  E8 00000000 E     1		call	CrLf
+ 00000081  52		     2		push	edx
+ 00000082  BA 00000031 R     2		mov		edx, OFFSET intro_1
+ 00000087  E8 00000000 E     2		call	WriteString
+ 0000008C  5A		     2		pop		edx
+ 0000008D  E8 00000000 E     1		call	CrLf
 					mWriteStringLn	intro_2
- 0000008C  52		     2		push	edx
- 0000008D  BA 00000082 R     2		mov		edx, OFFSET intro_2
- 00000092  E8 00000000 E     2		call	WriteString
- 00000097  5A		     2		pop		edx
- 00000098  E8 00000000 E     1		call	CrLf
+ 00000092  52		     2		push	edx
+ 00000093  BA 00000082 R     2		mov		edx, OFFSET intro_2
+ 00000098  E8 00000000 E     2		call	WriteString
+ 0000009D  5A		     2		pop		edx
+ 0000009E  E8 00000000 E     1		call	CrLf
 					mWriteStringLn	intro_3
- 0000009D  52		     2		push	edx
- 0000009E  BA 000000CF R     2		mov		edx, OFFSET intro_3
- 000000A3  E8 00000000 E     2		call	WriteString
- 000000A8  5A		     2		pop		edx
- 000000A9  E8 00000000 E     1		call	CrLf
+ 000000A3  52		     2		push	edx
+ 000000A4  BA 000000CF R     2		mov		edx, OFFSET intro_3
+ 000000A9  E8 00000000 E     2		call	WriteString
+ 000000AE  5A		     2		pop		edx
+ 000000AF  E8 00000000 E     1		call	CrLf
 					mWriteStringLn	intro_4
- 000000AE  52		     2		push	edx
- 000000AF  BA 0000011D R     2		mov		edx, OFFSET intro_4
- 000000B4  E8 00000000 E     2		call	WriteString
- 000000B9  5A		     2		pop		edx
- 000000BA  E8 00000000 E     1		call	CrLf
+ 000000B4  52		     2		push	edx
+ 000000B5  BA 0000011D R     2		mov		edx, OFFSET intro_4
+ 000000BA  E8 00000000 E     2		call	WriteString
+ 000000BF  5A		     2		pop		edx
+ 000000C0  E8 00000000 E     1		call	CrLf
 					mWriteStringLn	intro_5
- 000000BF  52		     2		push	edx
- 000000C0  BA 0000016D R     2		mov		edx, OFFSET intro_5
- 000000C5  E8 00000000 E     2		call	WriteString
- 000000CA  5A		     2		pop		edx
- 000000CB  E8 00000000 E     1		call	CrLf
+ 000000C5  52		     2		push	edx
+ 000000C6  BA 0000016D R     2		mov		edx, OFFSET intro_5
+ 000000CB  E8 00000000 E     2		call	WriteString
+ 000000D0  5A		     2		pop		edx
+ 000000D1  E8 00000000 E     1		call	CrLf
 					mWriteStringLn	EC_intro_1
- 000000D0  52		     2		push	edx
- 000000D1  BA 0000019A R     2		mov		edx, OFFSET EC_intro_1
- 000000D6  E8 00000000 E     2		call	WriteString
- 000000DB  5A		     2		pop		edx
- 000000DC  E8 00000000 E     1		call	CrLf
+ 000000D6  52		     2		push	edx
+ 000000D7  BA 0000019A R     2		mov		edx, OFFSET EC_intro_1
+ 000000DC  E8 00000000 E     2		call	WriteString
+ 000000E1  5A		     2		pop		edx
+ 000000E2  E8 00000000 E     1		call	CrLf
 					mWriteStringLn	EC_intro_2
- 000000E1  52		     2		push	edx
- 000000E2  BA 000001DE R     2		mov		edx, OFFSET EC_intro_2
- 000000E7  E8 00000000 E     2		call	WriteString
- 000000EC  5A		     2		pop		edx
- 000000ED  E8 00000000 E     1		call	CrLf
+ 000000E7  52		     2		push	edx
+ 000000E8  BA 000001DE R     2		mov		edx, OFFSET EC_intro_2
+ 000000ED  E8 00000000 E     2		call	WriteString
+ 000000F2  5A		     2		pop		edx
+ 000000F3  E8 00000000 E     1		call	CrLf
+ 000000F8  E8 00000000 E		call			CrLf
+ 000000FD  E8 00000000 E		call			CrLf
 
- 000000F2  C3				ret
- 000000F3			intro	ENDP
+ 00000102  C3				ret
+ 00000103			intro	ENDP
 
 				;---------------------------------------------------------------;
 				;	The generateProblem procedure will generate the 2 numbers	;
@@ -436,115 +440,115 @@ Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/12/19 17:45:29
 				;	Returns: n, r, and answer values to their address			;
 				;	Pre-Conditions: none										;
 				;---------------------------------------------------------------;
- 000000F3			showProblem	PROC
- 000000F3  55				push	ebp
- 000000F4  8B EC			mov		ebp, esp
- 000000F6  83 EC 0C			sub		esp, 12								; make space for 3 local variables for factorial
+ 00000103			showProblem	PROC
+ 00000103  55				push	ebp
+ 00000104  8B EC			mov		ebp, esp
+ 00000106  83 EC 0C			sub		esp, 12								; make space for 4 local variables for factorial
 
- 000000F9  8B 45 0C			mov		eax, [ebp + 12]						; offset to eax
- 000000FC  8B 18			mov		ebx, [eax]							; value of offset to ebx
- 000000FE  43				inc		ebx									; increase 
- 000000FF  8B 45 0C			mov		eax, [ebp + 12]						; offset to eax
- 00000102  89 18			mov		[eax], ebx							; value to value of offset
+ 00000109  8B 45 0C			mov		eax, [ebp + 12]						; offset to eax
+ 0000010C  8B 18			mov		ebx, [eax]							; value of offset to ebx
+ 0000010E  43				inc		ebx									; increase 
+ 0000010F  8B 45 0C			mov		eax, [ebp + 12]						; offset to eax
+ 00000112  89 18			mov		[eax], ebx							; value to value of offset
 
 					mWrite			"Problem "
- 000003CD		     1		.data
- 000003CD 50 72 6F 62 6C     1		??0000	BYTE	"Problem ", 0
+ 000003D1		     1		.data
+ 000003D1 50 72 6F 62 6C     1		??0000	BYTE	"Problem ", 0
 	   65 6D 20 00
- 00000104		     1		.code
- 00000104  52		     1		push	edx
- 00000105  BA 000003CD R     1		mov		edx, OFFSET ??0000
- 0000010A  E8 00000000 E     1		call	WriteString
- 0000010F  5A		     1		pop		edx
- 00000110  8B 45 0C			mov				eax, [ebp + 12]
+ 00000114		     1		.code
+ 00000114  52		     1		push	edx
+ 00000115  BA 000003D1 R     1		mov		edx, OFFSET ??0000
+ 0000011A  E8 00000000 E     1		call	WriteString
+ 0000011F  5A		     1		pop		edx
+ 00000120  8B 45 0C			mov				eax, [ebp + 12]
 					mWriteDec		[eax]						; problemNum
- 00000113  50		     1		push	eax
- 00000114  8B 00	     1		mov		eax, [eax]
- 00000116  E8 00000000 E     1		call	WriteDec
- 0000011B  58		     1		pop		eax
+ 00000123  50		     1		push	eax
+ 00000124  8B 00	     1		mov		eax, [eax]
+ 00000126  E8 00000000 E     1		call	WriteDec
+ 0000012B  58		     1		pop		eax
 
 
 					mWrite			" ("
- 000003D6		     1		.data
- 000003D6 20 28 00	     1		??0001	BYTE	" (", 0
- 0000011C		     1		.code
- 0000011C  52		     1		push	edx
- 0000011D  BA 000003D6 R     1		mov		edx, OFFSET ??0001
- 00000122  E8 00000000 E     1		call	WriteString
- 00000127  5A		     1		pop		edx
- 00000128  8B 45 08			mov			eax, [ebp + 8]
+ 000003DA		     1		.data
+ 000003DA 20 28 00	     1		??0001	BYTE	" (", 0
+ 0000012C		     1		.code
+ 0000012C  52		     1		push	edx
+ 0000012D  BA 000003DA R     1		mov		edx, OFFSET ??0001
+ 00000132  E8 00000000 E     1		call	WriteString
+ 00000137  5A		     1		pop		edx
+ 00000138  8B 45 08			mov			eax, [ebp + 8]
 					mWriteDec	[eax]
- 0000012B  50		     1		push	eax
- 0000012C  8B 00	     1		mov		eax, [eax]
- 0000012E  E8 00000000 E     1		call	WriteDec
- 00000133  58		     1		pop		eax
+ 0000013B  50		     1		push	eax
+ 0000013C  8B 00	     1		mov		eax, [eax]
+ 0000013E  E8 00000000 E     1		call	WriteDec
+ 00000143  58		     1		pop		eax
 					mWrite		"/"
- 000003D9		     1		.data
- 000003D9 2F 00		     1		??0002	BYTE	"/", 0
- 00000134		     1		.code
- 00000134  52		     1		push	edx
- 00000135  BA 000003D9 R     1		mov		edx, OFFSET ??0002
- 0000013A  E8 00000000 E     1		call	WriteString
- 0000013F  5A		     1		pop		edx
- 00000140  8B 45 0C			mov			eax, [ebp + 12]
- 00000143  8B 18			mov			ebx, [eax]
- 00000145  4B				dec			ebx
+ 000003DD		     1		.data
+ 000003DD 2F 00		     1		??0002	BYTE	"/", 0
+ 00000144		     1		.code
+ 00000144  52		     1		push	edx
+ 00000145  BA 000003DD R     1		mov		edx, OFFSET ??0002
+ 0000014A  E8 00000000 E     1		call	WriteString
+ 0000014F  5A		     1		pop		edx
+ 00000150  8B 45 0C			mov			eax, [ebp + 12]
+ 00000153  8B 18			mov			ebx, [eax]
+ 00000155  4B				dec			ebx
 					mWriteDec	ebx
- 00000146  50		     1		push	eax
- 00000147  8B C3	     1		mov		eax, ebx
- 00000149  E8 00000000 E     1		call	WriteDec
- 0000014E  58		     1		pop		eax
+ 00000156  50		     1		push	eax
+ 00000157  8B C3	     1		mov		eax, ebx
+ 00000159  E8 00000000 E     1		call	WriteDec
+ 0000015E  58		     1		pop		eax
 
 					mWriteLn	" answered correct)"
- 000003DB		     2		.data
- 000003DB 20 61 6E 73 77     2		??0003	BYTE	" answered correct)", 0
+ 000003DF		     2		.data
+ 000003DF 20 61 6E 73 77     2		??0003	BYTE	" answered correct)", 0
 	   65 72 65 64 20
 	   63 6F 72 72 65
 	   63 74 29 00
- 0000014F		     2		.code
- 0000014F  52		     2		push	edx
- 00000150  BA 000003DB R     2		mov		edx, OFFSET ??0003
- 00000155  E8 00000000 E     2		call	WriteString
- 0000015A  5A		     2		pop		edx
- 0000015B  E8 00000000 E     1		call	CrLf
+ 0000015F		     2		.code
+ 0000015F  52		     2		push	edx
+ 00000160  BA 000003DF R     2		mov		edx, OFFSET ??0003
+ 00000165  E8 00000000 E     2		call	WriteString
+ 0000016A  5A		     2		pop		edx
+ 0000016B  E8 00000000 E     1		call	CrLf
 
 					mWriteString	problem_1
- 00000160  52		     1		push	edx
- 00000161  BA 00000228 R     1		mov		edx, OFFSET problem_1
- 00000166  E8 00000000 E     1		call	WriteString
- 0000016B  5A		     1		pop		edx
+ 00000170  52		     1		push	edx
+ 00000171  BA 00000228 R     1		mov		edx, OFFSET problem_1
+ 00000176  E8 00000000 E     1		call	WriteString
+ 0000017B  5A		     1		pop		edx
 
- 0000016C  B8 0000000C			mov		eax, nMAXNUM						; set the max to eax
- 00000171  83 E8 03			sub		eax, nMINNUM						; subtract the lowest from eax (this will give us a range of 1 to (max-min))
- 00000174  E8 00000000 E		call	RandomRange							; generate random number in range (1 to (max-min))
- 00000179  83 C0 03			add		eax, nMINNUM						; add lowest to generated number (this fixes the range to be from min to max)
- 0000017C  A3 000003B7 R		mov		n, eax
- 00000181  89 45 18			mov		[ebp + 24], eax						; move the n value to the stack
+ 0000017C  B8 0000000C			mov		eax, nMAXNUM						; set the max to eax
+ 00000181  83 E8 03			sub		eax, nMINNUM						; subtract the lowest from eax (this will give us a range of 1 to (max-min))
+ 00000184  E8 00000000 E		call	RandomRange							; generate random number in range (1 to (max-min))
+ 00000189  83 C0 03			add		eax, nMINNUM						; add lowest to generated number (this fixes the range to be from min to max)
+ 0000018C  A3 000003BB R		mov		n, eax
+ 00000191  89 45 18			mov		[ebp + 24], eax						; move the n value to the stack
 
- 00000184  E8 00000000 E		call	WriteDec							; this prints our N value to the screen
+ 00000194  E8 00000000 E		call	WriteDec							; this prints our N value to the screen
 
- 00000189  E8 00000000 E		call	CrLf
+ 00000199  E8 00000000 E		call	CrLf
 					mWriteString	problem_2
- 0000018E  52		     1		push	edx
- 0000018F  BA 00000248 R     1		mov		edx, OFFSET problem_2
- 00000194  E8 00000000 E     1		call	WriteString
- 00000199  5A		     1		pop		edx
+ 0000019E  52		     1		push	edx
+ 0000019F  BA 00000248 R     1		mov		edx, OFFSET problem_2
+ 000001A4  E8 00000000 E     1		call	WriteString
+ 000001A9  5A		     1		pop		edx
 
- 0000019A  83 E8 01			sub		eax, rMINNUM						; subtract the lowest from eax (this will give us a range of 1 to (max-min))
- 0000019D  E8 00000000 E		call	RandomRange							; generate random number in range (1 to (max-min))
- 000001A2  83 C0 01			add		eax, rMINNUM						; add lowest to generated number (this fixes the range to be from min to max)
- 000001A5  A3 000003BB R		mov		r, eax
- 000001AA  89 45 14			mov		[ebp + 20], eax						; move the r value to the stack
+ 000001AA  83 E8 01			sub		eax, rMINNUM						; subtract the lowest from eax (this will give us a range of 1 to (max-min))
+ 000001AD  E8 00000000 E		call	RandomRange							; generate random number in range (1 to (max-min))
+ 000001B2  83 C0 01			add		eax, rMINNUM						; add lowest to generated number (this fixes the range to be from min to max)
+ 000001B5  A3 000003BF R		mov		r, eax
+ 000001BA  89 45 14			mov		[ebp + 20], eax						; move the r value to the stack
 
- 000001AD  E8 00000000 E		call	WriteDec							; this prints our R value to the screen
- 000001B2  E8 00000000 E		call	CrLf
+ 000001BD  E8 00000000 E		call	WriteDec							; this prints our R value to the screen
+ 000001C2  E8 00000000 E		call	CrLf
 
- 000001B7  E8 00000006			call	combinations						; this will add 4 bytes to the index distance of the addresses (to compensate for return address)
+ 000001C7  E8 00000006			call	combinations						; this will add 4 bytes to the index distance of the addresses (to compensate for return address)
 					
- 000001BC  8B E5			mov		esp, ebp							; remove locals from stack
- 000001BE  5D				pop		ebp
- 000001BF  C2 0022			ret		34
- 000001C2			showProblem	ENDP
+ 000001CC  8B E5			mov		esp, ebp							; remove locals from stack
+ 000001CE  5D				pop		ebp
+ 000001CF  C2 0022			ret		34
+ 000001D2			showProblem	ENDP
 
 				;---------------------------------------------------------------;
 				;	The combinations process calculates (n!)/(r!(n-r)!), and	;
@@ -555,44 +559,45 @@ Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/12/19 17:45:29
 				;	Returns: the problems calculation value to answer			;
 				;	Pre-Conditions, n and r are real integer values				;
 				;---------------------------------------------------------------;
- 000001C2			combinations	PROC
+ 000001D2			combinations	PROC
 
 					;------------------N!-----------------------;
- 000001C2  FF 75 18			push	[ebp + 24]							; push the N value to the stack [ebp + 8] in factorial
- 000001C5  E8 00000036			call	factorial							; returns the N! to eax
- 000001CA  89 45 FC			mov		DWORD PTR [ebp - 4], eax			; store in local var 1
+ 000001D2  FF 75 18			push	[ebp + 24]							; push the N value to the stack [ebp + 8] in factorial
+ 000001D5  E8 0000003E			call	factorial							; returns the N! to eax
+ 000001DA  89 45 FC			mov		DWORD PTR [ebp - 4], eax			; store in local var 1
 
 					;------------------R!-----------------------;
- 000001CD  FF 75 14			push	[ebp + 20]							; push the R value to the stack [ebp + 8] in factorial
- 000001D0  E8 0000002B			call	factorial							; returns the R! to eax
- 000001D5  89 45 F8			mov		DWORD PTR [ebp - 8], eax			; store in local var 2
+ 000001DD  FF 75 14			push	[ebp + 20]							; push the R value to the stack [ebp + 8] in factorial
+ 000001E0  E8 00000033			call	factorial							; returns the R! to eax
+ 000001E5  89 45 F8			mov		DWORD PTR [ebp - 8], eax			; store in local var 2
 
 					;-----------------(N-R)!--------------------;
- 000001D8  8B 45 18			mov		eax, [ebp + 24]						; The N value
- 000001DB  8B 5D 14			mov		ebx, [ebp + 20]						; The R value
- 000001DE  2B C3			sub		eax, ebx							; N - R Value
- 000001E0  50				push	eax
- 000001E1  E8 0000001A			call	factorial							; returns the (N - R)! to eax
- 000001E6  89 45 F4			mov		DWORD PTR [ebp - 12], eax			; store in local var 3
+ 000001E8  8B 45 18			mov		eax, [ebp + 24]						; The N value
+ 000001EB  8B 5D 14			mov		ebx, [ebp + 20]						; The R value
+ 000001EE  2B C3			sub		eax, ebx							; N - R Value
+ 000001F0  50				push	eax
+ 000001F1  E8 00000022			call	factorial							; returns the (N - R)! to eax
+ 000001F6  89 45 F4			mov		DWORD PTR [ebp - 12], eax			; store in local var 3
 
 					;now for the answer
 					;		n!
 					;	----------
 					;	r!(n - r)!
 
- 000001E9  8B 45 F8			mov		eax, DWORD PTR [ebp - 8]			; R!
- 000001EC  8B 5D F4			mov		ebx, DWORD PTR [ebp - 12]			; (N - R)!
- 000001EF  F7 E3			mul		ebx									; R! * (N - R)!
+ 000001F9  DB 45 F8			fild	DWORD PTR [ebp - 8]					; load R! to ST(0)
+ 000001FC  DA 4D F4			fimul	DWORD PTR [ebp - 12]				; multiply R! * (N - R)!
+ 000001FF  DB 55 1C			fist	dword ptr [ebp + 28]				; move value from ST(0) to var
+ 00000202  DB 45 FC			fild	DWORD PTR [ebp - 4]					; load N! to ST(0)
+ 00000205  DA 75 1C			fidiv	dword ptr [ebp + 28]				; N! / (R! * (N - R)!)
+ 00000208  DB 55 1C			fist	dword ptr [ebp + 28]				; store into FLValue
 
- 000001F1  8B D8			mov		ebx, eax							; set bottom value to divisor
- 000001F3  8B 45 FC			mov		eax, DWORD PTR [ebp - 4]			; N!
- 000001F6  F7 F3			div		ebx									; (n!)/(r!(n-r)!)			answer stored in eax
+ 0000020B  8B 45 1C			mov				eax, [ebp + 28]
+ 0000020E  8B 5D 10			mov				ebx, [ebp + 16]
+ 00000211  89 03			mov				[ebx], eax					; store into answer address
 
- 000001F8  8B 5D 10			mov		ebx, [ebp + 16]						; answer offset to ebx
- 000001FB  89 03			mov		[ebx], eax							; move answer to the stack value
-
- 000001FD  C2 000C			ret		12
- 00000200			combinations	ENDP
+ 00000213  DB E3			fninit										; clear registers ST()
+ 00000215  C2 000C			ret		12
+ 00000218			combinations	ENDP
 
 				;---------------------------------------------------------------;
 				;	The factorial procedure will take an input on the stack, i,	;
@@ -601,29 +606,29 @@ Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/12/19 17:45:29
 				;	returns: EAX = value of the factorial						;
 				;	Pre-Conditions: i as a valid integer.						;
 				;---------------------------------------------------------------;
- 00000200			factorial	PROC
- 00000200  55				push	ebp
- 00000201  8B EC			mov		ebp, esp
+ 00000218			factorial	PROC
+ 00000218  55				push	ebp
+ 00000219  8B EC			mov		ebp, esp
 					
- 00000203  8B 45 08			mov		eax, [ebp + 8]						; the designated stack location for the index value
- 00000206  83 F8 00			cmp		eax, 0								; check to see if index > 0
- 00000209  77 07			ja		RecursiveCall						; i > 0
- 0000020B  B8 00000001			mov		eax, 1
- 00000210  EB 0C			jmp		endRecursion						; we need to loop back to the first call
+ 0000021B  8B 45 08			mov		eax, [ebp + 8]						; the designated stack location for the index value
+ 0000021E  83 F8 00			cmp		eax, 0								; check to see if index > 0
+ 00000221  77 07			ja		RecursiveCall						; i > 0
+ 00000223  B8 00000001			mov		eax, 1
+ 00000228  EB 0C			jmp		endRecursion						; we need to loop back to the first call
 
- 00000212				RecursiveCall:
- 00000212  48					dec		eax								; i - 1
- 00000213  50					push	eax								; used as the next layer of recursions new index
- 00000214  E8 FFFFFFE7				call	factorial
+ 0000022A				RecursiveCall:
+ 0000022A  48					dec		eax								; i - 1
+ 0000022B  50					push	eax								; used as the next layer of recursions new index
+ 0000022C  E8 FFFFFFE7				call	factorial
 
- 00000219				Return:										; only called when we keep looping back layers of recursion
- 00000219  8B 5D 08				mov		ebx, [ebp + 8]					; get index
- 0000021C  F7 E3				mul		ebx								; prod * index
+ 00000231				Return:										; only called when we keep looping back layers of recursion
+ 00000231  8B 5D 08				mov		ebx, [ebp + 8]					; get index
+ 00000234  F7 E3				mul		ebx								; prod * index
 
- 0000021E				endRecursion:
- 0000021E  5D					pop		ebp								; remove the current layer of recursion's ebp placer
- 0000021F  C2 0004				ret		4								; clear the dedicated stack bytes for the index value
- 00000222			factorial	ENDP
+ 00000236				endRecursion:
+ 00000236  5D					pop		ebp								; remove the current layer of recursion's ebp placer
+ 00000237  C2 0004				ret		4								; clear the dedicated stack bytes for the index value
+ 0000023A			factorial	ENDP
 
 				;---------------------------------------------------------------;
 				;	The getData procedure will get the user input as a string	;
@@ -634,231 +639,231 @@ Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/12/19 17:45:29
 				;	Returns: if user answer was correct							;
 				;	Pre-Condition: answer should be a valid integer				;
 				;---------------------------------------------------------------;
- 00000222			getData PROC
- 00000222  55				push    ebp
- 00000223  8B EC			mov     ebp,esp
- 00000225  83 EC 08			sub		esp, 8								; 2 local varaibles
+ 0000023A			getData PROC
+ 0000023A  55				push    ebp
+ 0000023B  8B EC			mov     ebp,esp
+ 0000023D  83 EC 08			sub		esp, 8								; 2 local varaibles
 
- 00000228				tryAgain:
+ 00000240				tryAgain:
 						mWriteString   prompt_1
- 00000228  52		     1		push	edx
- 00000229  BA 00000274 R     1		mov		edx, OFFSET prompt_1
- 0000022E  E8 00000000 E     1		call	WriteString
- 00000233  5A		     1		pop		edx
- 00000234  8B 55 0C				mov     edx, [ebp + 12]					; move OFFSET of temp to receive string of integers
- 00000237  B9 0000000C				mov     ecx, 12
- 0000023C  E8 00000000 E			call    ReadString
- 00000241  83 F8 0A				cmp     eax, 10							; user input was a number larger than 10 bytes
- 00000244  7F 51				jg      invalidInput
+ 00000240  52		     1		push	edx
+ 00000241  BA 00000274 R     1		mov		edx, OFFSET prompt_1
+ 00000246  E8 00000000 E     1		call	WriteString
+ 0000024B  5A		     1		pop		edx
+ 0000024C  8B 55 0C				mov     edx, [ebp + 12]					; move OFFSET of temp to receive string of integers
+ 0000024F  B9 0000000C				mov     ecx, 12
+ 00000254  E8 00000000 E			call    ReadString
+ 00000259  83 F8 0A				cmp     eax, 10							; user input was a number larger than 10 bytes
+ 0000025C  7F 51				jg      invalidInput
 
- 00000246  8B C8				mov     ecx, eax						; loop through each char in input
- 00000248  8B 75 0C				mov     esi, [ebp + 12]					; point at char in string
- 0000024B  BA 00000000				mov		edx, 0
- 00000250  89 55 F8				mov		[ebp - 8], edx					; start accumulation at 0
+ 0000025E  8B C8				mov     ecx, eax						; loop through each char in input
+ 00000260  8B 75 0C				mov     esi, [ebp + 12]					; point at char in string
+ 00000263  BA 00000000				mov		edx, 0
+ 00000268  89 55 F8				mov		[ebp - 8], edx					; start accumulation at 0
 
- 00000253				loopString:									; loop validated each char in the input
- 00000253  8A 06				mov     al, [esi]						; move value of char into al register
- 00000255  46					inc     esi								; point to next char in string
- 00000256  2C 30				sub     al, 48d							; subtract 48 from ASCII value of char to get integer  
+ 0000026B				loopString:									; loop validated each char in the input
+ 0000026B  8A 06				mov     al, [esi]						; move value of char into al register
+ 0000026D  46					inc     esi								; point to next char in string
+ 0000026E  2C 30				sub     al, 48d							; subtract 48 from ASCII value of char to get integer  
 
- 00000258  3C 00				cmp     al ,0							; make sure char is >= 0
- 0000025A  7C 3B				jl      invalidInput
- 0000025C  3C 09				cmp     al, 9							; or <= 9
- 0000025E  7F 37				jg      invalidInput
+ 00000270  3C 00				cmp     al ,0							; make sure char is >= 0
+ 00000272  7C 3B				jl      invalidInput
+ 00000274  3C 09				cmp     al, 9							; or <= 9
+ 00000276  7F 37				jg      invalidInput
 						; in order to convert, we want to do (i = curNum, n = char index, i * (10 ^ n)
 						; this will allow us to add each additional loop value to edx, to end up with converted string
- 00000260  89 45 FC				mov		[ebp - 4], eax
+ 00000278  89 45 FC				mov		[ebp - 4], eax
 						;push	eax								; ebp - 4
- 00000263  8B D9				mov		ebx, ecx						; n = ecx
- 00000265  4B					dec		ebx
- 00000266  B8 00000001				mov		eax, 1							; (10 ^ n) = eax
- 0000026B  BF 0000000A				mov		edi, 10
- 00000270					PowerOf:
- 00000270  83 FB 00					cmp		ebx, 0
- 00000273  74 08					je		PowerOfDone
- 00000275  F7 E7					mul		edi							; eax * 10
- 00000277  4B						dec		ebx							; n - 1
- 00000278  83 FB 00					cmp		ebx, 0
- 0000027B  7F F3					jg		PowerOf
- 0000027D					PowerOfDone:
+ 0000027B  8B D9				mov		ebx, ecx						; n = ecx
+ 0000027D  4B					dec		ebx
+ 0000027E  B8 00000001				mov		eax, 1							; (10 ^ n) = eax
+ 00000283  BF 0000000A				mov		edi, 10
+ 00000288					PowerOf:
+ 00000288  83 FB 00					cmp		ebx, 0
+ 0000028B  74 08					je		PowerOfDone
+ 0000028D  F7 E7					mul		edi							; eax * 10
+ 0000028F  4B						dec		ebx							; n - 1
+ 00000290  83 FB 00					cmp		ebx, 0
+ 00000293  7F F3					jg		PowerOf
+ 00000295					PowerOfDone:
 						
 						;eax now = (10 ^ n)
- 0000027D  8B D8				mov		ebx, eax						; temporarily hold (10 ^ n) in ebx
- 0000027F  8B 45 FC				mov		eax, [ebp - 4]					; set eax back to the input char value
+ 00000295  8B D8				mov		ebx, eax						; temporarily hold (10 ^ n) in ebx
+ 00000297  8B 45 FC				mov		eax, [ebp - 4]					; set eax back to the input char value
 
- 00000282  0F B6 F8				movzx	edi, al							; move value of al to edi as temp register
- 00000285  8B C3				mov		eax, ebx						; move (10 ^ n) back to eax
- 00000287  F7 E7				mul		edi								; eax = i * (10 ^ n)
- 00000289  33 D2				xor		edx, edx
- 0000028B  8B 55 F8				mov		edx, [ebp - 8]
- 0000028E  03 D0				add		edx, eax						; add eax to accumulation total
- 00000290  89 55 F8				mov		[ebp - 8], edx
+ 0000029A  0F B6 F8				movzx	edi, al							; move value of al to edi as temp register
+ 0000029D  8B C3				mov		eax, ebx						; move (10 ^ n) back to eax
+ 0000029F  F7 E7				mul		edi								; eax = i * (10 ^ n)
+ 000002A1  33 D2				xor		edx, edx
+ 000002A3  8B 55 F8				mov		edx, [ebp - 8]
+ 000002A6  03 D0				add		edx, eax						; add eax to accumulation total
+ 000002A8  89 55 F8				mov		[ebp - 8], edx
 
- 00000293  E2 BE				loop    loopString
- 00000295  EB 27				jmp     Verify
+ 000002AB  E2 BE				loop    loopString
+ 000002AD  EB 27				jmp     Verify
 
- 00000297				invalidInput:								; reset registers and variables to 0
- 00000297  B0 00				mov     al, 0
- 00000299  B8 00000000				mov     eax, 0
- 0000029E  8B 5D 08				mov     ebx, [ebp + 8]
- 000002A1  89 03				mov     [ebx], eax
- 000002A3  8B 5D 0C				mov     ebx, [ebp + 12]
- 000002A6  89 03				mov     [ebx], eax       
+ 000002AF				invalidInput:								; reset registers and variables to 0
+ 000002AF  B0 00				mov     al, 0
+ 000002B1  B8 00000000				mov     eax, 0
+ 000002B6  8B 5D 08				mov     ebx, [ebp + 8]
+ 000002B9  89 03				mov     [ebx], eax
+ 000002BB  8B 5D 0C				mov     ebx, [ebp + 12]
+ 000002BE  89 03				mov     [ebx], eax       
 						mWriteStringLn   failed_input_1
- 000002A8  52		     2		push	edx
- 000002A9  BA 000002D3 R     2		mov		edx, OFFSET failed_input_1
- 000002AE  E8 00000000 E     2		call	WriteString
- 000002B3  5A		     2		pop		edx
- 000002B4  E8 00000000 E     1		call	CrLf
- 000002B9  E9 FFFFFF6A				jmp     tryAgain
+ 000002C0  52		     2		push	edx
+ 000002C1  BA 000002D3 R     2		mov		edx, OFFSET failed_input_1
+ 000002C6  E8 00000000 E     2		call	WriteString
+ 000002CB  5A		     2		pop		edx
+ 000002CC  E8 00000000 E     1		call	CrLf
+ 000002D1  E9 FFFFFF6A				jmp     tryAgain
 
- 000002BE				Verify:
- 000002BE  8B 45 08				mov		eax, [ebp + 8]					; answer
- 000002C1  8B 18				mov		ebx, [eax]
- 000002C3  3B DA				cmp		ebx, edx						; compare answer to input result
- 000002C5  74 02				je		answerRight
- 000002C7  75 66				jne		answerWrong
+ 000002D6				Verify:
+ 000002D6  8B 45 08				mov		eax, [ebp + 8]					; answer
+ 000002D9  8B 18				mov		ebx, [eax]
+ 000002DB  3B DA				cmp		ebx, edx						; compare answer to input result
+ 000002DD  74 02				je		answerRight
+ 000002DF  75 66				jne		answerWrong
 
 
- 000002C9				answerRight:
- 000002C9  8B 45 08				mov				eax, [ebp + 8]
+ 000002E1				answerRight:
+ 000002E1  8B 45 08				mov				eax, [ebp + 8]
 						mWrite			"There are "
- 000003EE		     1		.data
- 000003EE 54 68 65 72 65     1		??0004	BYTE	"There are ", 0
+ 000003F2		     1		.data
+ 000003F2 54 68 65 72 65     1		??0004	BYTE	"There are ", 0
 	   20 61 72 65 20
 	   00
- 000002CC		     1		.code
- 000002CC  52		     1		push	edx
- 000002CD  BA 000003EE R     1		mov		edx, OFFSET ??0004
- 000002D2  E8 00000000 E     1		call	WriteString
- 000002D7  5A		     1		pop		edx
+ 000002E4		     1		.code
+ 000002E4  52		     1		push	edx
+ 000002E5  BA 000003F2 R     1		mov		edx, OFFSET ??0004
+ 000002EA  E8 00000000 E     1		call	WriteString
+ 000002EF  5A		     1		pop		edx
 						mWriteDec		[eax]
- 000002D8  50		     1		push	eax
- 000002D9  8B 00	     1		mov		eax, [eax]
- 000002DB  E8 00000000 E     1		call	WriteDec
- 000002E0  58		     1		pop		eax
+ 000002F0  50		     1		push	eax
+ 000002F1  8B 00	     1		mov		eax, [eax]
+ 000002F3  E8 00000000 E     1		call	WriteDec
+ 000002F8  58		     1		pop		eax
 						mWrite			" combinations of "
- 000003F9		     1		.data
- 000003F9 20 63 6F 6D 62     1		??0005	BYTE	" combinations of ", 0
+ 000003FD		     1		.data
+ 000003FD 20 63 6F 6D 62     1		??0005	BYTE	" combinations of ", 0
 	   69 6E 61 74 69
 	   6F 6E 73 20 6F
 	   66 20 00
- 000002E1		     1		.code
- 000002E1  52		     1		push	edx
- 000002E2  BA 000003F9 R     1		mov		edx, OFFSET ??0005
- 000002E7  E8 00000000 E     1		call	WriteString
- 000002EC  5A		     1		pop		edx
+ 000002F9		     1		.code
+ 000002F9  52		     1		push	edx
+ 000002FA  BA 000003FD R     1		mov		edx, OFFSET ??0005
+ 000002FF  E8 00000000 E     1		call	WriteString
+ 00000304  5A		     1		pop		edx
 						mWriteDec		[ebp + 20]
- 000002ED  50		     1		push	eax
- 000002EE  8B 45 14	     1		mov		eax, [ebp + 20]
- 000002F1  E8 00000000 E     1		call	WriteDec
- 000002F6  58		     1		pop		eax
+ 00000305  50		     1		push	eax
+ 00000306  8B 45 14	     1		mov		eax, [ebp + 20]
+ 00000309  E8 00000000 E     1		call	WriteDec
+ 0000030E  58		     1		pop		eax
 						mWrite			" items from a set of "
- 0000040B		     1		.data
- 0000040B 20 69 74 65 6D     1		??0006	BYTE	" items from a set of ", 0
+ 0000040F		     1		.data
+ 0000040F 20 69 74 65 6D     1		??0006	BYTE	" items from a set of ", 0
 	   73 20 66 72 6F
 	   6D 20 61 20 73
 	   65 74 20 6F 66
 	   20 00
- 000002F7		     1		.code
- 000002F7  52		     1		push	edx
- 000002F8  BA 0000040B R     1		mov		edx, OFFSET ??0006
- 000002FD  E8 00000000 E     1		call	WriteString
- 00000302  5A		     1		pop		edx
+ 0000030F		     1		.code
+ 0000030F  52		     1		push	edx
+ 00000310  BA 0000040F R     1		mov		edx, OFFSET ??0006
+ 00000315  E8 00000000 E     1		call	WriteString
+ 0000031A  5A		     1		pop		edx
 						mWriteDec		[ebp + 24]
- 00000303  50		     1		push	eax
- 00000304  8B 45 18	     1		mov		eax, [ebp + 24]
- 00000307  E8 00000000 E     1		call	WriteDec
- 0000030C  58		     1		pop		eax
+ 0000031B  50		     1		push	eax
+ 0000031C  8B 45 18	     1		mov		eax, [ebp + 24]
+ 0000031F  E8 00000000 E     1		call	WriteDec
+ 00000324  58		     1		pop		eax
 						mWriteLn		". You're correct!"
- 00000421		     2		.data
- 00000421 2E 20 59 6F 75     2		??0007	BYTE	". You're correct!", 0
+ 00000425		     2		.data
+ 00000425 2E 20 59 6F 75     2		??0007	BYTE	". You're correct!", 0
 	   27 72 65 20 63
 	   6F 72 72 65 63
 	   74 21 00
- 0000030D		     2		.code
- 0000030D  52		     2		push	edx
- 0000030E  BA 00000421 R     2		mov		edx, OFFSET ??0007
- 00000313  E8 00000000 E     2		call	WriteString
- 00000318  5A		     2		pop		edx
- 00000319  E8 00000000 E     1		call	CrLf
- 0000031E  8B 5D 10				mov				ebx, [ebp + 16]
- 00000321  8B 03				mov				eax, [ebx]
- 00000323  40					inc				eax
- 00000324  8B 5D 10				mov				ebx, [ebp + 16]
- 00000327  89 03				mov				[ebx], eax
+ 00000325		     2		.code
+ 00000325  52		     2		push	edx
+ 00000326  BA 00000425 R     2		mov		edx, OFFSET ??0007
+ 0000032B  E8 00000000 E     2		call	WriteString
+ 00000330  5A		     2		pop		edx
+ 00000331  E8 00000000 E     1		call	CrLf
+ 00000336  8B 5D 10				mov				ebx, [ebp + 16]
+ 00000339  8B 03				mov				eax, [ebx]
+ 0000033B  40					inc				eax
+ 0000033C  8B 5D 10				mov				ebx, [ebp + 16]
+ 0000033F  89 03				mov				[ebx], eax
 
- 00000329  8B E5				mov		esp, ebp						; remove locals from stack
- 0000032B  5D					pop		ebp
- 0000032C  C2 0014				ret		20
+ 00000341  8B E5				mov		esp, ebp						; remove locals from stack
+ 00000343  5D					pop		ebp
+ 00000344  C2 0014				ret		20
 
- 0000032F				answerWrong:
- 0000032F  8B 45 08				mov				eax, [ebp + 8]
+ 00000347				answerWrong:
+ 00000347  8B 45 08				mov				eax, [ebp + 8]
 						mWrite			"There are "
- 00000433		     1		.data
- 00000433 54 68 65 72 65     1		??0008	BYTE	"There are ", 0
+ 00000437		     1		.data
+ 00000437 54 68 65 72 65     1		??0008	BYTE	"There are ", 0
 	   20 61 72 65 20
 	   00
- 00000332		     1		.code
- 00000332  52		     1		push	edx
- 00000333  BA 00000433 R     1		mov		edx, OFFSET ??0008
- 00000338  E8 00000000 E     1		call	WriteString
- 0000033D  5A		     1		pop		edx
+ 0000034A		     1		.code
+ 0000034A  52		     1		push	edx
+ 0000034B  BA 00000437 R     1		mov		edx, OFFSET ??0008
+ 00000350  E8 00000000 E     1		call	WriteString
+ 00000355  5A		     1		pop		edx
 						mWriteDec		[eax]
- 0000033E  50		     1		push	eax
- 0000033F  8B 00	     1		mov		eax, [eax]
- 00000341  E8 00000000 E     1		call	WriteDec
- 00000346  58		     1		pop		eax
+ 00000356  50		     1		push	eax
+ 00000357  8B 00	     1		mov		eax, [eax]
+ 00000359  E8 00000000 E     1		call	WriteDec
+ 0000035E  58		     1		pop		eax
 						mWrite			" combinations of "
- 0000043E		     1		.data
- 0000043E 20 63 6F 6D 62     1		??0009	BYTE	" combinations of ", 0
+ 00000442		     1		.data
+ 00000442 20 63 6F 6D 62     1		??0009	BYTE	" combinations of ", 0
 	   69 6E 61 74 69
 	   6F 6E 73 20 6F
 	   66 20 00
- 00000347		     1		.code
- 00000347  52		     1		push	edx
- 00000348  BA 0000043E R     1		mov		edx, OFFSET ??0009
- 0000034D  E8 00000000 E     1		call	WriteString
- 00000352  5A		     1		pop		edx
+ 0000035F		     1		.code
+ 0000035F  52		     1		push	edx
+ 00000360  BA 00000442 R     1		mov		edx, OFFSET ??0009
+ 00000365  E8 00000000 E     1		call	WriteString
+ 0000036A  5A		     1		pop		edx
 						mWriteDec		[ebp + 20]
- 00000353  50		     1		push	eax
- 00000354  8B 45 14	     1		mov		eax, [ebp + 20]
- 00000357  E8 00000000 E     1		call	WriteDec
- 0000035C  58		     1		pop		eax
+ 0000036B  50		     1		push	eax
+ 0000036C  8B 45 14	     1		mov		eax, [ebp + 20]
+ 0000036F  E8 00000000 E     1		call	WriteDec
+ 00000374  58		     1		pop		eax
 						mWrite			" items from a set of "
- 00000450		     1		.data
- 00000450 20 69 74 65 6D     1		??000A	BYTE	" items from a set of ", 0
+ 00000454		     1		.data
+ 00000454 20 69 74 65 6D     1		??000A	BYTE	" items from a set of ", 0
 	   73 20 66 72 6F
 	   6D 20 61 20 73
 	   65 74 20 6F 66
 	   20 00
- 0000035D		     1		.code
- 0000035D  52		     1		push	edx
- 0000035E  BA 00000450 R     1		mov		edx, OFFSET ??000A
- 00000363  E8 00000000 E     1		call	WriteString
- 00000368  5A		     1		pop		edx
+ 00000375		     1		.code
+ 00000375  52		     1		push	edx
+ 00000376  BA 00000454 R     1		mov		edx, OFFSET ??000A
+ 0000037B  E8 00000000 E     1		call	WriteString
+ 00000380  5A		     1		pop		edx
 						mWriteDec		[ebp + 24]
- 00000369  50		     1		push	eax
- 0000036A  8B 45 18	     1		mov		eax, [ebp + 24]
- 0000036D  E8 00000000 E     1		call	WriteDec
- 00000372  58		     1		pop		eax
+ 00000381  50		     1		push	eax
+ 00000382  8B 45 18	     1		mov		eax, [ebp + 24]
+ 00000385  E8 00000000 E     1		call	WriteDec
+ 0000038A  58		     1		pop		eax
 						mWriteLn		". You're incorrect!"
- 00000466		     2		.data
- 00000466 2E 20 59 6F 75     2		??000B	BYTE	". You're incorrect!", 0
+ 0000046A		     2		.data
+ 0000046A 2E 20 59 6F 75     2		??000B	BYTE	". You're incorrect!", 0
 	   27 72 65 20 69
 	   6E 63 6F 72 72
 	   65 63 74 21 00
- 00000373		     2		.code
- 00000373  52		     2		push	edx
- 00000374  BA 00000466 R     2		mov		edx, OFFSET ??000B
- 00000379  E8 00000000 E     2		call	WriteString
- 0000037E  5A		     2		pop		edx
- 0000037F  E8 00000000 E     1		call	CrLf
+ 0000038B		     2		.code
+ 0000038B  52		     2		push	edx
+ 0000038C  BA 0000046A R     2		mov		edx, OFFSET ??000B
+ 00000391  E8 00000000 E     2		call	WriteString
+ 00000396  5A		     2		pop		edx
+ 00000397  E8 00000000 E     1		call	CrLf
 
- 00000384  8B E5				mov		esp, ebp						; remove locals from stack
- 00000386  5D					pop		ebp
- 00000387  C2 0014				ret		20
- 0000038A			getData	ENDP
+ 0000039C  8B E5				mov		esp, ebp						; remove locals from stack
+ 0000039E  5D					pop		ebp
+ 0000039F  C2 0014				ret		20
+ 000003A2			getData	ENDP
 
 				;---------------------------------------------------------------;
 				;	The restart procedure will test to see if the user is		;
@@ -871,65 +876,65 @@ Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/12/19 17:45:29
 				;	Returns: eax = 1 if user wishes to restart					;
 				;	Pre-Conditions: none										;
 				;---------------------------------------------------------------;
- 0000038A			restart		PROC
- 0000038A  55				push	ebp
- 0000038B  8B EC			mov		ebp, esp
- 0000038D				startOfCall:
+ 000003A2			restart		PROC
+ 000003A2  55				push	ebp
+ 000003A3  8B EC			mov		ebp, esp
+ 000003A5				startOfCall:
 						mWriteString	prompt_2
- 0000038D  52		     1		push	edx
- 0000038E  BA 000002A0 R     1		mov		edx, OFFSET prompt_2
- 00000393  E8 00000000 E     1		call	WriteString
- 00000398  5A		     1		pop		edx
+ 000003A5  52		     1		push	edx
+ 000003A6  BA 000002A0 R     1		mov		edx, OFFSET prompt_2
+ 000003AB  E8 00000000 E     1		call	WriteString
+ 000003B0  5A		     1		pop		edx
 					
- 00000399  8B 55 08				mov		edx, [ebp + 8]					; userinput
- 0000039C  B9 0000000A				mov		ecx, 10
- 000003A1  E8 00000000 E			call	ReadString
+ 000003B1  8B 55 08				mov		edx, [ebp + 8]					; userinput
+ 000003B4  B9 0000000A				mov		ecx, 10
+ 000003B9  E8 00000000 E			call	ReadString
 
- 000003A6  8B 75 08				mov		esi, [ebp + 8]
- 000003A9  AC					lodsb									; load string as byte to ax 8 bit register
- 000003AA  66| 83 F8 59				cmp		ax, 89d							; compare input to Y decimal value
- 000003AE  74 14				je		startOver
- 000003B0  66| 83 F8 79				cmp		ax, 121d						; compare input to y decimal value
- 000003B4  74 0E				je		startOver
- 000003B6  66| 83 F8 4E				cmp		ax, 78d							; compare input to N decimal value
- 000003BA  74 1B				je		endProg
- 000003BC  66| 83 F8 6E				cmp		ax, 110d						; compare input to n decimal value
- 000003C0  74 15				je		endProg
- 000003C2  EB 32				jmp		failedInput						; some other input
+ 000003BE  8B 75 08				mov		esi, [ebp + 8]
+ 000003C1  AC					lodsb									; load string as byte to ax 8 bit register
+ 000003C2  66| 83 F8 59				cmp		ax, 89d							; compare input to Y decimal value
+ 000003C6  74 14				je		startOver
+ 000003C8  66| 83 F8 79				cmp		ax, 121d						; compare input to y decimal value
+ 000003CC  74 0E				je		startOver
+ 000003CE  66| 83 F8 4E				cmp		ax, 78d							; compare input to N decimal value
+ 000003D2  74 1B				je		endProg
+ 000003D4  66| 83 F8 6E				cmp		ax, 110d						; compare input to n decimal value
+ 000003D8  74 15				je		endProg
+ 000003DA  EB 32				jmp		failedInput						; some other input
 
- 000003C4				startOver:
- 000003C4  B8 00000001				mov		eax, 1
- 000003C9  E8 00000000 E			call	CrLf
- 000003CE  E8 00000000 E			call	CrLf
- 000003D3  5D					pop		ebp
- 000003D4  C2 0004				ret		4
+ 000003DC				startOver:
+ 000003DC  B8 00000001				mov		eax, 1
+ 000003E1  E8 00000000 E			call	CrLf
+ 000003E6  E8 00000000 E			call	CrLf
+ 000003EB  5D					pop		ebp
+ 000003EC  C2 0004				ret		4
 
- 000003D7				endProg:
- 000003D7  B8 00000000				mov		eax, 0
- 000003DC  E8 00000000 E			call	CrLf
+ 000003EF				endProg:
+ 000003EF  B8 00000000				mov		eax, 0
+ 000003F4  E8 00000000 E			call	CrLf
 						mWriteStringLn	finished
- 000003E1  52		     2		push	edx
- 000003E2  BA 00000386 R     2		mov		edx, OFFSET finished
- 000003E7  E8 00000000 E     2		call	WriteString
- 000003EC  5A		     2		pop		edx
- 000003ED  E8 00000000 E     1		call	CrLf
- 000003F2  5D					pop		ebp
- 000003F3  C2 0004				ret		4
+ 000003F9  52		     2		push	edx
+ 000003FA  BA 00000386 R     2		mov		edx, OFFSET finished
+ 000003FF  E8 00000000 E     2		call	WriteString
+ 00000404  5A		     2		pop		edx
+ 00000405  E8 00000000 E     1		call	CrLf
+ 0000040A  5D					pop		ebp
+ 0000040B  C2 0004				ret		4
 
- 000003F6				failedInput:
+ 0000040E				failedInput:
 						mWriteStringLn	failed_input_2
- 000003F6  52		     2		push	edx
- 000003F7  BA 00000309 R     2		mov		edx, OFFSET failed_input_2
- 000003FC  E8 00000000 E     2		call	WriteString
- 00000401  5A		     2		pop		edx
- 00000402  E8 00000000 E     1		call	CrLf
- 00000407  EB 84				jmp		startOfCall
+ 0000040E  52		     2		push	edx
+ 0000040F  BA 00000309 R     2		mov		edx, OFFSET failed_input_2
+ 00000414  E8 00000000 E     2		call	WriteString
+ 00000419  5A		     2		pop		edx
+ 0000041A  E8 00000000 E     1		call	CrLf
+ 0000041F  EB 84				jmp		startOfCall
 
 					
- 00000409			restart		ENDP
+ 00000421			restart		ENDP
 
 				END main										; the symbolyses that the main program is finished
-Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/12/19 17:45:29
+Microsoft (R) Macro Assembler Version 14.16.27027.1	    03/14/19 11:41:37
 Program 6B		(Project6B.asm			     Symbols 2 - 1
 
 
@@ -1034,8 +1039,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 0000047A Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000409 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 0000047E Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000421 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -1142,31 +1147,31 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-combinations . . . . . . . . . .	P Near	 000001C2 _TEXT	Length= 0000003E Public STDCALL
-factorial  . . . . . . . . . . .	P Near	 00000200 _TEXT	Length= 00000022 Public STDCALL
-  RecursiveCall  . . . . . . . .	L Near	 00000212 _TEXT	
-  Return . . . . . . . . . . . .	L Near	 00000219 _TEXT	
-  endRecursion . . . . . . . . .	L Near	 0000021E _TEXT	
-getData  . . . . . . . . . . . .	P Near	 00000222 _TEXT	Length= 00000168 Public STDCALL
-  tryAgain . . . . . . . . . . .	L Near	 00000228 _TEXT	
-  loopString . . . . . . . . . .	L Near	 00000253 _TEXT	
-  PowerOf  . . . . . . . . . . .	L Near	 00000270 _TEXT	
-  PowerOfDone  . . . . . . . . .	L Near	 0000027D _TEXT	
-  invalidInput . . . . . . . . .	L Near	 00000297 _TEXT	
-  Verify . . . . . . . . . . . .	L Near	 000002BE _TEXT	
-  answerRight  . . . . . . . . .	L Near	 000002C9 _TEXT	
-  answerWrong  . . . . . . . . .	L Near	 0000032F _TEXT	
-intro  . . . . . . . . . . . . .	P Near	 00000060 _TEXT	Length= 00000093 Public STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000060 Public STDCALL
+combinations . . . . . . . . . .	P Near	 000001D2 _TEXT	Length= 00000046 Public STDCALL
+factorial  . . . . . . . . . . .	P Near	 00000218 _TEXT	Length= 00000022 Public STDCALL
+  RecursiveCall  . . . . . . . .	L Near	 0000022A _TEXT	
+  Return . . . . . . . . . . . .	L Near	 00000231 _TEXT	
+  endRecursion . . . . . . . . .	L Near	 00000236 _TEXT	
+getData  . . . . . . . . . . . .	P Near	 0000023A _TEXT	Length= 00000168 Public STDCALL
+  tryAgain . . . . . . . . . . .	L Near	 00000240 _TEXT	
+  loopString . . . . . . . . . .	L Near	 0000026B _TEXT	
+  PowerOf  . . . . . . . . . . .	L Near	 00000288 _TEXT	
+  PowerOfDone  . . . . . . . . .	L Near	 00000295 _TEXT	
+  invalidInput . . . . . . . . .	L Near	 000002AF _TEXT	
+  Verify . . . . . . . . . . . .	L Near	 000002D6 _TEXT	
+  answerRight  . . . . . . . . .	L Near	 000002E1 _TEXT	
+  answerWrong  . . . . . . . . .	L Near	 00000347 _TEXT	
+intro  . . . . . . . . . . . . .	P Near	 00000066 _TEXT	Length= 0000009D Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000066 Public STDCALL
   NewProblem . . . . . . . . . .	L Near	 0000000A _TEXT	
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
-restart  . . . . . . . . . . . .	P Near	 0000038A _TEXT	Length= 0000007F Public STDCALL
-  startOfCall  . . . . . . . . .	L Near	 0000038D _TEXT	
-  startOver  . . . . . . . . . .	L Near	 000003C4 _TEXT	
-  endProg  . . . . . . . . . . .	L Near	 000003D7 _TEXT	
-  failedInput  . . . . . . . . .	L Near	 000003F6 _TEXT	
+restart  . . . . . . . . . . . .	P Near	 000003A2 _TEXT	Length= 0000007F Public STDCALL
+  startOfCall  . . . . . . . . .	L Near	 000003A5 _TEXT	
+  startOver  . . . . . . . . . .	L Near	 000003DC _TEXT	
+  endProg  . . . . . . . . . . .	L Near	 000003EF _TEXT	
+  failedInput  . . . . . . . . .	L Near	 0000040E _TEXT	
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
-showProblem  . . . . . . . . . .	P Near	 000000F3 _TEXT	Length= 000000CF Public STDCALL
+showProblem  . . . . . . . . . .	P Near	 00000103 _TEXT	Length= 000000CF Public STDCALL
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 
 
@@ -1174,18 +1179,18 @@ Symbols:
 
                 N a m e                 Type     Value    Attr
 
-??0000 . . . . . . . . . . . . .	Byte	 000003CD _DATA	
-??0001 . . . . . . . . . . . . .	Byte	 000003D6 _DATA	
-??0002 . . . . . . . . . . . . .	Byte	 000003D9 _DATA	
-??0003 . . . . . . . . . . . . .	Byte	 000003DB _DATA	
-??0004 . . . . . . . . . . . . .	Byte	 000003EE _DATA	
-??0005 . . . . . . . . . . . . .	Byte	 000003F9 _DATA	
-??0006 . . . . . . . . . . . . .	Byte	 0000040B _DATA	
-??0007 . . . . . . . . . . . . .	Byte	 00000421 _DATA	
-??0008 . . . . . . . . . . . . .	Byte	 00000433 _DATA	
-??0009 . . . . . . . . . . . . .	Byte	 0000043E _DATA	
-??000A . . . . . . . . . . . . .	Byte	 00000450 _DATA	
-??000B . . . . . . . . . . . . .	Byte	 00000466 _DATA	
+??0000 . . . . . . . . . . . . .	Byte	 000003D1 _DATA	
+??0001 . . . . . . . . . . . . .	Byte	 000003DA _DATA	
+??0002 . . . . . . . . . . . . .	Byte	 000003DD _DATA	
+??0003 . . . . . . . . . . . . .	Byte	 000003DF _DATA	
+??0004 . . . . . . . . . . . . .	Byte	 000003F2 _DATA	
+??0005 . . . . . . . . . . . . .	Byte	 000003FD _DATA	
+??0006 . . . . . . . . . . . . .	Byte	 0000040F _DATA	
+??0007 . . . . . . . . . . . . .	Byte	 00000425 _DATA	
+??0008 . . . . . . . . . . . . .	Byte	 00000437 _DATA	
+??0009 . . . . . . . . . . . . .	Byte	 00000442 _DATA	
+??000A . . . . . . . . . . . . .	Byte	 00000454 _DATA	
+??000B . . . . . . . . . . . . .	Byte	 0000046A _DATA	
 @CodeSize  . . . . . . . . . . .	Number	 00000000h   
 @DataSize  . . . . . . . . . . .	Number	 00000000h   
 @Interface . . . . . . . . . . .	Number	 00000003h   
@@ -1237,6 +1242,7 @@ FILE_SHARE_DELETE  . . . . . . .	Number	 00000004h
 FILE_SHARE_READ  . . . . . . . .	Number	 00000001h   
 FILE_SHARE_WRITE . . . . . . . .	Number	 00000002h   
 FILE_WRITE_DATA  . . . . . . . .	Number	 00000002h   
+FLValue  . . . . . . . . . . . .	DWord	 000003AF _DATA	
 FOCUS_EVENT  . . . . . . . . . .	Number	 00000010h   
 FORMAT_MESSAGE_ALLOCATE_BUFFER .	Number	 00000100h   
 FORMAT_MESSAGE_FROM_SYSTEM . . .	Number	 00001000h   
@@ -1397,7 +1403,7 @@ VK_UP  . . . . . . . . . . . . .	Number	 00000026h
 WINDOW_BUFFER_SIZE_EVENT . . . .	Number	 00000004h   
 WriteConsoleOutputCharacter  . .	Text   	 WriteConsoleOutputCharacterA
 WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
-answer . . . . . . . . . . . . .	DWord	 000003BF _DATA	
+answer . . . . . . . . . . . . .	DWord	 000003C3 _DATA	
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
@@ -1422,22 +1428,22 @@ lightRed . . . . . . . . . . . .	Number	 0000000Ch
 magenta  . . . . . . . . . . . .	Number	 00000005h   
 nMAXNUM  . . . . . . . . . . . .	Number	 0000000Ch   
 nMINNUM  . . . . . . . . . . . .	Number	 00000003h   
-n  . . . . . . . . . . . . . . .	DWord	 000003B7 _DATA	
+n  . . . . . . . . . . . . . . .	DWord	 000003BB _DATA	
 outro_1  . . . . . . . . . . . .	Byte	 00000340 _DATA	
 outro_2  . . . . . . . . . . . .	Byte	 0000034B _DATA	
 outro_3  . . . . . . . . . . . .	Byte	 0000035D _DATA	
 outro_4  . . . . . . . . . . . .	Byte	 00000373 _DATA	
-problemNum . . . . . . . . . . .	DWord	 000003AF _DATA	
+problemNum . . . . . . . . . . .	DWord	 000003B3 _DATA	
 problem_1  . . . . . . . . . . .	Byte	 00000228 _DATA	
 problem_2  . . . . . . . . . . .	Byte	 00000248 _DATA	
-problemsRight  . . . . . . . . .	DWord	 000003B3 _DATA	
+problemsRight  . . . . . . . . .	DWord	 000003B7 _DATA	
 project  . . . . . . . . . . . .	Byte	 00000000 _DATA	
 prompt_1 . . . . . . . . . . . .	Byte	 00000274 _DATA	
 prompt_2 . . . . . . . . . . . .	Byte	 000002A0 _DATA	
 rMINNUM  . . . . . . . . . . . .	Number	 00000001h   
 red  . . . . . . . . . . . . . .	Number	 00000004h   
-r  . . . . . . . . . . . . . . .	DWord	 000003BB _DATA	
-userinput  . . . . . . . . . . .	Byte	 000003C3 _DATA	
+r  . . . . . . . . . . . . . . .	DWord	 000003BF _DATA	
+userinput  . . . . . . . . . . .	Byte	 000003C7 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   

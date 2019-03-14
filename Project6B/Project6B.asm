@@ -47,6 +47,7 @@ finished		BYTE	"Thank you for using my program! Goodbye.", 0										; Thank th
 nMAXNUM			=		12																					; The maximum range for n
 nMINNUM			=		3																					; The minimum range for n
 rMINNUM			=		1																					; The lowest number that can be generated for r
+FLValue			DWORD	?
 problemNum		DWORD	0
 problemsRight	DWORD	0
 n				DWORD	?
@@ -133,6 +134,7 @@ main	PROC
 
 		NewProblem:
 	;-----------Generate A Problem--------------;
+		push	FLValue							; +28
 		push	n								; +24
 		push	r								; +20
 		push	OFFSET	answer					; +16
@@ -169,7 +171,7 @@ main	ENDP									; the main PROC is finished, this symbolyses that we are done 
 ;	Pre-Conditions: called varaibles must be real strings		;
 ;---------------------------------------------------------------;
 intro	PROC
-	mov		eax, lightGray + (blue * 16)		; color varaibles consist of: black, white, brown, yellow, blue, green, cyan, red, magenta, gray, lightBlue, lightGreen, lightCyan, lightRed, lightMagenta, and lightGray.
+	mov		eax, cyan + (black * 16)			; color varaibles consist of: black, white, brown, yellow, blue, green, cyan, red, magenta, gray, lightBlue, lightGreen, lightCyan, lightRed, lightMagenta, and lightGray.
 	call	setTextColor						; EXTRA CREDIT: change background and foreground colors
 
 	mWriteStringLn	project
@@ -180,6 +182,8 @@ intro	PROC
 	mWriteStringLn	intro_5
 	mWriteStringLn	EC_intro_1
 	mWriteStringLn	EC_intro_2
+	call			CrLf
+	call			CrLf
 
 	ret
 intro	ENDP
@@ -197,7 +201,7 @@ intro	ENDP
 showProblem	PROC
 	push	ebp
 	mov		ebp, esp
-	sub		esp, 12								; make space for 3 local variables for factorial
+	sub		esp, 12								; make space for 4 local variables for factorial
 
 	mov		eax, [ebp + 12]						; offset to eax
 	mov		ebx, [eax]							; value of offset to ebx
@@ -285,17 +289,18 @@ combinations	PROC
 	;	----------
 	;	r!(n - r)!
 
-	mov		eax, DWORD PTR [ebp - 8]			; R!
-	mov		ebx, DWORD PTR [ebp - 12]			; (N - R)!
-	mul		ebx									; R! * (N - R)!
+	fild	DWORD PTR [ebp - 8]					; load R! to ST(0)
+	fimul	DWORD PTR [ebp - 12]				; multiply R! * (N - R)!
+	fist	dword ptr [ebp + 28]				; move value from ST(0) to var
+	fild	DWORD PTR [ebp - 4]					; load N! to ST(0)
+	fidiv	dword ptr [ebp + 28]				; N! / (R! * (N - R)!)
+	fist	dword ptr [ebp + 28]				; store into FLValue
 
-	mov		ebx, eax							; set bottom value to divisor
-	mov		eax, DWORD PTR [ebp - 4]			; N!
-	div		ebx									; (n!)/(r!(n-r)!)			answer stored in eax
+	mov				eax, [ebp + 28]
+	mov				ebx, [ebp + 16]
+	mov				[ebx], eax					; store into answer address
 
-	mov		ebx, [ebp + 16]						; answer offset to ebx
-	mov		[ebx], eax							; move answer to the stack value
-
+	fninit										; clear registers ST()
 	ret		12
 combinations	ENDP
 

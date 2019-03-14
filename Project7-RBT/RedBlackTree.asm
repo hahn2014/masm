@@ -2,7 +2,7 @@ TITLE Project 7 - RedBlackTree		(RedBlackTree.asm)
 
 ; Author: Bryce Hahn
 ; Project ID: Project 7
-; Date: 3/13/2019
+; Date: 3/14/2019
 ; Description:
 ;	Red Black Tree, options to read in values from
 ;	a given file, auto generated within a given
@@ -10,6 +10,7 @@ TITLE Project 7 - RedBlackTree		(RedBlackTree.asm)
 ;	sorted tree to the console.
 
 INCLUDE Irvine32.inc
+INCLUDE	Node.inc
 
 .data
 MINIMUM			=		1																					; The min number of nodes that can be written
@@ -21,7 +22,7 @@ buffer			DWORD   BUFFER_SIZE dup (?)																	; file buffer
 bytesRead		DWORD	0																					; temp to keep track of bytes
 infileH			DWORD   0
 inFilename		BYTE    "input.txt", 0																		; file name
-
+;root			node	<>
 
 ;#region Macro Setup
 
